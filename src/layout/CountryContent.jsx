@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useLanguage } from "../context/LanguageContext"
-import { getDescription, getTimeline, getTimelineEvent, getTestimonies, getWitness, getResistance, getResistor, getFototeca, getAnalysts, getAnalyst } from "../utils/api"
+import { getDescription, getTimeline, getTimelineEvent, getTestimonies, getWitness, getResistance, getResistor, getFototeca, getAnalysts, getAnalyst, getVelumArticles, getVelumArticle, getTerminologyIndex, getTerminologyByCategory } from "../utils/api"
 import "./country-content.css"
 import "./timeline.css"
 import MediaGallery from "./MediaGallery"
@@ -123,9 +123,8 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
       if (section.startsWith("terminology-")) {
         const category = section.replace("terminology-", "")
         setCurrentCategory(category)
-        const res = await fetch(`/data/${lang}/terminology.index.json`)
-        const json = await res.json()
-        const categoryData = json.categories.find((c) => c.id === category)
+        const indexData = await getTerminologyIndex(lang)
+        const categoryData = indexData?.categories?.find((c) => c.id === category)
         if (categoryData) setAvailableLetters(categoryData.letters.map((l) => l.toUpperCase()))
         setView("letters")
       } else if (section === "testimonies") {
@@ -207,10 +206,9 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
           }
         }
       } else if (section === "velum") {
-        const res = await fetch(`/data/${lang}/velum/velum.index.json`)
-        const json = res.ok ? await res.json() : { items: [] }
-        setItems(json.items || [])
-        setView(json.items?.length ? "velum-grid" : "empty")
+        const velumData = await getVelumArticles(lang)
+        setItems(velumData || [])
+        setView(velumData?.length ? "velum-grid" : "empty")
       }
     } catch (err) {
       console.error("[v0] Error loading section:", err)
@@ -223,9 +221,8 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
   async function showItemsForLetter(letter) {
     setSelectedLetter(letter)
     try {
-      const res = await fetch(`/data/${lang}/terminology/${currentCategory}/${letter.toLowerCase()}.json`)
-      const json = res.ok ? await res.json() : { items: [] }
-      setItems(json.items || [])
+      const items = await getTerminologyByCategory(currentCategory, letter.toLowerCase(), lang)
+      setItems(items || [])
       setView("grid")
     } catch {
       setItems([])
@@ -327,10 +324,8 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
 
   async function loadVelumArticle(article) {
     try {
-      const path = `/data/${lang}/velum/${article.id}.json`
-      const res = await fetch(path)
-      if (res.ok) {
-        const json = await res.json()
+      const json = await getVelumArticle(article.id, lang)
+      if (json) {
         setSelectedItem(json)
         setView("velum-article")
       }

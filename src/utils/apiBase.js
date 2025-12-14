@@ -1,6 +1,3 @@
-const API_BASE =
-  process.env.NODE_ENV === 'production'
-    ? 'https://wiki-data-qxef.onrender.com'
-    : '';
+const API_BASE = '';
 
 export default API_BASE;

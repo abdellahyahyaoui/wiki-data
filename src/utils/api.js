@@ -105,3 +105,13 @@ export async function getTerm(termId, lang = 'es') {
   const data = await fetchFromApi(`/terminology/${termId}?lang=${lang}`);
   return data;
 }
+
+export async function getTerminologyIndex(lang = 'es') {
+  const data = await fetchFromApi(`/terminology/index?lang=${lang}`, `/data/${lang}/terminology.index.json`);
+  return data;
+}
+
+export async function getTerminologyByCategory(category, letter, lang = 'es') {
+  const data = await fetchFromApi(`/terminology/category/${category}/${letter}?lang=${lang}`, `/data/${lang}/terminology/${category}/${letter}.json`);
+  return data?.items || [];
+}

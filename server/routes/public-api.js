@@ -529,6 +529,90 @@ router.get('/terminology', async (req, res) => {
   res.json(fallback || { items: [] });
 });
 
+router.get('/terminology/index', async (req, res) => {
+  const lang = req.query.lang || 'es';
+  
+  const categoryMapping = {
+    'personaje': 'personajes',
+    'organizacion': 'organizaciones',
+    'concepto': 'conceptos',
+    'general': 'general',
+    'lugar': 'lugares',
+    'evento': 'eventos'
+  };
+  
+  if (await isDbConnected()) {
+    try {
+      const [terms] = await pool.query(
+        'SELECT term, category FROM terminology WHERE lang = ? ORDER BY term',
+        [lang]
+      );
+      
+      const categoriesMap = {};
+      terms.forEach(t => {
+        const catId = categoryMapping[t.category] || t.category;
+        if (!categoriesMap[catId]) {
+          categoriesMap[catId] = new Set();
+        }
+        const firstLetter = t.term.charAt(0).toLowerCase();
+        if (/[a-z]/.test(firstLetter)) {
+          categoriesMap[catId].add(firstLetter);
+        }
+      });
+      
+      const categories = Object.keys(categoriesMap).map(id => ({
+        id,
+        letters: Array.from(categoriesMap[id]).sort()
+      }));
+      
+      return res.json({ categories });
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/terminology.index.json`);
+  res.json(fallback || { categories: [] });
+});
+
+router.get('/terminology/category/:category/:letter', async (req, res) => {
+  const { category, letter } = req.params;
+  const lang = req.query.lang || 'es';
+  
+  const categoryMapping = {
+    'personajes': 'personaje',
+    'organizaciones': 'organizacion',
+    'conceptos': 'concepto',
+    'general': 'general',
+    'lugares': 'lugar',
+    'eventos': 'evento'
+  };
+  
+  const dbCategory = categoryMapping[category] || category;
+  
+  if (await isDbConnected()) {
+    try {
+      const [terms] = await pool.query(
+        'SELECT term_id as id, term as name, term as title, definition as content, category, related_terms as relatedTerms, sources FROM terminology WHERE lang = ? AND category = ? AND LOWER(LEFT(term, 1)) = ? ORDER BY term',
+        [lang, dbCategory, letter.toLowerCase()]
+      );
+      
+      return res.json({ 
+        items: terms.map(t => ({
+          ...t,
+          relatedTerms: typeof t.relatedTerms === 'string' ? JSON.parse(t.relatedTerms) : t.relatedTerms || [],
+          sources: typeof t.sources === 'string' ? JSON.parse(t.sources) : t.sources || []
+        }))
+      });
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/terminology/${category}/${letter.toLowerCase()}.json`);
+  res.json(fallback || { items: [] });
+});
+
 router.get('/terminology/:termId', async (req, res) => {
   const { termId } = req.params;
   const lang = req.query.lang || 'es';
