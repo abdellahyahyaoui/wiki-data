@@ -26,7 +26,8 @@ Aplicación CMS para documentar conflictos mundiales con timeline, testimonios, 
 ### Base de Datos
 - MySQL externo (sldk595.piensasolutions.com)
 - Charset: utf8mb4 para soporte Unicode completo
-- Tablas: countries, sections, descriptions, timeline_events, witnesses, testimonies, resistors, resistance_entries, fototeca, analysts, analyses, pending_changes, cms_users, predefined_countries
+- Tablas principales: countries, sections, descriptions, timeline_events, witnesses, testimonies, resistors, resistance_entries, fototeca, analysts, analyses
+- Tablas adicionales: velum_articles, terminology, section_headers, pending_changes, cms_users, predefined_countries
 
 ## Archivos Clave
 - `server/db.js` - Conexión MySQL y creación de tablas
@@ -52,6 +53,10 @@ Aplicación CMS para documentar conflictos mundiales con timeline, testimonios, 
 3. Lista desplegable de países predefinidos en AdminDashboard
 4. Selector de galería existente en FototecaEditor
 5. Script de migración de datos JSON a MySQL
+6. Nueva tabla y rutas para VELUM (artículos académicos)
+7. Nueva tabla y rutas para Terminología (glosario)
+8. Nueva tabla para encabezados de sección personalizables
+9. Testimonios ahora cargan contenido completo desde MySQL
 
 ## Preferencias del Usuario
 - Idioma: Español
