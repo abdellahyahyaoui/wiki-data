@@ -1,49 +1,50 @@
-# WikiConflicts CMS - Estado Actual
+# WikiConflicts CMS - Estado Actualizado
 
-## FECHA: 2024-12-14 (Completado)
+## FECHA: 2024-12-14
 
 ## RESUMEN
-Todas las tareas de mejora del CMS han sido completadas exitosamente.
+Solucionados problemas de carga de contenido del CMS en el frontend.
 
-## FUNCIONALIDADES IMPLEMENTADAS
+## PROBLEMAS SOLUCIONADOS
 
-### 1. VELUM (Artículos Académicos)
-- Tabla `velum_articles` en la base de datos
-- Rutas CMS CRUD: `/api/cms/velum`
-- API pública: `/api/public/velum`, `/api/public/velum/:articleId`
-- Contenido de prueba insertado (artículo sobre La Nakba 1948)
+### 1. Conexión MySQL
+- Faltaba MYSQL_PASSWORD como secret - ya añadido
+- MySQL ahora conecta correctamente
 
-### 2. Terminología (Glosario)
-- Tabla `terminology` en la base de datos
-- Rutas CMS CRUD: `/api/cms/terminology`
-- API pública: `/api/public/terminology`, `/api/public/terminology/:termId`
-- Términos de prueba: Nakba, Intifada, Ocupación
+### 2. API Base URL
+- Frontend usaba URL externa en producción
+- Cambiado `src/utils/apiBase.js` a usar string vacío para servidor local
 
-### 3. Encabezados de Sección
-- Tabla `section_headers` para títulos personalizables por sección/país
-- Rutas CMS: `/api/cms/countries/:code/section-headers/:sectionId`
+### 3. Velum y Terminología
+- Antes: usaban fetch directo a archivos estáticos /data/...
+- Ahora: usan funciones API desde api.js
+- Añadidos endpoints: `/terminology/index`, `/terminology/category/:category/:letter`
 
-### 4. Testimonios con Contenido Completo
-- Los testimonios ahora cargan texto completo (párrafos) desde MySQL
-- Testimonio de prueba añadido: Hanan Ashrawi
+### 4. Testimonios/Resistencia/Análisis específicos
+- Antes: fetch directo a archivos JSON
+- Ahora: usan nuevas funciones API
+- Añadidos endpoints: 
+  - `/countries/:code/testimonies/:witnessId/:testimonyId`
+  - `/countries/:code/resistance/:resistorId/:entryId`
+  - `/countries/:code/analysts/:analystId/:analysisId`
+
+## ARCHIVOS MODIFICADOS
+- `src/utils/apiBase.js` - API_BASE = ''
+- `src/utils/api.js` - Añadidas funciones: getTerminologyIndex, getTerminologyByCategory, getSpecificTestimony, getSpecificResistanceEntry, getSpecificAnalysis
+- `src/layout/CountryContent.jsx` - Actualizado para usar API en todas las secciones
+- `server/routes/public-api.js` - Añadidos nuevos endpoints
 
 ## ARQUITECTURA
-- Backend: Express.js puerto 5000 (host 0.0.0.0)
+- Backend: Express.js puerto 5000
 - MySQL: sldk595.piensasolutions.com / qapb973
-- Frontend: React (servido desde /build)
+- Frontend: React construido en /build
 - Workflow: "WikiConflicts App" corriendo
-
-## APIs VERIFICADAS
-Todas las APIs funcionan correctamente:
-- GET `/api/public/velum` - Lista artículos VELUM
-- GET `/api/public/terminology` - Lista términos del glosario
-- GET `/api/public/countries/palestine/testimonies/hanan-ashrawi` - Testimonio con contenido completo
 
 ## ACCESO ADMIN
 - Usuario: admin
-- Contraseña: Valor de ADMIN_INITIAL_PASSWORD secret
+- Contraseña: Admin1234! (o valor en ADMIN_INITIAL_PASSWORD)
 
-## PRÓXIMOS PASOS SUGERIDOS
-1. Añadir más contenido a través del panel admin
-2. Implementar tests automatizados para las nuevas rutas
-3. Considerar publicar la aplicación
+## ESTADO ACTUAL
+- Servidor corriendo con MySQL conectado
+- Todas las secciones deberían cargar contenido desde la base de datos
+- App lista para usar y añadir contenido desde el panel admin

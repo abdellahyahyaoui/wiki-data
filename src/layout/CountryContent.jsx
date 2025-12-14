@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useLanguage } from "../context/LanguageContext"
-import { getDescription, getTimeline, getTimelineEvent, getTestimonies, getWitness, getResistance, getResistor, getFototeca, getAnalysts, getAnalyst, getVelumArticles, getVelumArticle, getTerminologyIndex, getTerminologyByCategory } from "../utils/api"
+import { getDescription, getTimeline, getTimelineEvent, getTestimonies, getWitness, getResistance, getResistor, getFototeca, getAnalysts, getAnalyst, getVelumArticles, getVelumArticle, getTerminologyIndex, getTerminologyByCategory, getSpecificTestimony, getSpecificResistanceEntry, getSpecificAnalysis } from "../utils/api"
 import "./country-content.css"
 import "./timeline.css"
 import MediaGallery from "./MediaGallery"
@@ -293,15 +293,17 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
     try {
       const isTestimony = analysesIndex?.type === "testimony"
       const isResistance = analysesIndex?.type === "resistance" || section === "resistance"
-      let baseFolder = "analysts"
-      if (isTestimony) baseFolder = "testimonies"
-      if (isResistance) baseFolder = "resistance"
-
-      const path = `/data/${lang}/${countryCode}/${baseFolder}/${analysesIndex.id}/${analysisId}.json`
-
-      const res = await fetch(path)
-      if (res.ok) {
-        const json = await res.json()
+      
+      let json = null
+      if (isTestimony) {
+        json = await getSpecificTestimony(countryCode, analysesIndex.id, analysisId, lang)
+      } else if (isResistance) {
+        json = await getSpecificResistanceEntry(countryCode, analysesIndex.id, analysisId, lang)
+      } else {
+        json = await getSpecificAnalysis(countryCode, analysesIndex.id, analysisId, lang)
+      }
+      
+      if (json) {
         setSelectedItem(json)
         setView("article")
       }

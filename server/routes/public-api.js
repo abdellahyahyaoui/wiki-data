@@ -261,6 +261,52 @@ router.get('/countries/:code/testimonies/:witnessId', async (req, res) => {
   res.json(fallback || null);
 });
 
+router.get('/countries/:code/testimonies/:witnessId/:testimonyId', async (req, res) => {
+  const { code, witnessId, testimonyId } = req.params;
+  const lang = req.query.lang || 'es';
+  
+  if (await isDbConnected()) {
+    try {
+      const [countries] = await pool.query(
+        'SELECT id FROM countries WHERE code = ? AND lang = ?',
+        [code, lang]
+      );
+      
+      if (countries.length > 0) {
+        const [witnesses] = await pool.query(
+          'SELECT id FROM witnesses WHERE country_id = ? AND witness_id = ?',
+          [countries[0].id, witnessId]
+        );
+        
+        if (witnesses.length > 0) {
+          const [testimonies] = await pool.query(
+            'SELECT testimony_id as id, title, summary, date, paragraphs, content_blocks, media FROM testimonies WHERE witness_id = ? AND testimony_id = ?',
+            [witnesses[0].id, testimonyId]
+          );
+          
+          if (testimonies.length > 0) {
+            const t = testimonies[0];
+            return res.json({
+              id: t.id,
+              title: t.title,
+              summary: t.summary,
+              date: t.date,
+              paragraphs: typeof t.paragraphs === 'string' ? JSON.parse(t.paragraphs) : t.paragraphs || [],
+              contentBlocks: typeof t.content_blocks === 'string' ? JSON.parse(t.content_blocks) : t.content_blocks || [],
+              media: typeof t.media === 'string' ? JSON.parse(t.media) : t.media || []
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/${code}/testimonies/${witnessId}/${testimonyId}.json`);
+  res.json(fallback || null);
+});
+
 router.get('/countries/:code/resistance', async (req, res) => {
   const { code } = req.params;
   const lang = req.query.lang || 'es';
@@ -336,6 +382,52 @@ router.get('/countries/:code/resistance/:resistorId', async (req, res) => {
   }
   
   const fallback = loadJsonFallback(`/data/${lang}/${code}/resistance/${resistorId}.json`);
+  res.json(fallback || null);
+});
+
+router.get('/countries/:code/resistance/:resistorId/:entryId', async (req, res) => {
+  const { code, resistorId, entryId } = req.params;
+  const lang = req.query.lang || 'es';
+  
+  if (await isDbConnected()) {
+    try {
+      const [countries] = await pool.query(
+        'SELECT id FROM countries WHERE code = ? AND lang = ?',
+        [code, lang]
+      );
+      
+      if (countries.length > 0) {
+        const [resistors] = await pool.query(
+          'SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?',
+          [countries[0].id, resistorId]
+        );
+        
+        if (resistors.length > 0) {
+          const [entries] = await pool.query(
+            'SELECT entry_id as id, title, summary, date, paragraphs, content_blocks, media FROM resistance_entries WHERE resistor_id = ? AND entry_id = ?',
+            [resistors[0].id, entryId]
+          );
+          
+          if (entries.length > 0) {
+            const e = entries[0];
+            return res.json({
+              id: e.id,
+              title: e.title,
+              summary: e.summary,
+              date: e.date,
+              paragraphs: typeof e.paragraphs === 'string' ? JSON.parse(e.paragraphs) : e.paragraphs || [],
+              contentBlocks: typeof e.content_blocks === 'string' ? JSON.parse(e.content_blocks) : e.content_blocks || [],
+              media: typeof e.media === 'string' ? JSON.parse(e.media) : e.media || []
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/${code}/resistance/${resistorId}/${entryId}.json`);
   res.json(fallback || null);
 });
 
@@ -441,6 +533,52 @@ router.get('/countries/:code/analysts/:analystId', async (req, res) => {
   }
   
   const fallback = loadJsonFallback(`/data/${lang}/${code}/analysts/${analystId}.json`);
+  res.json(fallback || null);
+});
+
+router.get('/countries/:code/analysts/:analystId/:analysisId', async (req, res) => {
+  const { code, analystId, analysisId } = req.params;
+  const lang = req.query.lang || 'es';
+  
+  if (await isDbConnected()) {
+    try {
+      const [countries] = await pool.query(
+        'SELECT id FROM countries WHERE code = ? AND lang = ?',
+        [code, lang]
+      );
+      
+      if (countries.length > 0) {
+        const [analysts] = await pool.query(
+          'SELECT id FROM analysts WHERE country_id = ? AND analyst_id = ?',
+          [countries[0].id, analystId]
+        );
+        
+        if (analysts.length > 0) {
+          const [analyses] = await pool.query(
+            'SELECT analysis_id as id, title, summary, date, paragraphs, content_blocks, media FROM analyses WHERE analyst_id = ? AND analysis_id = ?',
+            [analysts[0].id, analysisId]
+          );
+          
+          if (analyses.length > 0) {
+            const a = analyses[0];
+            return res.json({
+              id: a.id,
+              title: a.title,
+              summary: a.summary,
+              date: a.date,
+              paragraphs: typeof a.paragraphs === 'string' ? JSON.parse(a.paragraphs) : a.paragraphs || [],
+              contentBlocks: typeof a.content_blocks === 'string' ? JSON.parse(a.content_blocks) : a.content_blocks || [],
+              media: typeof a.media === 'string' ? JSON.parse(a.media) : a.media || []
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/${code}/analysts/${analystId}/${analysisId}.json`);
   res.json(fallback || null);
 });
 

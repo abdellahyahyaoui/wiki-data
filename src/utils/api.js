@@ -115,3 +115,18 @@ export async function getTerminologyByCategory(category, letter, lang = 'es') {
   const data = await fetchFromApi(`/terminology/category/${category}/${letter}?lang=${lang}`, `/data/${lang}/terminology/${category}/${letter}.json`);
   return data?.items || [];
 }
+
+export async function getSpecificTestimony(code, witnessId, testimonyId, lang = 'es') {
+  const data = await fetchFromApi(`/countries/${code}/testimonies/${witnessId}/${testimonyId}?lang=${lang}`, `/data/${lang}/${code}/testimonies/${witnessId}/${testimonyId}.json`);
+  return data;
+}
+
+export async function getSpecificResistanceEntry(code, resistorId, entryId, lang = 'es') {
+  const data = await fetchFromApi(`/countries/${code}/resistance/${resistorId}/${entryId}?lang=${lang}`, `/data/${lang}/${code}/resistance/${resistorId}/${entryId}.json`);
+  return data;
+}
+
+export async function getSpecificAnalysis(code, analystId, analysisId, lang = 'es') {
+  const data = await fetchFromApi(`/countries/${code}/analysts/${analystId}/${analysisId}?lang=${lang}`, `/data/${lang}/${code}/analysts/${analystId}/${analysisId}.json`);
+  return data;
+}
