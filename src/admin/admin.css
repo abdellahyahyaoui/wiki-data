@@ -2767,3 +2767,222 @@
   background: var(--admin-bg);
 }
 
+
+/* Terminology Editor Styles */
+.admin-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-search-box {
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.admin-filter-select select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: white;
+  min-width: 180px;
+}
+
+.admin-terminology-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.admin-term-card {
+  background: var(--admin-card-bg);
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid var(--admin-border);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.admin-term-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.admin-term-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-term-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--admin-primary);
+}
+
+.admin-term-category {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-term-category.cat-general {
+  background: #e8e8e8;
+  color: #555;
+}
+
+.admin-term-category.cat-personaje {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.admin-term-category.cat-organizacion {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.admin-term-category.cat-concepto {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.admin-term-category.cat-lugar {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.admin-term-category.cat-evento {
+  background: #fce4ec;
+  color: #c2185b;
+}
+
+.admin-term-definition {
+  font-size: 0.9rem;
+  color: var(--admin-text);
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.admin-term-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.admin-term-related .label {
+  font-size: 0.75rem;
+  color: var(--admin-text-light);
+  margin-right: 0.25rem;
+}
+
+.admin-term-tag {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.admin-term-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.admin-tags-input {
+  background: var(--admin-bg);
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.admin-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-tag {
+  background: var(--admin-primary);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.admin-tag.source {
+  background: var(--admin-primary-light);
+}
+
+.admin-tag button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.admin-tag button:hover {
+  opacity: 1;
+}
+
+.admin-tag-add {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-tag-add input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.admin-btn-danger {
+  background: var(--admin-danger);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.admin-btn-danger:hover {
+  background: #c82333;
+}
+
+.admin-btn-danger.small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}

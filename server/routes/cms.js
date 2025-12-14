@@ -1177,4 +1177,151 @@ router.delete('/velum/:articleId', authenticateToken, checkPermission('delete'),
   res.json({ success: true, message: 'Artículo eliminado' });
 });
 
+router.get('/terminology', authenticateToken, (req, res) => {
+  const lang = req.query.lang || 'es';
+  const indexPath = path.join(dataDir, lang, 'terminology', 'terminology.index.json');
+  
+  const data = readJSON(indexPath) || { items: [] };
+  res.json(data);
+});
+
+router.post('/terminology', authenticateToken, checkPermission('create'), (req, res) => {
+  const { term, definition, category, relatedTerms, sources } = req.body;
+  const lang = req.query.lang || 'es';
+
+  if (!term || !definition) {
+    return res.status(400).json({ error: 'Término y definición son requeridos' });
+  }
+
+  const terminologyDir = path.join(dataDir, lang, 'terminology');
+  ensureDir(terminologyDir);
+
+  const indexPath = path.join(terminologyDir, 'terminology.index.json');
+  const indexData = readJSON(indexPath) || { items: [] };
+
+  const id = term.toLowerCase().replace(/[^a-z0-9áéíóúñü]/g, '-').slice(0, 50);
+
+  if (req.requiresApproval) {
+    savePendingChange({
+      type: 'create',
+      section: 'terminology',
+      lang,
+      data: { id, term, definition, category, relatedTerms, sources },
+      userId: req.user.id,
+      userName: req.user.name
+    });
+    return res.json({ success: true, pending: true, message: 'Cambio enviado para aprobación' });
+  }
+
+  const newItem = {
+    id,
+    term,
+    definition,
+    category: category || 'general',
+    relatedTerms: relatedTerms || [],
+    sources: sources || []
+  };
+
+  indexData.items.push(newItem);
+  writeJSON(indexPath, indexData);
+
+  res.json({ success: true, item: newItem });
+});
+
+router.get('/terminology/:termId', authenticateToken, (req, res) => {
+  const { termId } = req.params;
+  const lang = req.query.lang || 'es';
+  const indexPath = path.join(dataDir, lang, 'terminology', 'terminology.index.json');
+  
+  const data = readJSON(indexPath) || { items: [] };
+  const item = data.items.find(i => i.id === termId);
+  
+  if (!item) {
+    return res.status(404).json({ error: 'Término no encontrado' });
+  }
+  
+  res.json(item);
+});
+
+router.put('/terminology/:termId', authenticateToken, checkPermission('edit'), (req, res) => {
+  const { termId } = req.params;
+  const { term, definition, category, relatedTerms, sources } = req.body;
+  const lang = req.query.lang || 'es';
+
+  const terminologyDir = path.join(dataDir, lang, 'terminology');
+  const indexPath = path.join(terminologyDir, 'terminology.index.json');
+  const indexData = readJSON(indexPath);
+
+  if (!indexData) {
+    return res.status(404).json({ error: 'Terminología no encontrada' });
+  }
+
+  const itemIndex = indexData.items.findIndex(i => i.id === termId);
+  if (itemIndex === -1) {
+    return res.status(404).json({ error: 'Término no encontrado' });
+  }
+
+  if (req.requiresApproval) {
+    savePendingChange({
+      type: 'edit',
+      section: 'terminology',
+      lang,
+      termId,
+      data: { term, definition, category, relatedTerms, sources },
+      oldData: indexData.items[itemIndex],
+      userId: req.user.id,
+      userName: req.user.name
+    });
+    return res.json({ success: true, pending: true, message: 'Cambio enviado para aprobación' });
+  }
+
+  indexData.items[itemIndex] = {
+    ...indexData.items[itemIndex],
+    term: term || indexData.items[itemIndex].term,
+    definition: definition !== undefined ? definition : indexData.items[itemIndex].definition,
+    category: category || indexData.items[itemIndex].category,
+    relatedTerms: relatedTerms || indexData.items[itemIndex].relatedTerms,
+    sources: sources || indexData.items[itemIndex].sources
+  };
+  writeJSON(indexPath, indexData);
+
+  res.json({ success: true, item: indexData.items[itemIndex] });
+});
+
+router.delete('/terminology/:termId', authenticateToken, checkPermission('delete'), (req, res) => {
+  const { termId } = req.params;
+  const lang = req.query.lang || 'es';
+
+  const terminologyDir = path.join(dataDir, lang, 'terminology');
+  const indexPath = path.join(terminologyDir, 'terminology.index.json');
+
+  const indexData = readJSON(indexPath);
+  if (!indexData) {
+    return res.status(404).json({ error: 'Terminología no encontrada' });
+  }
+
+  const itemIndex = indexData.items.findIndex(i => i.id === termId);
+  if (itemIndex === -1) {
+    return res.status(404).json({ error: 'Término no encontrado' });
+  }
+
+  if (req.requiresApproval) {
+    savePendingChange({
+      type: 'delete',
+      section: 'terminology',
+      lang,
+      termId,
+      data: indexData.items[itemIndex],
+      userId: req.user.id,
+      userName: req.user.name
+    });
+    return res.json({ success: true, pending: true, message: 'Cambio enviado para aprobación' });
+  }
+
+  indexData.items.splice(itemIndex, 1);
+  writeJSON(indexPath, indexData);
+
+  res.json({ success: true, message: 'Término eliminado' });
+});
+
 module.exports = router;

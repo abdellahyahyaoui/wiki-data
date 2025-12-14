@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function RichContentEditor({ blocks = [], onChange, allowAudio = true }) {
@@ -9,6 +9,21 @@ export default function RichContentEditor({ blocks = [], onChange, allowAudio = 
   const [galleryFilter, setGalleryFilter] = useState('all');
   const [targetBlockIndex, setTargetBlockIndex] = useState(null);
   const [targetMediaType, setTargetMediaType] = useState(null);
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!initializedRef.current && (!blocks || blocks.length === 0)) {
+      initializedRef.current = true;
+      const initialBlock = {
+        id: Date.now().toString(),
+        type: 'text',
+        content: '',
+        position: 'center',
+        caption: ''
+      };
+      onChange([initialBlock]);
+    }
+  }, []);
 
   function addBlock(type) {
     const newBlock = {

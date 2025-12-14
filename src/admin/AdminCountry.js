@@ -8,6 +8,7 @@ import AnalystsEditor from './components/AnalystsEditor';
 import FototecaEditor from './components/FototecaEditor';
 import ResistanceEditor from './components/ResistanceEditor';
 import VelumEditor from './components/VelumEditor';
+import TerminologyEditor from './components/TerminologyEditor';
 import GalleryManager from './components/GalleryManager';
 import API_BASE from '../utils/apiBase';
 
@@ -127,6 +128,7 @@ const res = await fetch(
   const sections = [
     { id: 'description', label: 'Descripción', icon: '📖' },
     { id: 'velum', label: 'VELUM', icon: '📜' },
+    { id: 'terminology', label: 'Terminología', icon: '📚' },
     { id: 'timeline', label: 'Timeline', icon: '📅' },
     { id: 'testimonies', label: 'Testimonios', icon: '👤' },
     { id: 'resistance', label: 'Resistencia', icon: '✊' },
@@ -206,6 +208,9 @@ const res = await fetch(
           )}
           {activeSection === 'velum' && (
             <VelumEditor countryCode={selectedCountry} lang={selectedLang} />
+          )}
+          {activeSection === 'terminology' && (
+            <TerminologyEditor lang={selectedLang} />
           )}
           {activeSection === 'timeline' && (
             <TimelineEditor countryCode={selectedCountry} lang={selectedLang} />
