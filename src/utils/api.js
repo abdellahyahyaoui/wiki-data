@@ -1,4 +1,4 @@
-const API_BASE = '/api/public';
+const API_BASE = 'https://wiki-data-qxef.onrender.com/api/public';
 
 export async function fetchFromApi(endpoint, fallbackPath = null) {
   try {
