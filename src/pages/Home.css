@@ -300,10 +300,10 @@
   background:#07202bc4;
   color: #ffffff;
 font-weight: 900;
-  padding: 20px 11px;
+  padding: 15px 10px;
   font-size: 15px;
-  /* font-family: "Cormorant Garamond", serif;
-  font-style: italic; */
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
   border-radius: 50%;
   /* box-shadow: 3px 3px 12px 0px #7b8b92; */
 }
@@ -311,6 +311,7 @@ font-weight: 900;
 .admin-button:hover {
   background: var( --off-white);
   color:var(--clr-accent-blue);
+  
 }
 
 .admin-button-mobile {

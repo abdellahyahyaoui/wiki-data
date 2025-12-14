@@ -7,6 +7,7 @@
 .timeline-header {
   text-align: center;
   margin-bottom: 3rem;
+              border-bottom: 3px double #1a6483;
 }
 
 .timeline-header h2 {
@@ -15,6 +16,7 @@
   color:#1d546b;
   margin-bottom: 0.5rem;
   font-weight: 600;
+              
 }
 
 .timeline-header p {

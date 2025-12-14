@@ -29,7 +29,7 @@
   text-align: center;
 font-family: Cormorant Garamond,serif;
   letter-spacing: -0.5px;
-  border-bottom: 1px solid #949aa3;
+              border-bottom: 3px double #1a6483;
   padding-bottom: 20px;
 }
 
@@ -517,6 +517,8 @@ font-family: Cormorant Garamond,serif;
   text-align: left;
   text-align: center;
   font-family: poppins;
+              border-bottom: 3px double #1a6483;
+              padding-bottom: 10px;
 }
 .country-layout .country-content-wrapper .description-wrapper 
 .chapter-content-scrollable .article-content h1.article-title {
@@ -777,7 +779,7 @@ font-family: Cormorant Garamond,serif;
   text-align: center;
   margin-bottom: 40px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
+              border-bottom: 3px double #1a6483;
 }
 
 .fototeca-header h2 {
@@ -1224,7 +1226,7 @@ font-family: Cormorant Garamond,serif;
 .velum-header {
   text-align: center;
   padding: 40px 0 30px;
-  border-bottom: 2px solid #1a6483;
+              border-bottom: 3px double #1a6483;
   margin-bottom: 40px;
 }
 
@@ -1537,7 +1539,7 @@ font-family: poppins;
   text-align: center;
   color: #1d546b;
   margin-bottom: 0.5rem;
-  border-bottom: 3px double #1a6483;
+
   padding-bottom: 0.5rem;
 }
 
@@ -2031,7 +2033,7 @@ font-family: poppins;
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid #1a6483;
+            border-bottom: 3px double #1a6483;
 }
 
 .section-header-block .section-title {

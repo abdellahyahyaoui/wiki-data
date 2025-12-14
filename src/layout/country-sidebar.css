@@ -8,7 +8,7 @@
 
 .velum-title {
   color: #1d546b !important;
-  font-size: 18px !important;
+ 
 }
 
 .velum-submenu {
@@ -31,11 +31,12 @@ color: #1d546b;
   cursor: pointer;
 color: #1d546b;
   transition: all 0.2s ease;
-  
+              letter-spacing: 0.05em;
   margin-left: 0;
   background: transparent;
    /* font-family: 'Gambetta'; */
-    font-weight: 600;
+    font-weight: 700;
+    font-family: poppins;
 }
 
 .velum-item:hover {
@@ -67,11 +68,11 @@ color: #1d546b;
   position: relative;
   scrollbar-width: none;
   scale: 0.9;
- 
+                     border: 3px double #1a6483;
   /* Fix height calculation to ensure sidebar doesn't get cut off by footer */
 
   z-index: 70;
-  border: 1px solid #020202;
+  
    
       border-radius: 5px;
 }
@@ -86,6 +87,7 @@ color: #1d546b;
 .sidebar-title {
   font-size: 23px;
   font-weight: 900;
+  font-family: poppins;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -98,7 +100,8 @@ color: #1d546b;
   transition: color 0.2s ease;
   border: none;
   background: none;
-/* font-family: 'Gambetta'; */
+
+            letter-spacing: 0.05em;
 
 
 }
@@ -156,8 +159,9 @@ color: #1d546b;
   margin-left: 0;
   background: transparent;
   /* font-family: 'Gambetta'; */
-   font-weight: 600;
-  
+   font-weight: 700;
+   font-family: poppins;
+              letter-spacing: 0.05em;
 }
 
 .termino-item:hover {
@@ -180,10 +184,10 @@ color: #1d546b;
 /* Country name with minimalista styling */
 .sidebar-country-name {
   font-size: 30px; /* Reduced from 26px */
-  font-weight: 400; /* Lighter weight looks more elegant */
+  font-weight: 700; /* Lighter weight looks more elegant */
   margin: 12px 0 16px 0; /* Reduced margin */
   color:#1d546b;
-  font-family: var(--wiki-font-serif);
+  font-family: poppins;
   line-height: 1.2;
   padding-bottom: 16px;
   border-bottom: 1px solid #0c0c0c;
@@ -206,7 +210,8 @@ color: #1d546b;
   transition: color 0.2s ease;
   border: none;
   background: none;
-  /* font-family: Cormorant Garamond, serif; */
+  font-family: poppins;
+              letter-spacing: 0.05em;
 }
 
 /* Section list */
@@ -229,7 +234,9 @@ color: #1d546b;
   background: transparent;
    /* font-family: 'Gambetta'; */
   /* font-style: italic; */
-  font-weight: 600;
+  font-weight: 700;
+  font-family: poppins;
+              letter-spacing: 0.05em;
 
 }
 
@@ -248,6 +255,7 @@ color: #1d546b;
   font-weight: 600;
   padding-left: 12px; /* Adjusted to match new padding */
    font-weight: bold;
+               letter-spacing: 0.05em;
 }
 
 /* Responsive: Hide sidebar on tablets and below */

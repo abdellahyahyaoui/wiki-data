@@ -164,9 +164,9 @@
 /* RESPONSIVE TWEAKS */
 @media (max-width: 420px) {
   .teal-country { font-size: 30px; }
-  .menu-item { font-size: 20px;
+  .menu-item { font-size: 30px;
           text-align: end;
-        /* font-weight: 700; */
+        font-weight: 700;
       font-family: poppins; }
   .teal-panel { padding: 20px; max-width: 100%;
     color: #1d546b;
