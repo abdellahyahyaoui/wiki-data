@@ -3,7 +3,7 @@
     {
       "id": "admin",
       "username": "admin",
-      "password": "$2b$10$8roWYFKhNDgmW/7oBUjbXOL5yXE2.qMXTuRFV70fnC2mpljhfpUZi",
+      "password": "$2b$10$WYfmIQZ6R8QHL058D1KmVuhD8AcnVXBvN58Dy.pz74Mg1hWgRSBCe",
       "role": "admin",
       "name": "Administrador",
       "countries": [
@@ -15,7 +15,7 @@
         "canDelete": true,
         "requiresApproval": false
       },
-      "createdAt": "2025-12-02T14:51:48.384Z",
+      "createdAt": "2025-12-14T08:22:44.596Z",
       "mustChangePassword": true
     }
   ]
