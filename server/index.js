@@ -88,7 +88,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+const host = '0.0.0.0';
 
 async function startServer() {
   try {
