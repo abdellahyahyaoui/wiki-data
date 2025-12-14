@@ -13,7 +13,7 @@ const uploadRoutes = require('./routes/upload');
 const publicApiRoutes = require('./routes/public-api');
 
 const app = express();
-const PORT = process.env.NODE_ENV === 'production' ? 5000 : (process.env.PORT || 3001);
+const PORT = process.env.PORT || 5000;
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '50mb' }));
@@ -81,8 +81,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // --- Serve React SPA ---
-if (process.env.NODE_ENV === 'production') {
-  const buildPath = path.join(__dirname, '../build');
+const buildPath = path.join(__dirname, '../build');
+if (fs.existsSync(buildPath)) {
   app.use(express.static(buildPath));
   app.use(express.static(path.join(__dirname, '../public')));
 
