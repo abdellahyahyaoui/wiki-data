@@ -85,3 +85,23 @@ export async function getAnalyst(code, analystId, lang = 'es') {
   const data = await fetchFromApi(`/countries/${code}/analysts/${analystId}?lang=${lang}`, `/data/${lang}/${code}/analysts/${analystId}.json`);
   return data;
 }
+
+export async function getVelumArticles(lang = 'es') {
+  const data = await fetchFromApi(`/velum?lang=${lang}`, `/data/${lang}/velum/velum.index.json`);
+  return data?.items || [];
+}
+
+export async function getVelumArticle(articleId, lang = 'es') {
+  const data = await fetchFromApi(`/velum/${articleId}?lang=${lang}`, `/data/${lang}/velum/${articleId}.json`);
+  return data;
+}
+
+export async function getTerminology(lang = 'es') {
+  const data = await fetchFromApi(`/terminology?lang=${lang}`, `/data/${lang}/terminology.json`);
+  return data?.items || [];
+}
+
+export async function getTerm(termId, lang = 'es') {
+  const data = await fetchFromApi(`/terminology/${termId}?lang=${lang}`);
+  return data;
+}

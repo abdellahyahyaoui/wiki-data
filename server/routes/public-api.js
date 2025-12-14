@@ -444,4 +444,119 @@ router.get('/countries/:code/analysts/:analystId', async (req, res) => {
   res.json(fallback || null);
 });
 
+router.get('/velum', async (req, res) => {
+  const lang = req.query.lang || 'es';
+  
+  if (await isDbConnected()) {
+    try {
+      const [articles] = await pool.query(
+        'SELECT article_id as id, title, subtitle, author, author_image as authorImage, cover_image as coverImage, date, abstract, keywords FROM velum_articles WHERE lang = ? ORDER BY date DESC',
+        [lang]
+      );
+      return res.json({ 
+        items: articles.map(a => ({
+          ...a,
+          keywords: typeof a.keywords === 'string' ? JSON.parse(a.keywords) : a.keywords || []
+        }))
+      });
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/velum/velum.index.json`);
+  res.json(fallback || { items: [] });
+});
+
+router.get('/velum/:articleId', async (req, res) => {
+  const { articleId } = req.params;
+  const lang = req.query.lang || 'es';
+  
+  if (await isDbConnected()) {
+    try {
+      const [articles] = await pool.query(
+        'SELECT * FROM velum_articles WHERE article_id = ? AND lang = ?',
+        [articleId, lang]
+      );
+      
+      if (articles.length > 0) {
+        const a = articles[0];
+        return res.json({
+          id: a.article_id,
+          title: a.title,
+          subtitle: a.subtitle,
+          author: a.author,
+          authorImage: a.author_image,
+          coverImage: a.cover_image,
+          date: a.date,
+          abstract: a.abstract,
+          keywords: typeof a.keywords === 'string' ? JSON.parse(a.keywords) : a.keywords || [],
+          sections: typeof a.sections === 'string' ? JSON.parse(a.sections) : a.sections || [],
+          bibliography: typeof a.bibliography === 'string' ? JSON.parse(a.bibliography) : a.bibliography || []
+        });
+      }
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/velum/${articleId}.json`);
+  res.json(fallback || null);
+});
+
+router.get('/terminology', async (req, res) => {
+  const lang = req.query.lang || 'es';
+  
+  if (await isDbConnected()) {
+    try {
+      const [terms] = await pool.query(
+        'SELECT term_id as id, term, definition, category, related_terms as relatedTerms, sources FROM terminology WHERE lang = ? ORDER BY term',
+        [lang]
+      );
+      return res.json({ 
+        items: terms.map(t => ({
+          ...t,
+          relatedTerms: typeof t.relatedTerms === 'string' ? JSON.parse(t.relatedTerms) : t.relatedTerms || [],
+          sources: typeof t.sources === 'string' ? JSON.parse(t.sources) : t.sources || []
+        }))
+      });
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  const fallback = loadJsonFallback(`/data/${lang}/terminology.json`);
+  res.json(fallback || { items: [] });
+});
+
+router.get('/terminology/:termId', async (req, res) => {
+  const { termId } = req.params;
+  const lang = req.query.lang || 'es';
+  
+  if (await isDbConnected()) {
+    try {
+      const [terms] = await pool.query(
+        'SELECT term_id as id, term, definition, category, related_terms as relatedTerms, sources FROM terminology WHERE term_id = ? AND lang = ?',
+        [termId, lang]
+      );
+      
+      if (terms.length > 0) {
+        const t = terms[0];
+        return res.json({
+          id: t.id,
+          term: t.term,
+          definition: t.definition,
+          category: t.category,
+          relatedTerms: typeof t.relatedTerms === 'string' ? JSON.parse(t.relatedTerms) : t.relatedTerms || [],
+          sources: typeof t.sources === 'string' ? JSON.parse(t.sources) : t.sources || []
+        });
+      }
+    } catch (error) {
+      console.error('DB error:', error.message);
+    }
+  }
+  
+  res.json(null);
+});
+
 module.exports = router;

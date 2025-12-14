@@ -200,6 +200,53 @@ async function initDatabase() {
     `);
 
     await connection.query(`
+      CREATE TABLE IF NOT EXISTS velum_articles (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        article_id VARCHAR(100) UNIQUE NOT NULL,
+        lang VARCHAR(10) DEFAULT 'es',
+        title VARCHAR(255) NOT NULL,
+        subtitle VARCHAR(500),
+        author VARCHAR(255),
+        author_image VARCHAR(500),
+        cover_image VARCHAR(500),
+        date VARCHAR(50),
+        abstract TEXT,
+        keywords JSON,
+        sections JSON,
+        bibliography JSON,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS terminology (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        term_id VARCHAR(100) UNIQUE NOT NULL,
+        lang VARCHAR(10) DEFAULT 'es',
+        term VARCHAR(255) NOT NULL,
+        definition TEXT NOT NULL,
+        category VARCHAR(50) DEFAULT 'general',
+        related_terms JSON,
+        sources JSON,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS section_headers (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        country_id INT NOT NULL,
+        section_id VARCHAR(50) NOT NULL,
+        title VARCHAR(255),
+        description TEXT,
+        FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_header (country_id, section_id)
+      )
+    `);
+
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS pending_changes (
         id INT AUTO_INCREMENT PRIMARY KEY,
         change_id VARCHAR(100) UNIQUE NOT NULL,
