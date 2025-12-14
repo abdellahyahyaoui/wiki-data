@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useLanguage } from "../context/LanguageContext"
+import { getDescription, getTimeline, getTimelineEvent, getTestimonies, getWitness, getResistance, getResistor, getFototeca, getAnalysts, getAnalyst } from "../utils/api"
 import "./country-content.css"
 import "./timeline.css"
 import MediaGallery from "./MediaGallery"
@@ -127,7 +128,17 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
         const categoryData = json.categories.find((c) => c.id === category)
         if (categoryData) setAvailableLetters(categoryData.letters.map((l) => l.toUpperCase()))
         setView("letters")
-      } else if (["testimonies", "analysts", "genocides"].includes(section)) {
+      } else if (section === "testimonies") {
+        loadSectionHeader(section)
+        const testimoniesData = await getTestimonies(countryCode, lang)
+        setItems(testimoniesData || [])
+        setView(testimoniesData?.length ? "grid" : "empty")
+      } else if (section === "analysts") {
+        loadSectionHeader(section)
+        const analystsData = await getAnalysts(countryCode, lang)
+        setItems(analystsData || [])
+        setView(analystsData?.length ? "grid" : "empty")
+      } else if (section === "genocides") {
         loadSectionHeader(section)
         const res = await fetch(`/data/${lang}/${countryCode}/${section}.index.json`)
         const json = res.ok ? await res.json() : { items: [] }
@@ -135,19 +146,16 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
         setView(json.items?.length ? "grid" : "empty")
       } else if (section === "resistance") {
         loadSectionHeader("resistance")
-        const res = await fetch(`/data/${lang}/${countryCode}/resistance/resistance.index.json`)
-        const json = res.ok ? await res.json() : { items: [] }
-        setItems(json.items || [])
-        setView(json.items?.length ? "grid" : "empty")
+        const resistanceData = await getResistance(countryCode, lang)
+        setItems(resistanceData || [])
+        setView(resistanceData?.length ? "grid" : "empty")
       } else if (section === "timeline") {
-        const res = await fetch(`/data/${lang}/${countryCode}/timeline/timeline.index.json`)
-        const json = res.ok ? await res.json() : { items: [] }
-        setItems(json.items || [])
-        setView(json.items?.length ? "timeline" : "empty")
+        const timelineData = await getTimeline(countryCode, lang)
+        setItems(timelineData || [])
+        setView(timelineData?.length ? "timeline" : "empty")
       } else if (section === "fototeca" || section === "fototeca-photos" || section === "fototeca-videos") {
-        const res = await fetch(`/data/${lang}/${countryCode}/fototeca/fototeca.index.json`)
-        const json = res.ok ? await res.json() : { items: [] }
-        let mediaItems = json.items || []
+        const fototecaData = await getFototeca(countryCode, lang)
+        let mediaItems = fototecaData || []
         
         if (section === "fototeca-photos") {
           mediaItems = mediaItems.filter(item => item.type === 'image')
@@ -185,17 +193,16 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
           setView("empty")
         }
       } else if (section === "description") {
-        const res = await fetch(`/data/${lang}/${countryCode}/description.json`)
-        if (!res.ok) {
+        const descriptionData = await getDescription(countryCode, lang)
+        if (!descriptionData || (!descriptionData.chapters && !descriptionData.title)) {
           setView("empty")
         } else {
-          const json = await res.json()
-          if (json.chapters) {
-            setItems(json.chapters)
-            setSelectedItem(json.chapters[0] || null)
+          if (descriptionData.chapters) {
+            setItems(descriptionData.chapters)
+            setSelectedItem(descriptionData.chapters[0] || null)
             setView("chapter-index")
           } else {
-            setSelectedItem(json)
+            setSelectedItem(descriptionData)
             setView("article")
           }
         }
@@ -253,36 +260,31 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
         return
       }
 
-      let path = ""
-      if (section === "testimonies") path = `/data/${lang}/${countryCode}/testimonies/${item.id}.json`
-      else if (section === "analysts") path = `/data/${lang}/${countryCode}/analysts/${item.id}.json`
-      else if (section === "genocides") path = `/data/${lang}/${countryCode}/genocides/${item.id}.json`
-      else if (section === "resistance") path = `/data/${lang}/${countryCode}/resistance/${item.id}.json`
+      let json = null
+      if (section === "testimonies") {
+        json = await getWitness(countryCode, item.id, lang)
+      } else if (section === "analysts") {
+        json = await getAnalyst(countryCode, item.id, lang)
+      } else if (section === "genocides") {
+        const res = await fetch(`/data/${lang}/${countryCode}/genocides/${item.id}.json`)
+        json = res.ok ? await res.json() : null
+      } else if (section === "resistance") {
+        json = await getResistor(countryCode, item.id, lang)
+      }
 
-      if (path) {
-        const res = await fetch(path)
-
-        if (res.ok) {
-          const json = await res.json()
-
-          if (json.analyses && Array.isArray(json.analyses)) {
-  // Caso ANALYSTS (múltiples análisis)
-  setAnalysesIndex({ ...json, type: "analysis" })
-  setView("analyses-index")
-} else if (json.testimonies && Array.isArray(json.testimonies)) {
-  // Caso TESTIMONIES (múltiples testimonios por persona)
-  setAnalysesIndex({ ...json, type: "testimony" })
-  setView("analyses-index")
-} else if (json.entries && Array.isArray(json.entries)) {
-  // Caso RESISTANCE (múltiples entradas por autor)
-  setAnalysesIndex({ ...json, type: "resistance" })
-  setView("analyses-index")
-} else {
-  // Caso normal (artículo único)
-  setSelectedItem(json)
-  setView("article")
-}
-
+      if (json) {
+        if (json.analyses && Array.isArray(json.analyses)) {
+          setAnalysesIndex({ ...json, type: "analysis" })
+          setView("analyses-index")
+        } else if (json.testimonies && Array.isArray(json.testimonies)) {
+          setAnalysesIndex({ ...json, type: "testimony" })
+          setView("analyses-index")
+        } else if (json.entries && Array.isArray(json.entries)) {
+          setAnalysesIndex({ ...json, type: "resistance" })
+          setView("analyses-index")
+        } else {
+          setSelectedItem(json)
+          setView("article")
         }
       }
     } catch (err) {
@@ -313,10 +315,8 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
 
   async function loadTimelineDetail(item) {
     try {
-      const path = `/data/${lang}/${countryCode}/timeline/${item.id}.json`
-      const res = await fetch(path)
-      if (res.ok) {
-        const json = await res.json()
+      const json = await getTimelineEvent(countryCode, item.id, lang)
+      if (json) {
         setSelectedItem(json)
         setView("timeline-article")
       }

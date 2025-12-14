@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLanguage } from "../context/LanguageContext"
+import { getCountries } from "../utils/api"
 import "./floating-countries.css"
 
 const FALLBACK_COUNTRIES = [
@@ -15,14 +16,13 @@ const FALLBACK_COUNTRIES = [
 export default function FloatingCountries({ isDropdown = false }) {
   const navigate = useNavigate()
   const { lang } = useLanguage()
-  const [countries, setCountries] = useState(FALLBACK_COUNTRIES) // Initialize with fallback data
+  const [countries, setCountries] = useState(FALLBACK_COUNTRIES)
 
   useEffect(() => {
     async function loadCountries() {
       try {
-        const res = await fetch(`/data/${lang}/countries.json`)
-        if (res.ok) {
-          const data = await res.json()
+        const data = await getCountries(lang)
+        if (data && data.length > 0) {
           setCountries(data)
         }
       } catch (err) {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useLanguage } from "../context/LanguageContext"
+import { getCountryMeta } from "../utils/api"
 
 import CountryHeader from "./CountryHeader"
 import CountrySidebar from "./CountrySidebar"
@@ -32,48 +33,36 @@ export default function CountryLayout() {
 
   useEffect(() => {
     async function loadMeta() {
+      const minimalMeta = {
+        name: code.charAt(0).toUpperCase() + code.slice(1),
+        sections: [
+          { id: "description", title: "Descripción del conflicto", label: "Descripción del conflicto" },
+          { id: "testimonies", title: "Testimonios", label: "Testimonios" },
+          { id: "analysts", title: "Análisis", label: "Análisis" },
+          { id: "media-gallery", title: "Fototeca", label: "Fototeca" },
+        ],
+      }
+      
       try {
-        const url = `/data/${lang}/${code}/meta.json`
-        const res = await fetch(url)
-        if (!res.ok) {
-          const minimalMeta = {
-            name: code.charAt(0).toUpperCase() + code.slice(1),
-            sections: [
-              { id: "description", title: "Descripción del conflicto", label: "Descripción del conflicto" },
-              { id: "testimonies", title: "Testimonios", label: "Testimonios" },
-              { id: "analysts", title: "Análisis", label: "Análisis" },
-              { id: "media-gallery", title: "Fototeca", label: "Fototeca" },
-            ],
+        const json = await getCountryMeta(code, lang)
+        
+        if (json && json.sections) {
+          setMeta(json)
+          if (isMobile) {
+            setCurrentSection("description")
+          } else {
+            let firstSection = json.sections?.find((s) => s.id === "description") || json.sections?.[0]
+            if (firstSection?.id === "media-gallery") {
+              firstSection = { ...firstSection, id: "media-gallery-images" }
+            }
+            setCurrentSection(firstSection?.id || "description")
           }
+        } else {
           setMeta(minimalMeta)
           setCurrentSection("description")
-          setLoading(false)
-          return
-        }
-
-        const json = await res.json()
-        setMeta(json)
-
-        if (isMobile) {
-          setCurrentSection("description")
-        } else {
-          let firstSection = json.sections?.find((s) => s.id === "description") || json.sections?.[0]
-          if (firstSection?.id === "media-gallery") {
-            firstSection = { ...firstSection, id: "media-gallery-images" }
-          }
-          setCurrentSection(firstSection?.id || "description")
         }
       } catch (err) {
-        console.error("[v0] Error loading meta.json:", err)
-        const minimalMeta = {
-          name: code.charAt(0).toUpperCase() + code.slice(1),
-          sections: [
-            { id: "description", title: "Descripción del conflicto", label: "Descripción del conflicto" },
-            { id: "testimonies", title: "Testimonios", label: "Testimonios" },
-            { id: "analysts", title: "Análisis", label: "Análisis" },
-            { id: "media-gallery", title: "Fototeca", label: "Fototeca" },
-          ],
-        }
+        console.error("[v0] Error loading meta:", err)
         setMeta(minimalMeta)
         setCurrentSection("description")
       }

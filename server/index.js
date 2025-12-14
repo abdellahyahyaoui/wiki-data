@@ -10,6 +10,7 @@ const { testConnection, initDatabase } = require('./db');
 const authRoutes = require('./routes/auth');
 const cmsRoutes = require('./routes/cms-db');
 const uploadRoutes = require('./routes/upload');
+const publicApiRoutes = require('./routes/public-api');
 
 const app = express();
 const PORT = process.env.NODE_ENV === 'production' ? 5000 : (process.env.PORT || 3001);
@@ -72,6 +73,7 @@ if (!fs.existsSync(pendingFile)) {
 app.use('/api/auth', authRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/public', publicApiRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, '../public/imagenes')));
 
