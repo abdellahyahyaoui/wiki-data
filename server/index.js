@@ -83,16 +83,19 @@ app.get('/api/health', (req, res) => {
 
 if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../build');
-
-  // Sirve los archivos estáticos de React
   app.use(express.static(buildPath));
+  app.use(express.static(path.join(__dirname, '../public')));
 
-  // Catch-all para React Router
-app.get('/:any(*)', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
-});
-
+  // Fallback para SPA React
+  app.use((req, res, next) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(buildPath, 'index.html'));
+    } else {
+      next();
+    }
+  });
 }
+
 
 const host = '0.0.0.0';
 
