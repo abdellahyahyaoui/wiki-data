@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import RichContentEditor from './RichContentEditor';
+import API_BASE from '../../utils/apiBase';
 
 export default function TimelineEditor({ countryCode }) {
   const { user, getAuthHeaders } = useAuth();
@@ -27,7 +28,7 @@ export default function TimelineEditor({ countryCode }) {
 
   async function loadItems() {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/timeline?lang=es`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/timeline?lang=es`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -74,7 +75,7 @@ export default function TimelineEditor({ countryCode }) {
 
   async function openEditModal(item) {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/timeline/${item.id}?lang=es`, {
+      const res =  fetch(`${API_BASE}/api/cms/countries/${countryCode}/timeline/${item.id}?lang=es`, {
         headers: getAuthHeaders()
       });
       

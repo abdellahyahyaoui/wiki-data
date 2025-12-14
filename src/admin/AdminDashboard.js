@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import API_BASE from '../utils/apiBase';
+
 import './admin.css';
 
 export default function AdminDashboard() {
@@ -20,9 +22,12 @@ export default function AdminDashboard() {
   async function loadData() {
     try {
       const [countriesRes, pendingRes, predefinedRes] = await Promise.all([
-        fetch('/api/cms/countries?lang=es', { headers: getAuthHeaders() }),
-        user.role === 'admin' ? fetch('/api/cms/pending', { headers: getAuthHeaders() }) : Promise.resolve({ ok: true, json: () => ({ changes: [] }) }),
-        fetch('/api/cms/predefined-countries', { headers: getAuthHeaders() })
+   fetch(`${API_BASE}/api/cms/countries?lang=es`, { headers: getAuthHeaders() }),
+user.role === 'admin'
+  ? fetch(`${API_BASE}/api/cms/pending`, { headers: getAuthHeaders() })
+  : Promise.resolve({ ok: true, json: () => ({ changes: [] }) }),
+fetch(`${API_BASE}/api/cms/predefined-countries`, { headers: getAuthHeaders() })
+
       ]);
 
       if (countriesRes.ok) {
@@ -53,7 +58,8 @@ export default function AdminDashboard() {
     if (!country) return;
 
     try {
-      const res = await fetch('/api/cms/countries', {
+      const res = await fetch(`${API_BASE}/api/cms/countries`, {
+
         method: 'POST',
         headers: {
           ...getAuthHeaders(),

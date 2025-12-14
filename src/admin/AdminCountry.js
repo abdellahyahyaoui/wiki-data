@@ -9,6 +9,8 @@ import FototecaEditor from './components/FototecaEditor';
 import ResistanceEditor from './components/ResistanceEditor';
 import VelumEditor from './components/VelumEditor';
 import GalleryManager from './components/GalleryManager';
+import API_BASE from '../utils/apiBase';
+
 import './admin.css';
 
 const AVAILABLE_COUNTRIES = [
@@ -80,7 +82,10 @@ export default function AdminCountry() {
   async function loadCountry() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/cms/countries?lang=${selectedLang}`, { headers: getAuthHeaders() });
+const res = await fetch(
+  `${API_BASE}/api/cms/countries?lang=${selectedLang}`,
+  { headers: getAuthHeaders() }
+);
       if (res.ok) {
         const data = await res.json();
         setAvailableCountries(data.countries || []);

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ImageUploader from './ImageUploader';
 import RichContentEditor from './RichContentEditor';
+import API_BASE from '../../utils/apiBase';
+
 
 export default function VelumEditor({ countryCode, lang = 'es' }) {
   const { user, getAuthHeaders } = useAuth();
@@ -33,7 +35,7 @@ export default function VelumEditor({ countryCode, lang = 'es' }) {
 
   async function loadArticles() {
     try {
-      const res = await fetch(`/api/cms/velum?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/velum?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -66,7 +68,7 @@ export default function VelumEditor({ countryCode, lang = 'es' }) {
 
   async function openEditModal(article) {
     try {
-      const res = await fetch(`/api/cms/velum/${article.id}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/velum/${article.id}?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       
@@ -136,7 +138,7 @@ export default function VelumEditor({ countryCode, lang = 'es' }) {
     const method = editingArticle ? 'PUT' : 'POST';
 
     try {
-      const res = await fetch(url, {
+      const res = await fetch(`${API_BASE}${url}`, {
         method,
         headers: {
           ...getAuthHeaders(),

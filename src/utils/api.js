@@ -1,15 +1,16 @@
-const API_BASE = 'https://wiki-data-qxef.onrender.com/api/public';
+// src/utils/api.js
+import API_BASE from './apiBase';
 
 export async function fetchFromApi(endpoint, fallbackPath = null) {
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`);
+    const res = await fetch(`${API_BASE}/api/public${endpoint}`);
     if (res.ok) {
       return await res.json();
     }
   } catch (error) {
     console.error(`API fetch error for ${endpoint}:`, error.message);
   }
-  
+
   if (fallbackPath) {
     try {
       const res = await fetch(fallbackPath);
@@ -20,9 +21,10 @@ export async function fetchFromApi(endpoint, fallbackPath = null) {
       console.error(`Fallback fetch error for ${fallbackPath}:`, error.message);
     }
   }
-  
+
   return null;
 }
+
 
 export async function getCountries(lang = 'es') {
   const data = await fetchFromApi(`/countries?lang=${lang}`, `/data/${lang}/countries.json`);

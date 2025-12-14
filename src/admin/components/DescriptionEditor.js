@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import RichContentEditor from './RichContentEditor';
+import API_BASE from '../../utils/apiBase';
+
 
 export default function DescriptionEditor({ countryCode }) {
   const { user, getAuthHeaders } = useAuth();
@@ -22,8 +24,10 @@ export default function DescriptionEditor({ countryCode }) {
 
   async function loadDescription() {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/description?lang=es`, {
-        headers: getAuthHeaders()
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/description?lang=es`, {
+  headers: getAuthHeaders()
+
+
       });
       if (res.ok) {
         const data = await res.json();
@@ -152,7 +156,8 @@ export default function DescriptionEditor({ countryCode }) {
     }
 
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/description?lang=es`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/description?lang=es`, {
+
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),
@@ -186,7 +191,8 @@ export default function DescriptionEditor({ countryCode }) {
     const updatedChapters = description.chapters.filter((_, i) => i !== index);
 
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/description?lang=es`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/description?lang=es`, {
+
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),
@@ -208,7 +214,8 @@ export default function DescriptionEditor({ countryCode }) {
 
   async function handleUpdateTitle(newTitle) {
     try {
-      await fetch(`/api/cms/countries/${countryCode}/description?lang=es`, {
+      await fetch(`${API_BASE}/api/cms/countries/${countryCode}/description?lang=es`, {
+
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),

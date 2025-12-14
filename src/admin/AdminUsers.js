@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import API_BASE from '../utils/apiBase';
 import './admin.css';
 
 export default function AdminUsers() {
@@ -36,8 +37,9 @@ export default function AdminUsers() {
   async function loadData() {
     try {
       const [usersRes, countriesRes] = await Promise.all([
-        fetch('/api/auth/users', { headers: getAuthHeaders() }),
-        fetch('/api/cms/countries?lang=es', { headers: getAuthHeaders() })
+       fetch(`${API_BASE}/api/auth/users`, { headers: getAuthHeaders() }),
+fetch(`${API_BASE}/api/cms/countries?lang=es`, { headers: getAuthHeaders() })
+
       ]);
 
       if (usersRes.ok) {
@@ -95,8 +97,9 @@ export default function AdminUsers() {
     e.preventDefault();
     
     const url = editingUser 
-      ? `/api/auth/users/${editingUser.id}`
-      : '/api/auth/users';
+  ? `${API_BASE}/api/auth/users/${editingUser.id}`
+  : `${API_BASE}/api/auth/users`;
+
     
     const method = editingUser ? 'PUT' : 'POST';
     
@@ -131,7 +134,8 @@ export default function AdminUsers() {
     if (!window.confirm(`¿Eliminar al usuario "${u.name}"?`)) return;
 
     try {
-      const res = await fetch(`/api/auth/users/${u.id}`, {
+      const res = await fetch(`${API_BASE}/api/auth/users/${u.id}`, {
+
         method: 'DELETE',
         headers: getAuthHeaders()
       });

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import API_BASE from '../utils/apiBase';
+
 import './admin.css';
 
 export default function AdminPending() {
@@ -19,7 +21,10 @@ export default function AdminPending() {
 
   async function loadChanges() {
     try {
-      const res = await fetch('/api/cms/pending', { headers: getAuthHeaders() });
+     const res = await fetch(`${API_BASE}/api/cms/pending`, {
+  headers: getAuthHeaders()
+});
+
       if (res.ok) {
         const data = await res.json();
         setChanges(data.changes || []);
@@ -32,7 +37,8 @@ export default function AdminPending() {
 
   async function handleApprove(changeId) {
     try {
-      const res = await fetch(`/api/cms/pending/${changeId}/approve`, {
+      const res = await fetch(`${API_BASE}/api/cms/pending/${changeId}/approve`, {
+
         method: 'POST',
         headers: getAuthHeaders()
       });
@@ -48,7 +54,8 @@ export default function AdminPending() {
     if (!window.confirm('¿Rechazar este cambio?')) return;
     
     try {
-      const res = await fetch(`/api/cms/pending/${changeId}/reject`, {
+      const res = await fetch(`${API_BASE}/api/cms/pending/${changeId}/reject`, {
+
         method: 'POST',
         headers: getAuthHeaders()
       });
