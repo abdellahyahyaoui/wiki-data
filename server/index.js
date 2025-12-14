@@ -10,7 +10,7 @@ const cmsRoutes = require('./routes/cms-db');
 const uploadRoutes = require('./routes/upload');
 
 const app = express();
-const PORT = process.env.NODE_ENV === 'production' ? 5000 : 3001;
+const PORT = process.env.NODE_ENV === 'production' ? 5000 : (process.env.PORT || 3001);
 
 app.use(cors({
   origin: true,

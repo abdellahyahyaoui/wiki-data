@@ -3,17 +3,23 @@
 ## Descripción
 Aplicación CMS para documentar conflictos mundiales con timeline, testimonios, resistencia, fototeca y análisis.
 
+## Replit Environment
+- Frontend: React on port 5000 (0.0.0.0)
+- Backend: Express.js on port 3001 (localhost)
+- Database: MySQL external (with JSON fallback if MySQL unavailable)
+- Run command: `npm run start` (runs both frontend and backend concurrently)
+
 ## Arquitectura
 
 ### Frontend
 - React con react-router-dom
-- Puerto: 5000
+- Puerto: 5000 (host 0.0.0.0)
 - Componentes principales en `/src`
 - Panel de administración en `/src/admin`
 
 ### Backend
 - Express.js
-- Puerto: 3001
+- Puerto: 3001 (host localhost)
 - Rutas CMS en `/server/routes/cms-db.js`
 - Conexión MySQL en `/server/db.js`
 
