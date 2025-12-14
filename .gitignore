@@ -1,6 +1,8 @@
-cat <<EOF > .gitignore
 node_modules/
 src.zip
 .env
 .DS_Store
-EOF
+build/
+*.log
+server/data/users.json
+server/data/jwt-secret.key
