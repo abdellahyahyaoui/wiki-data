@@ -1,0 +1,229 @@
+/* Complete redesign for professional newspaper aesthetic */
+.media-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Wider cards */
+  gap: 20px;
+  padding: 16px 0;
+}
+
+.media-card {
+  cursor: pointer;
+  border-radius: 5px; /* Sharper corners for pro look */
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  background: #fff;
+  border: 1px solid #061b23;
+  display: flex;
+  flex-direction: column;
+}
+
+.media-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(139, 0, 0, 0.15);
+  border-color: #061b23;
+}
+
+.media-thumb {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.media-title {
+  padding: 12px 16px;
+  font-size: 14px;
+  text-align: left;
+  color:#061b23;
+  font-family: var(--wiki-font-sans);
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+.media-empty {
+  text-align: center;
+  padding: 60px 40px;
+  font-size: 16px;
+  color: #061b23;
+  font-style: italic;
+}
+
+/* Enhanced modal with smooth animations */
+.media-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #061b23;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.media-detail-content {
+  max-width: 90%;
+  max-height: 90vh;
+  text-align: center;
+  position: relative;
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.media-full {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.media-detail-title {
+  color: #fff;
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Improved control buttons */
+.media-close,
+.media-prev,
+.media-next {
+  position: absolute;
+  background: #061b23;
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-weight: 300;
+  z-index: 1001;
+}
+
+.media-close:hover,
+.media-prev:hover,
+.media-next:hover {
+  background: #061b23;
+  transform: scale(1.1);
+}
+
+.media-close {
+  top: 20px;
+  right: 20px;
+}
+
+.media-prev {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.media-next {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 768px) {
+  .media-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .media-thumb {
+    height: 110px;
+  }
+
+  .media-title {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .media-detail-content {
+    max-width: 95%;
+    max-height: 85vh;
+  }
+
+  .media-full {
+    max-height: 70vh;
+  }
+
+  .media-close,
+  .media-prev,
+  .media-next {
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .media-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .media-thumb {
+    height: 100px;
+  }
+
+  .media-title {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .media-close,
+  .media-prev,
+  .media-next {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .media-close {
+    top: 12px;
+    right: 12px;
+  }
+
+  .media-prev {
+    left: 12px;
+  }
+
+  .media-next {
+    right: 12px;
+  }
+}

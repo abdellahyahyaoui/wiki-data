@@ -1,0 +1,29 @@
+{
+  "id": "9",
+  "name": "Faten Mofeed",
+  "bio": "Faten, madre palestina, narra con voz quebrada su recorrido entre guerras, desplazamientos y pérdidas. Desde 2014 hasta hoy, ha visto su hogar destruido varias veces, ha perdido familiares y ha sobrevivido junto a sus tres hijos. En medio de la destrucción, suplica justicia, pan y una vida digna para ellos.",
+  "image": "/imagenes/faten.jpg",
+  "social": {
+    "donation": "https://gofund.me/394beb01"
+  },
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "Tan Solo quiero vivir",
+      "summary": "En el año 2014, comenzó una guerra en Gaza.",
+      "date": "Soy Faten, madre en Gaza. No busco lástima: pido justicia y vida para mis hijos."
+    },
+    {
+      "id": "t2",
+      "title": "Lana",
+      "summary": "",
+      "date": "Soy Faten, madre en Gaza. No busco lástima: pido justicia y vida para mis hijos."
+    },
+    {
+      "id": "t3",
+      "title": "Ayer rompí mi silencio",
+      "summary": "Soy de esas personas que casi no salen de casa, no solo por la guerra…",
+      "date": "Soy Faten, madre en Gaza. No busco lástima: pido justicia y vida para mis hijos."
+    }
+  ]
+}

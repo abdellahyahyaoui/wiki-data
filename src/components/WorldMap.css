@@ -1,0 +1,157 @@
+/* === CONTENEDOR DEL MAPA === */
+.map-wrapper {
+  width: 100%;
+  height: 70vh;
+  min-height: 500px;
+  position: fixed;
+}
+
+/* Sombra general del mapa */
+.composable-map-container {
+  filter: drop-shadow(0 45px 60px rgba(0, 0, 0, 0.992));
+}
+
+/* ============================
+      PAÍS LEVANTADO (hover)
+   ============================ */
+.country-lifted {
+  transform: translateY(-6px);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4)) brightness(1.2);
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+/* País conflictivo: brillo suave */
+.conflict-country {
+  animation: strongPulseShake 3.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes strongPulseShake {
+  0% {
+    transform: scale(1) translate(0, 0);
+    filter: brightness(0.8) contrast(1);
+  }
+
+  30% {
+    transform: scale(1.03) translate(1px, -1px);
+    filter: brightness(1.2) contrast(1.4);
+  }
+
+  50% {
+    transform: scale(1.06) translate(-1px, 1px);
+    filter: brightness(1.6) contrast(1.8);
+  }
+
+  70% {
+    transform: scale(1.03) translate(1px, -1px);
+    filter: brightness(1.2) contrast(1.4);
+  }
+
+  100% {
+    transform: scale(1) translate(0, 0);
+    filter: brightness(0.8) contrast(1);
+  }
+}
+
+
+/* ============================
+   ONDAS SUAVES (sin punto rojo)
+   ============================ */
+
+/* 🔥 Esta clase hace que NADA bloquee clic o hover */
+.conflict-marker-group {
+  pointer-events: none !important;
+}
+
+@keyframes pulsate {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+    border-color: #ffffff;     /* INICIO: blanco */
+  }
+  70% {
+    border-color: #ffffff;     /* TRANSICIÓN: rojo actual */
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+    border-color: #ef4444;     /* FIN: rojo + se desvanece */
+  }
+}
+
+
+.conflict-marker-pulse {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ffffff;  /* empieza blanco */
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulsate 2.5s ease-out infinite;
+  pointer-events: none;
+}
+
+
+.conflict-marker-pulse:nth-child(2) {
+  animation-delay: 0.5s;
+}
+.conflict-marker-pulse:nth-child(3) {
+  animation-delay: 1s;
+}
+.conflict-marker-pulse:nth-child(4) {
+  animation-delay: 1.5s;
+}
+
+/* ==============================
+      NOMBRE DESLIZANTE + BANDERA
+   ============================== */
+.country-name-float {
+  position: absolute;
+  top: 0px;
+  left: 40px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  /* font-family: "Cormorant Garamond", serif !important; */
+  font-size: 42px;
+  font-weight: 600;
+  color: #1d546b;
+
+  padding: 8px 20px;
+
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(10px);
+
+  border-left: 4px solid #1d546b;
+  letter-spacing: 1px;
+
+  opacity: 0;
+  animation: slideInName 0.45s ease-out forwards;
+
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+  pointer-events: none; /* Nunca bloquear hover del mapa */
+  z-index: 20;
+}
+
+.country-flag-small {
+  width: 38px;
+  height: 26px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+
+@keyframes slideInName {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

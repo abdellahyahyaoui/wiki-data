@@ -1,0 +1,26 @@
+{
+  "letter": "A",
+  "category": "conceptos",
+  "items": [
+    {
+      "id": "apartheid",
+      "name": "Apartheid",
+      "shortDescription": "Sistema de segregación racial",
+      "title": "Apartheid",
+      "content": "El apartheid fue un sistema de segregación racial institucionalizado que existió en Sudáfrica desde 1948 hasta principios de la década de 1990.",
+      "paragraphs": [
+        "El término apartheid significa 'separación' en afrikáans. El sistema clasificaba a las personas según su raza y les otorgaba diferentes derechos y privilegios basados en esa clasificación.",
+        "La población negra mayoritaria fue despojada de sus derechos políticos, económicos y sociales. Se crearon 'bantustanes' o territorios segregados para diferentes grupos étnicos.",
+        "El apartheid fue declarado un crimen contra la humanidad por las Naciones Unidas. El término se usa hoy para describir sistemas similares de discriminación y segregación en otros contextos."
+      ],
+      "image": "/placeholder.svg?height=400&width=600"
+    },
+    {
+      "id": "asilo",
+      "name": "Asilo",
+      "shortDescription": "Protección otorgada por un estado a refugiados",
+      "title": "Derecho de Asilo",
+      "content": "El derecho de asilo es la protección que un Estado ofrece en su territorio a personas perseguidas en su país de origen por motivos políticos, religiosos, raciales o de otro tipo."
+    }
+  ]
+}

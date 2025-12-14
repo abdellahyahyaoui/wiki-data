@@ -1,0 +1,14 @@
+{
+  "images": [
+    {
+      "id": "image1",
+      "title": "Foto histórica 1",
+      "url": "/data/es/palestine/media/images/image1.png"
+    },
+    {
+      "id": "image2",
+      "title": "Foto histórica 2",
+      "url": "/data/es/palestine/media/images/image2.png"
+    }
+  ]
+}

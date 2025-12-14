@@ -1,0 +1,49 @@
+{
+  "id": "gaza-testimonios",
+  "title": "Gaza: Testimonios desde el Asedio",
+  "author": "Ahmed Masoud",
+  "date": "2024-06-10",
+  "coverImage": "/uploads/velum-gaza-cover.jpg",
+  "category": "Testimonios",
+  "content": [
+    {
+      "type": "text",
+      "content": "La Franja de Gaza, un territorio de apenas 365 kilometros cuadrados, alberga a mas de dos millones de personas. Desde 2007, sus habitantes viven bajo un bloqueo que ha transformado esta pequena franja costera en lo que muchos describen como 'la mayor prision al aire libre del mundo'.",
+      "dropCap": true
+    },
+    {
+      "type": "image",
+      "url": "/uploads/gaza-ciudad.jpg",
+      "caption": "Vista de la ciudad de Gaza",
+      "position": "center"
+    },
+    {
+      "type": "text",
+      "content": "Los testimonios de los habitantes de Gaza revelan una realidad de restricciones constantes. El suministro electrico, cuando funciona, apenas alcanza para unas pocas horas al dia. El agua potable escasea y la infraestructura sanitaria, danada por los repetidos bombardeos, apenas puede atender las necesidades de la poblacion."
+    },
+    {
+      "type": "image",
+      "url": "/uploads/ninos-gaza.jpg",
+      "caption": "Ninos jugando entre los escombros",
+      "position": "left"
+    },
+    {
+      "type": "text",
+      "content": "A pesar de estas condiciones, la vida continua. Los jovenes de Gaza han encontrado formas creativas de expresion artistica. Murales cubren los muros de los edificios danados, transformando simbolos de destruccion en lienzos de esperanza. La musica, la poesia y el cine florecen como formas de resistencia cultural."
+    },
+    {
+      "type": "text",
+      "content": "Los pescadores de Gaza representan una metafora perfecta de la situacion. Historicamente, la pesca era una de las principales actividades economicas. Hoy, los pescadores enfrentan restricciones que les impiden alejarse mas de unas pocas millas de la costa, limitando drasticamente sus capturas y sus ingresos."
+    },
+    {
+      "type": "image",
+      "url": "/uploads/pescadores-gaza.jpg",
+      "caption": "Pescadores preparando sus redes al amanecer",
+      "position": "right"
+    },
+    {
+      "type": "text",
+      "content": "Los testimonios recogidos en este articulo provienen de entrevistas realizadas a lo largo de varios anos. Son voces que el mundo necesita escuchar: maestros que ensenas sin libros, medicos que operan sin anestesia, madres que alimentan a sus hijos con lo poco que pueden conseguir. Son historias de resiliencia humana frente a circunstancias inimaginables."
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "id": "6",
+  "name": "Karim Al Masri",
+  "bio": "Karim ofrece una meditación poderosa y dolorosa sobre cómo el asedio prolongado transforma no solo los cuerpos, sino también las esperanzas. En este ensayo, Gaza es el espejo de un pueblo que sobrevive mientras se aferra a una patria cada vez más simbólica.",
+  "image": "/imagenes/Karim_Al_Masri.jpg",
+  "social": {
+    "facebook": "https://www.facebook.com/share/19rd63amJ3/",
+    "instagram": "https://www.instagram.com/kareem_almasri1?igsh=MTFxMHAzNnR6bmdpMA==",
+    "donation": "https://gofund.me/0963a2d1"
+  },
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "Palabras temblorosas de miedo ante el acontecimiento",
+      "summary": "Sé que no me atreveré a escribir ni tres cuartas partes de lo que realmente quiero decir.",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t2",
+      "title": "La patria pertenece a su gente",
+      "summary": "Nuestras vidas cambiaron",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t3",
+      "title": "Voluntad y Desafío",
+      "summary": "Desde Gaza,",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t4",
+      "title": "No somos cadáveres inspiradores",
+      "summary": "En Gaza, nos negamos a ser solo el eco del derramamiento de sangre,",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t5",
+      "title": "Sueños transformados",
+      "summary": "El palestino en Gaza no carecía de una causa.",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t6",
+      "title": "Un hogar de tela",
+      "summary": "Desde el siete de octubre, comenzó la historia de la injusticia, del genocidio y de la guerra.",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t7",
+      "title": "¿Hacia dónde vamos...?",
+      "summary": "¡Ay, qué dolor! La situación de la gente se ha vuelto extremadamente difícil...",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t8",
+      "title": "Gaza... ¡Bajo los escombros y la muerte!",
+      "summary": "Gaza está siendo exterminada, masacrada y desmembrada sin piedad.",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t9",
+      "title": "Quizás nos dejemos ir",
+      "summary": "Buenas noches, mundo.",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t10",
+      "title": "Disfruta... Allah mío...",
+      "summary": "La gente pasa frente a mí",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    },
+    {
+      "id": "t11",
+      "title": "Nunca imaginé...",
+      "summary": "Nunca imaginé, ni en mis pesadillas más oscuras,",
+      "date": "El palestino no dejó de soñar con Al-Quds… solo que el hambre y el asedio cambiaron el rumbo del alma."
+    }
+  ]
+}

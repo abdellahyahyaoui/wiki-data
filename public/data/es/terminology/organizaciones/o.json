@@ -1,0 +1,26 @@
+{
+  "letter": "O",
+  "category": "organizaciones",
+  "items": [
+    {
+      "id": "olp",
+      "name": "OLP",
+      "shortDescription": "Organización para la Liberación de Palestina",
+      "title": "Organización para la Liberación de Palestina (OLP)",
+      "content": "La Organización para la Liberación de Palestina (OLP) es una organización política y paramilitar considerada por la comunidad internacional como la representante del pueblo palestino.",
+      "paragraphs": [
+        "Fundada en 1964 con el objetivo de liberar Palestina a través de la lucha armada, la OLP fue reconocida por la Liga Árabe como el único representante legítimo del pueblo palestino en 1974.",
+        "La organización está compuesta por varios grupos y facciones, siendo Fatah el grupo más grande. En 1993, la OLP reconoció oficialmente al Estado de Israel a través de los Acuerdos de Oslo.",
+        "Aunque su importancia política ha disminuido desde la creación de la Autoridad Nacional Palestina, la OLP sigue siendo reconocida internacionalmente como la representación oficial del pueblo palestino."
+      ],
+      "image": "/placeholder.svg?height=400&width=600"
+    },
+    {
+      "id": "onu",
+      "name": "ONU",
+      "shortDescription": "Organización de las Naciones Unidas",
+      "title": "Organización de las Naciones Unidas",
+      "content": "La ONU ha desempeñado un papel crucial en el conflicto palestino-israelí desde 1947, cuando propuso el Plan de Partición de Palestina."
+    }
+  ]
+}

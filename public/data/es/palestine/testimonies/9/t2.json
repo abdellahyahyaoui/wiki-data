@@ -1,0 +1,53 @@
+{
+  "id": "t2",
+  "title": "Lana",
+  "pages": [
+    {
+      "tipo": "texto",
+      "content": [
+        "💔 La historia de Lana — la niña que la guerra traicionó (en voz de su madre)",
+        "Lana, mi niña hermosa, nació en 2015 en el corazón del barrio Al-Rimal, en Gaza.",
+        "Era la consentida de la familia, la única hija después de años de espera.",
+        "Todos la adoraban, y cualquier cosa que pedía, se la dábamos sin pensarlo.",
+        "No solo por ser la más pequeña, sino porque era realmente un angelito entre nosotros.",
+        "Lana creció entre sonidos de aviones, bombas y sirenas.",
+        "Nunca conoció una infancia normal.",
+        "Cada guerra que pasaba le dejaba una herida silenciosa por dentro.",
+        "Mi hija no lloraba fuerte... se acurrucaba, temblaba, cerraba los ojos y esperaba que el ruido terminara.",
+        "Tiene fobia a los ruidos fuertes.",
+        "Incluso el sonido del viento o los truenos todavía la asustan mucho.",
+        "Lana ama dibujar.",
+        "Ama los colores.",
+        "Podía convertir cualquier hoja en alegría.",
+        "Era excelente en la escuela, le apasionaba aprender, y esperaba con ansias su clase de arte...",
+        "Preparaba sus colores desde la noche anterior y me decía:",
+        "'Mamá, ¡mañana les voy a enseñar mi dibujo!'",
+        "Pero la última guerra... lo destruyó todo.",
+        "Nuestra casa se quemó.",
+        "Su escuela fue bombardeada.",
+        "Nuestro coche, que la llevaba todos los días al cole, desapareció.",
+        "Mi hija salió de debajo de los escombros, con heridas, con miedo,",
+        "y con ojos que no entendían por qué todo desapareció de golpe.",
+        "Y aun así... intentaba sonreírme.",
+        "Me abrazaba y me decía:",
+        "'Mamá, no pasa nada', como si ella fuera la madre y yo la hija.",
+        "Me pide una hamburguesa... le digo \"inshallah\".",
+        "Me pide un cuaderno para dibujar... le digo 'pronto'.",
+        "Y se duerme agarrada de mi mano, con miedo de que la noche la escuche."
+      ]
+    },
+    {
+      "tipo": "videoTexto",
+      "video": "/videos/faten.mp4",
+      "texto": [
+        "Soy \"madre\", y cada día veo cómo mi hija se apaga...",
+        "no solo por la guerra, sino por la ausencia de vida.",
+        "Cuento su historia no solo para compartir nuestro dolor,",
+        "sino por si alguien puede devolverle una parte de lo que perdió:",
+        "un cuaderno, un poco de calor, un color, un momento de \"paz\".",
+        "Todo lo que Lana tenía, ahora es un recuerdo.",
+        "\"Pero su esperanza... aún no se ha apagado\"."
+      ]
+    }
+  ]
+}

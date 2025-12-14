@@ -1,0 +1,19 @@
+{
+  "letter": "M",
+  "category": "personajes",
+  "items": [
+    {
+      "id": "mandela",
+      "name": "Nelson Mandela",
+      "shortDescription": "Líder anti-apartheid y expresidente de Sudáfrica",
+      "title": "Nelson Mandela",
+      "content": "Nelson Rolihlahla Mandela (1918-2013) fue un líder contra el apartheid sudafricano, revolucionario, político y filántropo que se desempeñó como presidente de Sudáfrica de 1994 a 1999.",
+      "paragraphs": [
+        "Mandela pasó 27 años en prisión por su activismo contra el apartheid. Tras su liberación en 1990, lideró las negociaciones para terminar con el régimen del apartheid.",
+        "En 1994, se convirtió en el primer presidente negro de Sudáfrica en elecciones democráticas. Su gobierno se centró en la reconciliación nacional y el desmantelamiento del legado del apartheid.",
+        "Recibió el Premio Nobel de la Paz en 1993. Es considerado un ícono global de la lucha por la justicia y la igualdad."
+      ],
+      "image": "/placeholder.svg?height=400&width=600"
+    }
+  ]
+}

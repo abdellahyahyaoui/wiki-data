@@ -1,0 +1,23 @@
+
+{
+  "id": "analyst1",
+  "name": "Dr. Khaled",
+  "image": "/images/analyst1.jpg",
+  "bio": "Experto en conflictos del Medio Oriente",
+  "analyses": [
+    {
+      "id": "analysis1",
+      "title": "Patrones de Conflicto 2024",
+      "date": "15 de marzo, 2024",
+      "summary": "Análisis de las operaciones militares recientes"
+    },
+    {
+      "id": "analysis2",
+      "title": "Impacto Humanitario",
+      "date": "2 de febrero, 2024",
+      "summary": "Evaluación del impacto en población civil"
+    }
+  ]
+}
+
+

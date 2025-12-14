@@ -1,0 +1,20 @@
+{
+  "id": "t1",
+  "title": "un niño hambriento y un compañero solitario.",
+  "pages": [
+    {
+      "tipo": "video",
+      "video": "/videos/sara.mp4"
+    },
+    {
+      "tipo": "imagen",
+      "src": "/imagenes/sara1.jpg",
+      "alt": "Imagen final del capítulo"
+    },
+    {
+      "tipo": "imagen",
+      "src": "/imagenes/sara3.jpg",
+      "alt": "Imagen final del capítulo"
+    }
+  ]
+}

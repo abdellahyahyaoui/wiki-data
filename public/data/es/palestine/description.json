@@ -1,0 +1,25 @@
+{
+  "title": "Descripción del Conflicto",
+  "chapters": [
+    {
+      "id": "nakba",
+      "title": "La Nakba (1948)",
+      "content": "En 1948, con la creación del Estado de Israel, más de 700.000 palestinos fueron desplazados o expulsados de sus hogares, un evento que se conoce como la Nakba.",
+      "paragraphs": [
+        "Las ciudades y aldeas palestinas fueron destruidas o ocupadas por fuerzas israelíes.",
+        "El éxodo masivo generó campos de refugiados en países vecinos y un conflicto humanitario que persiste hasta hoy."
+      ],
+      "image": "/images/nakba.jpg"
+    },
+    {
+      "id": "ocupacion",
+      "title": "Ocupación de 1967",
+      "content": "Tras la Guerra de los Seis Días, Israel ocupó Gaza, Cisjordania y Jerusalén Este, consolidando un control militar que continúa generando tensiones.",
+      "paragraphs": [
+        "Se establecieron asentamientos y barreras de seguridad, lo que ha complicado el proceso de paz.",
+        "La ocupación ha afectado la economía, la movilidad y los derechos humanos de la población palestina."
+      ],
+      "image": "/images/ocupacion.jpg"
+    }
+  ]
+}

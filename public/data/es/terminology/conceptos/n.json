@@ -1,0 +1,26 @@
+{
+  "letter": "N",
+  "category": "conceptos",
+  "items": [
+    {
+      "id": "nakba",
+      "name": "Nakba",
+      "shortDescription": "La catástrofe palestina de 1948",
+      "title": "Nakba - La Catástrofe",
+      "content": "La Nakba (النكبة, 'catástrofe' en árabe) se refiere al éxodo masivo de palestinos durante la guerra árabe-israelí de 1948 y la destrucción de la sociedad palestina.",
+      "paragraphs": [
+        "Entre 1947 y 1949, aproximadamente 750,000 palestinos fueron expulsados o huyeron de sus hogares durante la creación del Estado de Israel. Más de 500 aldeas palestinas fueron despobladas y destruidas.",
+        "Para los palestinos, la Nakba representa la pérdida de su patria y el comienzo de la diáspora palestina. El derecho al retorno de los refugiados palestinos sigue siendo uno de los temas más controvertidos del conflicto.",
+        "El día de la Nakba se conmemora el 15 de mayo de cada año, un día después de la declaración de independencia de Israel."
+      ],
+      "image": "/placeholder.svg?height=400&width=600"
+    },
+    {
+      "id": "naksa",
+      "name": "Naksa",
+      "shortDescription": "El retroceso de 1967",
+      "title": "Naksa - El Retroceso",
+      "content": "La Naksa (النكسة, 'retroceso' en árabe) se refiere a la derrota árabe en la Guerra de los Seis Días de 1967, cuando Israel ocupó Cisjordania, Gaza, Sinaí y los Altos del Golán."
+    }
+  ]
+}

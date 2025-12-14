@@ -1,0 +1,6 @@
+cat <<EOF > .gitignore
+node_modules/
+src.zip
+.env
+.DS_Store
+EOF

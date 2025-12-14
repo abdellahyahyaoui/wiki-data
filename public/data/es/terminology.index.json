@@ -1,0 +1,19 @@
+{
+  "categories": [
+    {
+      "id": "personajes",
+      "name": "Personajes",
+      "letters": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t","u","v","W" ,"x","y","z"]
+    },
+    {
+      "id": "organizaciones",
+      "name": "Organizaciones",
+      "letters": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t","u","v","W" ,"x","y","z"]
+    },
+    {
+      "id": "conceptos",
+      "name": "Conceptos",
+      "letters": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t","u","v","W" ,"x","y","z"]
+    }
+  ]
+}

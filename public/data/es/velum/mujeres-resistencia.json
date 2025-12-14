@@ -1,0 +1,43 @@
+{
+  "id": "mujeres-resistencia",
+  "title": "Mujeres en la Resistencia",
+  "author": "Dra. Leila Ahmed",
+  "date": "2024-03-08",
+  "coverImage": "/uploads/velum-mujeres-cover.jpg",
+  "category": "Sociedad",
+  "content": [
+    {
+      "type": "text",
+      "content": "A lo largo de la historia del conflicto palestino, las mujeres han desempenado un papel fundamental que a menudo permanece invisible en los relatos oficiales. Desde las primeras protestas contra el mandato britanico hasta las manifestaciones contemporaneas, las mujeres palestinas han sido protagonistas activas de la resistencia.",
+      "dropCap": true
+    },
+    {
+      "type": "image",
+      "url": "/uploads/mujeres-manifestacion.jpg",
+      "caption": "Mujeres palestinas en una manifestacion pacifica",
+      "position": "left"
+    },
+    {
+      "type": "text",
+      "content": "Las madres palestinas cargan con el peso emocional de criar hijos bajo ocupacion. Ensenan a sus pequenos la historia de su pueblo, les transmiten la lengua y las tradiciones, y los preparan para enfrentar una realidad de checkpoints, redadas nocturnas y demoliciones de viviendas. Esta labor educativa y de preservacion cultural es una forma de resistencia cotidiana."
+    },
+    {
+      "type": "text",
+      "content": "Las mujeres tambien han sido lideres en la organizacion comunitaria. Han establecido cooperativas agricolas, centros de formacion profesional y programas educativos que permiten a las comunidades palestinas mantener su autonomia economica a pesar de las restricciones impuestas por la ocupacion."
+    },
+    {
+      "type": "image",
+      "url": "/uploads/cooperativa-mujeres.jpg",
+      "caption": "Cooperativa textil dirigida por mujeres en Hebrón",
+      "position": "right"
+    },
+    {
+      "type": "text",
+      "content": "Figuras como Leila Khaled, Hanan Ashrawi y Ahed Tamimi representan diferentes generaciones y formas de activismo. Desde la diplomacia internacional hasta la confrontacion directa con soldados de ocupacion, las mujeres palestinas han demostrado que su compromiso con la causa de su pueblo no conoce limites."
+    },
+    {
+      "type": "text",
+      "content": "En los campos de refugiados, son las mujeres quienes mantienen viva la memoria de los pueblos destruidos. Bordan los mapas de sus aldeas en los tradicionales vestidos thobe, preservando en cada puntada la geografia de un hogar perdido pero no olvidado."
+    }
+  ]
+}

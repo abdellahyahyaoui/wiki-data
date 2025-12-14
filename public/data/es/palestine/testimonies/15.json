@@ -1,0 +1,18 @@
+{
+  "id": "15",
+  "name": "Mahmoud Saber Basal",
+  "bio": "Mensaje de Mahmoud Saber Basal, portavoz oficial de la Defensa Civil Palestina en Gaza, en el que hace un llamado a la comunidad internacional tras 19 días de huelga de hambre, exigiendo salvar a Gaza del asedio y de la muerte lenta.",
+  "image": "/imagenes/mahmoud_saber.jpg",
+  "social": {
+    "instagram": "https://www.instagram.com/mahmoud_basal88",
+    "telefono": "00972592010302"
+  },
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "Mi mensaje a la comunidad internacional",
+      "summary": "Hoy es el día diecinueve de mi huelga de hambre.",
+      "date": ""
+    }
+  ]
+}

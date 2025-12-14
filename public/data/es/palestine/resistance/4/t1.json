@@ -1,0 +1,13 @@
+{
+  "id": "t1",
+  "personId": "4",
+  "title": "El legado de Dalal",
+  "content": "El nombre de Dalal Mughrabi sigue siendo recordado en la memoria colectiva palestina. Escuelas, calles y centros culturales llevan su nombre en los territorios palestinos. Su historia representa para muchos palestinos el espiritu de sacrificio y la determinacion de las mujeres en la resistencia.",
+  "media": [
+    {
+      "type": "image",
+      "url": "/uploads/mural-dalal.jpg",
+      "caption": "Mural dedicado a Dalal en un campo de refugiados"
+    }
+  ]
+}

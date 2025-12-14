@@ -1,0 +1,63 @@
+VELUM es una sección global de la aplicación, situada por encima de Terminología, dedicada a publicar micro-tesis o artículos de investigación accesibles cuyo objetivo es levantar el velo sobre mecanismos ocultos, estructuras de manipulación, narrativas instrumentales o dinámicas que afectan a poblaciones vulnerables, especialmente en contextos de conflicto, opresión o violencia estructural.
+
+No es un sistema de noticias, ni un espacio para desmentir titulares del día a día.
+VELUM trabaja con grandes temas, patrones repetidos y mecanismos profundos.
+Cada publicación es una pieza que explica:
+
+qué parece estar sucediendo,
+
+qué mecanismo real hay detrás,
+
+qué patrones lo muestran,
+
+y qué impacto tiene en las personas afectadas.
+
+VELUM funciona como un archivo de tesis cortas, cada una de ellas presentada de manera sobria, elegante y documental.
+
+🟣 Objetivo principal
+
+Crear un espacio donde se exponen tramas, estructuras de manipulación y mecanismos de opresión de forma clara, profunda y accesible, desde la mirada de quienes sufren las consecuencias.
+Es un lugar para entender la realidad más allá de la propaganda, sin caer en teorías conspirativas ni en ruido mediático.
+
+🟣 Formato del listado (vista general)
+
+Las publicaciones se muestran como tarjetas (cards), organizadas por categoría o fecha.
+Cada tarjeta incluirá:
+
+título de la tesis,
+
+subtítulo breve,
+
+fecha,
+
+una pequeña imagen opcional,
+
+etiquetas (tags).
+
+El conjunto debe sentirse como un archivo documental, no como un blog ni como un periódico.
+
+🟣 Formato interno de cada artículo
+
+Cuando el usuario entra a una publicación de VELUM, debe ver una estructura tipo “pequeña tesis”:
+
+Portada
+
+título grande,
+
+subtítulo,
+
+imagen opcional.
+
+Introducción breve (3–5 líneas).
+
+Lo que parece (apariencia superficial).
+
+El mecanismo real (lo que realmente ocurre).
+
+Patrones o evidencias observables.
+
+Cierre reflexivo o conclusión ética.
+
+Multimedia opcional (imágenes o vídeos) colocados al estilo artículo documental.
+
+El diseño interno debe recordar a una revista de análisis o a un dossier académico accesible.

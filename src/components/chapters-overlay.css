@@ -1,0 +1,14 @@
+.chapters-panel {
+  background: linear-gradient(180deg, #0c2931 0%, #123a46 100%);
+}
+
+.chapters-panel .menu-item {
+  font-size: 24px;
+  padding: 14px 6px;
+}
+
+.chapters-panel .menu-item.active{
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-color: rgba(255,255,255,0.85);
+}

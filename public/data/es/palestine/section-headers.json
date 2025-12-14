@@ -1,0 +1,18 @@
+{
+  "testimonies": {
+    "title": "Testimonios de Palestina",
+    "description": "Voces de sobrevivientes y testigos que relatan sus experiencias bajo la ocupacion y el conflicto."
+  },
+  "resistance": {
+    "title": "Resistencia Popular Palestina",
+    "description": "Documentacion de los movimientos de resistencia pacifica y la lucha por la autodeterminacion del pueblo palestino."
+  },
+  "analysts": {
+    "title": "Analistas y Expertos",
+    "description": "Perspectivas y analisis de expertos sobre el conflicto palestino-israeli."
+  },
+  "genocides": {
+    "title": "Documentacion del Genocidio",
+    "description": "Registro historico de las atrocidades y violaciones de derechos humanos."
+  }
+}

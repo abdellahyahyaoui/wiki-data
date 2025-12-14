@@ -1,0 +1,53 @@
+{
+  "id": "cultura-preservacion",
+  "title": "Preservacion Cultural bajo Ocupacion",
+  "author": "Prof. Mahmoud Darwish",
+  "date": "2024-01-20",
+  "coverImage": "/uploads/velum-cultura-cover.jpg",
+  "category": "Cultura",
+  "content": [
+    {
+      "type": "text",
+      "content": "La cultura palestina es un tapiz rico y complejo tejido a lo largo de milenios. Desde las antiguas tradiciones cananeas hasta las influencias arabes, otomanas y modernas, esta herencia cultural representa un patrimonio unico que los palestinos luchan por preservar frente a los intentos de apropiacion y borrado.",
+      "dropCap": true
+    },
+    {
+      "type": "image",
+      "url": "/uploads/bordado-tradicional.jpg",
+      "caption": "Bordado tradicional palestino (tatriz)",
+      "position": "left"
+    },
+    {
+      "type": "text",
+      "content": "El tatriz, el arte del bordado tradicional palestino, es reconocido por la UNESCO como Patrimonio Cultural Inmaterial de la Humanidad. Cada region de Palestina historica desarrolló patrones distintivos: los bordados de Belen se distinguen por sus colores brillantes, mientras que los de Ramallah prefieren tonos mas sobrios. Las mujeres aprenden estos patrones desde ninas, transmitiendo asi un conocimiento que conecta generaciones."
+    },
+    {
+      "type": "text",
+      "content": "La dabke, la danza tradicional, sigue siendo un elemento central de las celebraciones palestinas. En bodas, graduaciones y festividades nacionales, los jovenes y mayores se toman de las manos y zapatean al ritmo de melodias ancestrales. Esta danza colectiva representa la unidad del pueblo y su conexion con la tierra."
+    },
+    {
+      "type": "image",
+      "url": "/uploads/dabke-danza.jpg",
+      "caption": "Jovenes palestinos bailando dabke",
+      "position": "right"
+    },
+    {
+      "type": "text",
+      "content": "La cocina palestina tambien es un campo de batalla cultural. Platos como el maqluba, el musakhan y el knafeh son reclamados como parte del patrimonio nacional. En cada receta se encuentra la historia de la tierra: el aceite de oliva de los milenarios olivares, el za'atar silvestre de las colinas, los limones de los huertos de Jaffa."
+    },
+    {
+      "type": "text",
+      "content": "La literatura palestina ha producido voces que resuenan en todo el mundo. Poetas como Mahmoud Darwish y Samih al-Qasim, novelistas como Ghassan Kanafani y ensayistas como Edward Said han llevado la narrativa palestina a audiencias globales. Sus obras son estudiadas en universidades de todo el mundo y traducidas a decenas de idiomas."
+    },
+    {
+      "type": "image",
+      "url": "/uploads/biblioteca-palestina.jpg",
+      "caption": "Biblioteca comunitaria en un campo de refugiados",
+      "position": "center"
+    },
+    {
+      "type": "text",
+      "content": "Preservar esta cultura no es solo mantener vivas las tradiciones del pasado. Es tambien crear nuevas expresiones que reflejen la realidad contemporanea. Artistas visuales, cineastas, musicos y escritores jovenes estan reinventando la cultura palestina, fusionando elementos tradicionales con formas modernas de expresion."
+    }
+  ]
+}

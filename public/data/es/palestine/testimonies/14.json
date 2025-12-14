@@ -1,0 +1,18 @@
+{
+  "id": "14",
+  "name": "Sara Zaqout",
+  "bio": "Este cuadro lleva una parte de mi alma, no son solo colores en una tela — es miedo, hambre, dolor y silencio convertidos en arte. Lo pinté en un momento en que la esperanza estaba lejana y el sonido del hambre era más fuerte que las palabras. Traté de expresar el sentimiento de un niño hambriento y su único compañero — un perro hambriento como él. Gaza está atravesando una hambruna provocada por el hombre. Así es como se ve. Estoy orgullosa de este cuadro porque dice lo que a veces no puedo expresar.",
+  "image": "/imagenes/sara2.jpg",
+  "social": {
+    "donation": "https://chuffed.org/project/118257-saras-winter-initiative?fbclid=PAQ0xDSwMSud1leHRuA2FlbQIxMAABp1nRaoJAVLtmrF6eAWjzfYCuuTuPW6A60ZsrH-PJiJnM0nqBGuIMtU-i1Xtj_aem_eo3VOCiKiJ6GzOOYUV5EPA",
+    "instagram": "https://www.instagram.com/sara.a.zaqout?igsh=MWhpYmxncjJ3Njkz"
+  },
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "un niño hambriento y un compañero solitario.",
+      "summary": "",
+      "date": "Lo pinté en un momento en que la esperanza estaba lejana y el sonido del hambre era más fuerte que las palabras. Traté de expresar el sentimiento de un niño hambriento y un compañero solitario."
+    }
+  ]
+}

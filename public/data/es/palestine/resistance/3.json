@@ -1,0 +1,30 @@
+{
+  "id": "3",
+  "name": "Marwan Barghouti",
+  "title": "Lider politico y simbolo de la resistencia pacifica",
+  "image": "/imagenes/marwan-barghouti.jpg",
+  "biography": "Marwan Barghouti es uno de los lideres politicos palestinos mas conocidos. Nacido en 1959 en Kobar, cerca de Ramallah, fue un defensor del dialogo y la negociacion antes de su encarcelamiento en 2002. Es considerado un simbolo de la lucha por la libertad palestina.",
+  "media": [
+    {
+      "type": "image",
+      "url": "/uploads/marwan-discurso.jpg",
+      "caption": "Marwan Barghouti dirigiendose a una multitud"
+    }
+  ],
+  "entries": [
+    {
+      "id": "r1",
+      "title": "WQQQ",
+      "summary": "QQQQQQQ",
+      "date": "",
+      "media": []
+    },
+    {
+      "id": "r2",
+      "title": "EEEEE",
+      "summary": "EEEEEEEEEEEEEEEEE",
+      "date": "",
+      "media": []
+    }
+  ]
+}

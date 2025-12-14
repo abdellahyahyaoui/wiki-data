@@ -1,0 +1,13 @@
+{
+  "id": "t1",
+  "personId": "3",
+  "title": "La filosofia de resistencia no violenta",
+  "content": "Marwan Barghouti siempre defendio que la resistencia palestina debe combinar multiples formas de lucha. Desde las negociaciones diplomaticas hasta la resistencia popular, pasando por la desobediencia civil. Su vision era crear un movimiento que pudiera ganar el apoyo de la comunidad internacional mientras mantenia la presion sobre la ocupacion.",
+  "media": [
+    {
+      "type": "image",
+      "url": "/uploads/manifestacion-pacifica.jpg",
+      "caption": "Manifestacion pacifica en Ramallah"
+    }
+  ]
+}

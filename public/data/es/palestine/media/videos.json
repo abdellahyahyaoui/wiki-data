@@ -1,0 +1,14 @@
+{
+  "videos": [
+    {
+      "id": "video1",
+      "title": "Documental sobre el conflicto",
+      "url": "/media/videos/video1.mp4"
+    },
+    {
+      "id": "video2",
+      "title": "Entrevista histórica",
+      "url": "/media/videos/video2.mp4"
+    }
+  ]
+}

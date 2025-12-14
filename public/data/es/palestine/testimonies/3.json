@@ -1,0 +1,73 @@
+{
+  "id": "3",
+  "name": "Khaled Abu Huwaishel",
+  "bio": "'Si nos quitan la pluma, la roca se habrá roto...' Khaled Youssef no es solo un nombre; es la voz de un padre, un hijo, un marido… pero, sobre todo, de un hombre que lucha por sobrevivir con dignidad. En este poderoso relato desde Gaza, nos muestra cómo el hambre no solo destruye cuerpos, sino también esperanzas. Un testimonio real que merece ser escuchado.",
+  "image": "/imagenes/Khaled_Abu_Huwaishel.jpg",
+  "social": {
+    "instagram": "https://www.instagram.com/khaled_1.y?igsh=Mzc5eGtvMmhtcTdk",
+    "telegram": "https://t.me/Journalist_Khaled_from_Gaza",
+    "donation": "https://www.gofundme.com/f/urgentevacuation-from-gaza-for-huwaishil-family?lang=en_US&utm_campaign=fp_sharesheet&utm_medium=customer&utm_source=copy_link&fbclid=PAQ0xDSwL8zqdleHRuA2FlbQIxMAABpyTnOVffybv_7GtXVHSqU0Mnz7_OVRn8nlonc5fNT8ttikUZkBYyY1zWNCoJ_aem_g10kMcHRQjBdfKu_6eqlcA"
+  },
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "Papá, ¿hay comida en el cielo?",
+      "summary": "En un rincón de una casa medio en ruinas, Adam, de siete años, estaba sentado,",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t2",
+      "title": "¡Aquí Está Gaza!",
+      "summary": "Aquí está Gaza, donde no queda nada para comer ni beber.",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t3",
+      "title": "En el Camino de la Muerte",
+      "summary": "Mi intención esa mañana era una sola: alimentar a mis hijos.",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t4",
+      "title": "Si Fuera un Espíritu",
+      "summary": "Ojalá me hubiera convertido en un espíritu;",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t5",
+      "title": "Déjennos morir de hambre",
+      "summary": "En Gaza, la muerte ya no es una noticia sorprendente.",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t6",
+      "title": "Querido hermano, con tu silencio nos matan...",
+      "summary": "Soy de Gaza,",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t7",
+      "title": "Solo son huérfanos..!",
+      "summary": "Ayuden a los huérfanos... No tienen nada en la vida más que sus lágrimas.",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t8",
+      "title": "Sionistas",
+      "summary": "Desde el surgimiento del proyecto sionista",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t9",
+      "title": "El dolor que nunca desaparece",
+      "summary": "Hay un dolor que solo conocen quienes lo han vivido.",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    },
+    {
+      "id": "t10",
+      "title": "A 5 segundos de Anas",
+      "summary": "💠 Entre el rugido de los aviones y el silencio de los mártires 💠",
+      "date": "La lluvia golpeaba el tejado mientras escribía estas líneas. Cada gota era un recuerdo, cada palabra una promesa de resistencia..."
+    }
+  ]
+}

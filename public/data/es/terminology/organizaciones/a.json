@@ -1,0 +1,19 @@
+{
+  "letter": "A",
+  "category": "organizaciones",
+  "items": [
+    {
+      "id": "amnistia",
+      "name": "Amnistía Internacional",
+      "shortDescription": "Organización de derechos humanos",
+      "title": "Amnistía Internacional",
+      "content": "Amnistía Internacional es un movimiento global de derechos humanos fundado en 1961 en Londres por el abogado británico Peter Benenson.",
+      "paragraphs": [
+        "La organización investiga y documenta violaciones de derechos humanos en todo el mundo, presionando a gobiernos y otras entidades para que respeten los derechos humanos.",
+        "Con más de 10 millones de miembros y simpatizantes en todo el mundo, Amnistía Internacional trabaja para proteger a personas dondequiera que se nieguen la justicia, la libertad, la verdad y la dignidad.",
+        "Ha documentado conflictos y crisis humanitarias en Palestina, Siria, Yemen, Myanmar y muchos otros lugares."
+      ],
+      "image": "/placeholder.svg?height=400&width=600"
+    }
+  ]
+}

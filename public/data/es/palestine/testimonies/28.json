@@ -1,0 +1,27 @@
+{
+  "id": "28",
+  "name": "Rajaa Hamed Hamdune",
+  "bio": "Historia de una mujer palestina que sobrevivió milagrosamente a una muerte segura cuando un tanque aplastó su casa, salió de entre la arena cargando a su hija, testigo de una masacre que le arrebató a su esposo y a sus hijos. Un testimonio vivo de resistencia y fe.",
+  "image": "/imagenes/rajae-hamed.jpg",
+  "social": {},
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "De los sueños a la ruina",
+      "summary": "Soy Rajaa Hamed Hamdouna, desplazada de la Franja de Gaza, de la zona de Al-Shati.",
+      "date": "Testimonio de una madre palestina que sobrevivió bajo un tanque junto a su hija pequeña."
+    },
+    {
+      "id": "t2",
+      "title": " Bajo el tanque",
+      "summary": "El sábado 7 de octubre, Ibrahim se estaba preparando para ir a la guardería.",
+      "date": "Testimonio de una madre palestina que sobrevivió bajo un tanque junto a su hija pequeña."
+    },
+    {
+      "id": "t3",
+      "title": "El arrastre hacia la vida ",
+      "summary": "",
+      "date": "Testimonio de una madre palestina que sobrevivió bajo un tanque junto a su hija pequeña."
+    }
+  ]
+}

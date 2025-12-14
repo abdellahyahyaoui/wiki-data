@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "id": "nakba-1948",
+      "date": "15 de mayo de 1948",
+      "year": 1948,
+      "title": "La Nakba - El Comienzo del Éxodo",
+      "image": "/imagenes/4.png",
+      "summary": "Más de 700.000 palestinos fueron expulsados de sus hogares durante la creación del Estado de Israel.",
+      "month": null
+    },
+    {
+      "id": "guerra-1967",
+      "date": "5-10 de junio de 1967",
+      "year": 1967,
+      "title": "La Guerra de los Seis Días",
+      "image": "/imagenes/chohada2.png",
+      "summary": "Israel ocupa Cisjordania, Gaza, los Altos del Golán y la Península del Sinaí."
+    },
+    {
+      "id": "ola-de-frio",
+      "date": "12",
+      "year": 2025,
+      "month": 12,
+      "title": "ola de frio",
+      "summary": "ola de frio extremo que asola agaza",
+      "image": null
+    }
+  ]
+}

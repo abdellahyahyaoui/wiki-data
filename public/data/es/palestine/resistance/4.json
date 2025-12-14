@@ -1,0 +1,14 @@
+{
+  "id": "4",
+  "name": "Dalal Mughrabi",
+  "title": "Heroina de la resistencia palestina",
+  "image": "/imagenes/dalal-mughrabi.jpg",
+  "biography": "Dalal Mughrabi (1958-1978) fue una combatiente palestina que participo en una operacion de resistencia en 1978. Para los palestinos, representa el sacrificio y la determinacion en la lucha por la liberacion de su tierra.",
+  "media": [
+    {
+      "type": "image",
+      "url": "/uploads/dalal-memorial.jpg",
+      "caption": "Memorial en honor a Dalal Mughrabi"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "t1",
+  "title": "Palabras desde el corazón",
+  "paragraphs": [
+    "Perfecto, ahora todo tiene sentido 😄\n\nServidor Node: Se ha ejecutado correctamente y ha generado un usuario admin automáticamente porque era la primera ejecución.\n\nUsuario: admin\n\nContraseña generada: DYBrpR+KF/F7F9X2 ✅\n\nEsa es la contraseña que debes usar una sola vez para entrar al panel y luego cambiarla.\n\nProblema con el cliente React:\n\nLa línea Something is already running on port 5000 significa que ya hay algo usando ese puerto.\n\nPor eso el cliente no se inicia.\n\nPuedes cambiar el puerto o cerrar la instancia que está usando el 5000 antes de volver a arrancar.\n\nPróximos pasos:\n\nEntra al CMS con admin y la contraseña que apareció en consola.\n\nCambia la contraseña desde el panel.\n\nUna vez dentro, podrás crear o"
+  ],
+  "media": []
+}

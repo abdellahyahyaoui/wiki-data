@@ -1,0 +1,18 @@
+{
+  "id": "8",
+  "name": "Abdul Razzaq Al-Majdalawi",
+  "bio": "Imam y pensador de Gaza, no predica, sino que entierra. Abdul Razzaq Al-Majdalawi escribe desde debajo de la tierra, donde entierra a su primo mártir Diyaa, y desde allí transmite un mensaje a una Ummah que ha fallado.",
+  "image": "/imagenes/Abdul_Razzaq_Al-Majdalawi.jpg",
+  "social": {
+    "tiktok": "https://www.tiktok.com/@abdul.razzaq.majd?_t=ZN-8ya77E01ov8&_r=1",
+    "whatsapp": "https://wsend.co/972599612097"
+  },
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "Oh Diyaa… cuéntale al Mensajero de Allah",
+      "summary": "Estoy aquí entregando un mensaje a mi primo Diyaa, para que lo lleve al Mensajero de Allah ﷺ.",
+      "date": "Estoy aquí llevando un mensaje de parte de mi primo Diyaa para el Mensajero de Allah ﷺ, y nada más. Menos de una hora antes de su martirio, estaba recitando: ﴿يَوْمَ يَعَضُّ الظَّالِمُ عَلَى يَدَيْهِ﴾. Un testimonio vivo desde Gaza en el momento de su entierro."
+    }
+  ]
+}

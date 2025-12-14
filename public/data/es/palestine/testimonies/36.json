@@ -1,0 +1,15 @@
+{
+  "id": "36",
+  "name": "Saleh Amer Fuad Al-Jaafrawi",
+  "bio": "Saleh Amer Fuad Al-Jaafrawi fue un periodista y activista palestino que dedicó su vida a dar voz a su pueblo, transmitiendo la realidad de Gaza durante dos años bajo riesgos extremos.",
+  "image": "/imagenes/saleh-amer.png",
+  "social": {},
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "Testimonio de Saleh: La Voz Inquebrantable de Gaza",
+      "summary": "En el nombre de Allah, el Misericordioso, el Compasivo.",
+      "date": "No crean que mi martirio es un final, es el comienzo de un largo camino hacia la libertad."
+    }
+  ]
+}

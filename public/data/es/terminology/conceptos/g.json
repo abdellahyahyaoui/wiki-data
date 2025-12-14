@@ -1,0 +1,19 @@
+{
+  "letter": "G",
+  "category": "conceptos",
+  "items": [
+    {
+      "id": "genocidio",
+      "name": "Genocidio",
+      "shortDescription": "Exterminio sistemático de un grupo",
+      "title": "Genocidio",
+      "content": "El genocidio es la destrucción deliberada y sistemática de un grupo nacional, étnico, racial o religioso. El término fue acuñado por el jurista polaco Raphael Lemkin en 1944.",
+      "paragraphs": [
+        "La Convención para la Prevención y la Sanción del Delito de Genocidio de 1948 define cinco actos que constituyen genocidio cuando se cometen con la intención de destruir, total o parcialmente, a un grupo.",
+        "Estos actos incluyen: matar a miembros del grupo, causar lesión grave, someter al grupo a condiciones que busquen su destrucción física, imponer medidas para prevenir nacimientos, y transferir por la fuerza niños del grupo a otro grupo.",
+        "El Holocausto nazi, el genocidio de Ruanda en 1994, y el genocidio de Srebrenica en Bosnia son ejemplos reconocidos internacionalmente de genocidio."
+      ],
+      "image": "/placeholder.svg?height=400&width=600"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "id": "mujeres-resistencia",
+      "title": "Mujeres en la Resistencia",
+      "author": "Dra. Leila Ahmed",
+      "date": "2024-03-08",
+      "coverImage": "/uploads/velum-mujeres-cover.jpg",
+      "excerpt": "El papel fundamental de las mujeres palestinas en la lucha por la libertad y la justicia.",
+      "category": "Sociedad",
+      "featured": true
+    },
+    {
+      "id": "cultura-preservacion",
+      "title": "Preservacion Cultural bajo Ocupacion",
+      "author": "Prof. Mahmoud Darwish",
+      "date": "2024-01-20",
+      "coverImage": "/uploads/velum-cultura-cover.jpg",
+      "excerpt": "Como el pueblo palestino mantiene viva su cultura, tradiciones y lengua a pesar de la ocupacion.",
+      "category": "Cultura",
+      "featured": false
+    },
+    {
+      "id": "gaza-testimonios",
+      "title": "Gaza: Testimonios desde el Asedio",
+      "author": "Ahmed Masoud",
+      "date": "2024-06-10",
+      "coverImage": "/uploads/velum-gaza-cover.jpg",
+      "excerpt": "Historias de vida cotidiana y supervivencia en la Franja de Gaza bajo bloqueo.",
+      "category": "Testimonios",
+      "featured": true
+    }
+  ]
+}

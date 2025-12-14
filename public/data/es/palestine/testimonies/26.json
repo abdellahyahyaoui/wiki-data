@@ -1,0 +1,24 @@
+{
+  "id": "26",
+  "name": "Mohamed Adwan",
+  "bio": "Mohamed Adwan transmite el sufrimiento para ser parte de la voz de Gaza.",
+  "image": "/imagenes/mohamed_adwan.jpg",
+  "social": {
+    "instagram": "https://www.instagram.com/mohamedadwan77",
+    "whatsapp": "+970593399933"
+  },
+  "testimonies": [
+    {
+      "id": "t1",
+      "title": "Quien se coronó de gloria y quien se cubrió de vergüenza",
+      "summary": "Este mensaje es sobre quien se coronó con gloria y quien se cubrió de vergüenza.",
+      "date": "Desde el corazón de Gaza… cuento la guerra y la esperanza con voz humana."
+    },
+    {
+      "id": "t2",
+      "title": "Esta fue la noche más difícil",
+      "summary": "Esta fue la noche más difícil.",
+      "date": "Desde el corazón de Gaza… cuento la guerra y la esperanza con voz humana."
+    }
+  ]
+}

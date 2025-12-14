@@ -1,0 +1,26 @@
+{
+  "letter": "A",
+  "category": "personajes",
+  "items": [
+    {
+      "id": "arafat",
+      "name": "Yasser Arafat",
+      "shortDescription": "Líder político palestino y presidente de la OLP",
+      "title": "Yasser Arafat",
+      "content": "Mohammed Yasser Abdel Rahman Abdel Raouf Arafat al-Qudwa (1929-2004), conocido como Yasser Arafat, fue un líder político palestino y presidente de la Organización para la Liberación de Palestina (OLP) desde 1969 hasta su muerte en 2004.",
+      "paragraphs": [
+        "Arafat fundó el movimiento nacionalista palestino Fatah en 1959 y se convirtió en presidente de la OLP en 1969. Durante décadas fue la figura más prominente del movimiento nacional palestino.",
+        "En 1994, recibió el Premio Nobel de la Paz junto con Yitzhak Rabin y Shimon Peres por los Acuerdos de Oslo. Fue elegido presidente de la Autoridad Nacional Palestina en 1996.",
+        "Su liderazgo fue controvertido tanto dentro como fuera de Palestina. Murió en 2004 en circunstancias que aún generan debate."
+      ],
+      "image": "/placeholder.svg?height=400&width=600"
+    },
+    {
+      "id": "abu-mazen",
+      "name": "Mahmoud Abbas (Abu Mazen)",
+      "shortDescription": "Presidente de la Autoridad Nacional Palestina",
+      "title": "Mahmoud Abbas",
+      "content": "Mahmoud Abbas, también conocido por su kunya Abu Mazen, es el presidente de la Autoridad Nacional Palestina desde 2005 y presidente del Estado de Palestina desde 2008."
+    }
+  ]
+}
