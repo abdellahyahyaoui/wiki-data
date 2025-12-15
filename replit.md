@@ -1,5 +1,5 @@
 # WikiConflicts CMS
-
+Admin1234!
 ## Descripción
 Aplicación CMS para documentar conflictos mundiales con timeline, testimonios, resistencia, fototeca y análisis.
 

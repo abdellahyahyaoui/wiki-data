@@ -2,17 +2,211 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { pool } = require('../db');
 const { authenticateToken, checkCountryPermission, checkPermission } = require('../middleware/auth');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 
-router.get('/predefined-countries', authenticateToken, async (req, res) => {
+const PREDEFINED_COUNTRIES = [
+  // Oriente Medio y Norte de África
+  { code: 'algeria', name: 'Argelia', region: 'Norte de África' },
+  { code: 'bahrain', name: 'Bahréin', region: 'Oriente Medio' },
+  { code: 'comoros', name: 'Comoras', region: 'África Oriental' },
+  { code: 'egypt', name: 'Egipto', region: 'Norte de África' },
+  { code: 'iraq', name: 'Irak', region: 'Oriente Medio' },
+  { code: 'israel', name: 'Israel', region: 'Oriente Medio' },
+  { code: 'jordan', name: 'Jordania', region: 'Oriente Medio' },
+  { code: 'kuwait', name: 'Kuwait', region: 'Oriente Medio' },
+  { code: 'lebanon', name: 'Líbano', region: 'Oriente Medio' },
+  { code: 'libya', name: 'Libia', region: 'Norte de África' },
+  { code: 'mauritania', name: 'Mauritania', region: 'Norte de África' },
+  { code: 'morocco', name: 'Marruecos', region: 'Norte de África' },
+  { code: 'oman', name: 'Omán', region: 'Oriente Medio' },
+  { code: 'qatar', name: 'Catar', region: 'Oriente Medio' },
+  { code: 'saudi-arabia', name: 'Arabia Saudita', region: 'Oriente Medio' },
+  { code: 'sudan', name: 'Sudán', region: 'Norte de África' },
+  { code: 'south-sudan', name: 'Sudán del Sur', region: 'África Oriental' },
+  { code: 'syria', name: 'Siria', region: 'Oriente Medio' },
+  { code: 'tunisia', name: 'Túnez', region: 'Norte de África' },
+  { code: 'uae', name: 'Emiratos Árabes Unidos', region: 'Oriente Medio' },
+  { code: 'yemen', name: 'Yemen', region: 'Oriente Medio' },
+  { code: 'western-sahara', name: 'Sáhara Occidental', region: 'Norte de África' },
+  { code: 'palestine', name: 'Palestina', region: 'Oriente Medio' },
+  { code: 'iran', name: 'Irán', region: 'Oriente Medio' },
+  // Europa
+  { code: 'albania', name: 'Albania', region: 'Europa' },
+  { code: 'andorra', name: 'Andorra', region: 'Europa' },
+  { code: 'austria', name: 'Austria', region: 'Europa' },
+  { code: 'belarus', name: 'Bielorrusia', region: 'Europa' },
+  { code: 'belgium', name: 'Bélgica', region: 'Europa' },
+  { code: 'bosnia', name: 'Bosnia y Herzegovina', region: 'Europa' },
+  { code: 'bulgaria', name: 'Bulgaria', region: 'Europa' },
+  { code: 'croatia', name: 'Croacia', region: 'Europa' },
+  { code: 'czechia', name: 'República Checa', region: 'Europa' },
+  { code: 'denmark', name: 'Dinamarca', region: 'Europa' },
+  { code: 'estonia', name: 'Estonia', region: 'Europa' },
+  { code: 'france', name: 'Francia', region: 'Europa' },
+  { code: 'germany', name: 'Alemania', region: 'Europa' },
+  { code: 'greece', name: 'Grecia', region: 'Europa' },
+  { code: 'hungary', name: 'Hungría', region: 'Europa' },
+  { code: 'ireland', name: 'Irlanda', region: 'Europa' },
+  { code: 'italy', name: 'Italia', region: 'Europa' },
+  { code: 'kosovo', name: 'Kosovo', region: 'Europa' },
+  { code: 'latvia', name: 'Letonia', region: 'Europa' },
+  { code: 'liechtenstein', name: 'Liechtenstein', region: 'Europa' },
+  { code: 'lithuania', name: 'Lituania', region: 'Europa' },
+  { code: 'luxembourg', name: 'Luxemburgo', region: 'Europa' },
+  { code: 'malta', name: 'Malta', region: 'Europa' },
+  { code: 'moldova', name: 'Moldavia', region: 'Europa' },
+  { code: 'monaco', name: 'Mónaco', region: 'Europa' },
+  { code: 'montenegro', name: 'Montenegro', region: 'Europa' },
+  { code: 'netherlands', name: 'Países Bajos', region: 'Europa' },
+  { code: 'north-macedonia', name: 'Macedonia del Norte', region: 'Europa' },
+  { code: 'poland', name: 'Polonia', region: 'Europa' },
+  { code: 'portugal', name: 'Portugal', region: 'Europa' },
+  { code: 'romania', name: 'Rumanía', region: 'Europa' },
+  { code: 'san-marino', name: 'San Marino', region: 'Europa' },
+  { code: 'serbia', name: 'Serbia', region: 'Europa' },
+  { code: 'slovakia', name: 'Eslovaquia', region: 'Europa' },
+  { code: 'slovenia', name: 'Eslovenia', region: 'Europa' },
+  { code: 'spain', name: 'España', region: 'Europa' },
+  { code: 'switzerland', name: 'Suiza', region: 'Europa' },
+  { code: 'ukraine', name: 'Ucrania', region: 'Europa' },
+  { code: 'united-kingdom', name: 'Reino Unido', region: 'Europa' },
+  { code: 'vatican', name: 'Vaticano', region: 'Europa' },
+  // África
+  { code: 'angola', name: 'Angola', region: 'África' },
+  { code: 'benin', name: 'Benín', region: 'África' },
+  { code: 'botswana', name: 'Botsuana', region: 'África' },
+  { code: 'burkina-faso', name: 'Burkina Faso', region: 'África' },
+  { code: 'burundi', name: 'Burundi', region: 'África' },
+  { code: 'cameroon', name: 'Camerún', region: 'África' },
+  { code: 'cape-verde', name: 'Cabo Verde', region: 'África' },
+  { code: 'central-african-republic', name: 'República Centroafricana', region: 'África' },
+  { code: 'chad', name: 'Chad', region: 'África' },
+  { code: 'congo', name: 'República del Congo', region: 'África' },
+  { code: 'drc', name: 'Rep. Dem. del Congo', region: 'África' },
+  { code: 'djibouti', name: 'Yibuti', region: 'África' },
+  { code: 'equatorial-guinea', name: 'Guinea Ecuatorial', region: 'África' },
+  { code: 'eritrea', name: 'Eritrea', region: 'África' },
+  { code: 'ethiopia', name: 'Etiopía', region: 'África' },
+  { code: 'gabon', name: 'Gabón', region: 'África' },
+  { code: 'gambia', name: 'Gambia', region: 'África' },
+  { code: 'ghana', name: 'Ghana', region: 'África' },
+  { code: 'guinea', name: 'Guinea', region: 'África' },
+  { code: 'guinea-bissau', name: 'Guinea-Bisáu', region: 'África' },
+  { code: 'ivory-coast', name: 'Costa de Marfil', region: 'África' },
+  { code: 'kenya', name: 'Kenia', region: 'África' },
+  { code: 'lesotho', name: 'Lesoto', region: 'África' },
+  { code: 'liberia', name: 'Liberia', region: 'África' },
+  { code: 'madagascar', name: 'Madagascar', region: 'África' },
+  { code: 'malawi', name: 'Malaui', region: 'África' },
+  { code: 'mali', name: 'Malí', region: 'África' },
+  { code: 'mauritius', name: 'Mauricio', region: 'África' },
+  { code: 'mozambique', name: 'Mozambique', region: 'África' },
+  { code: 'namibia', name: 'Namibia', region: 'África' },
+  { code: 'niger', name: 'Níger', region: 'África' },
+  { code: 'nigeria', name: 'Nigeria', region: 'África' },
+  { code: 'rwanda', name: 'Ruanda', region: 'África' },
+  { code: 'sao-tome', name: 'Santo Tomé y Príncipe', region: 'África' },
+  { code: 'senegal', name: 'Senegal', region: 'África' },
+  { code: 'seychelles', name: 'Seychelles', region: 'África' },
+  { code: 'sierra-leone', name: 'Sierra Leona', region: 'África' },
+  { code: 'somalia', name: 'Somalia', region: 'África' },
+  { code: 'south-africa', name: 'Sudáfrica', region: 'África' },
+  { code: 'eswatini', name: 'Esuatini', region: 'África' },
+  { code: 'tanzania', name: 'Tanzania', region: 'África' },
+  { code: 'togo', name: 'Togo', region: 'África' },
+  { code: 'uganda', name: 'Uganda', region: 'África' },
+  { code: 'zambia', name: 'Zambia', region: 'África' },
+  { code: 'zimbabwe', name: 'Zimbabue', region: 'África' },
+  { code: 'reunion', name: 'Reunión', region: 'África' },
+  { code: 'mayotte', name: 'Mayotte', region: 'África' },
+  // Asia
+  { code: 'afghanistan', name: 'Afganistán', region: 'Asia' },
+  { code: 'armenia', name: 'Armenia', region: 'Asia' },
+  { code: 'azerbaijan', name: 'Azerbaiyán', region: 'Asia' },
+  { code: 'bangladesh', name: 'Bangladés', region: 'Asia' },
+  { code: 'bhutan', name: 'Bután', region: 'Asia' },
+  { code: 'brunei', name: 'Brunéi', region: 'Asia' },
+  { code: 'cambodia', name: 'Camboya', region: 'Asia' },
+  { code: 'china', name: 'China', region: 'Asia' },
+  { code: 'georgia', name: 'Georgia', region: 'Asia' },
+  { code: 'india', name: 'India', region: 'Asia' },
+  { code: 'indonesia', name: 'Indonesia', region: 'Asia' },
+  { code: 'japan', name: 'Japón', region: 'Asia' },
+  { code: 'kazakhstan', name: 'Kazajistán', region: 'Asia' },
+  { code: 'kyrgyzstan', name: 'Kirguistán', region: 'Asia' },
+  { code: 'laos', name: 'Laos', region: 'Asia' },
+  { code: 'malaysia', name: 'Malasia', region: 'Asia' },
+  { code: 'maldives', name: 'Maldivas', region: 'Asia' },
+  { code: 'mongolia', name: 'Mongolia', region: 'Asia' },
+  { code: 'myanmar', name: 'Myanmar', region: 'Asia' },
+  { code: 'nepal', name: 'Nepal', region: 'Asia' },
+  { code: 'north-korea', name: 'Corea del Norte', region: 'Asia' },
+  { code: 'pakistan', name: 'Pakistán', region: 'Asia' },
+  { code: 'philippines', name: 'Filipinas', region: 'Asia' },
+  { code: 'singapore', name: 'Singapur', region: 'Asia' },
+  { code: 'south-korea', name: 'Corea del Sur', region: 'Asia' },
+  { code: 'sri-lanka', name: 'Sri Lanka', region: 'Asia' },
+  { code: 'taiwan', name: 'Taiwán', region: 'Asia' },
+  { code: 'tajikistan', name: 'Tayikistán', region: 'Asia' },
+  { code: 'thailand', name: 'Tailandia', region: 'Asia' },
+  { code: 'turkmenistan', name: 'Turkmenistán', region: 'Asia' },
+  { code: 'uzbekistan', name: 'Uzbekistán', region: 'Asia' },
+  { code: 'vietnam', name: 'Vietnam', region: 'Asia' },
+  { code: 'papua-new-guinea', name: 'Papúa Nueva Guinea', region: 'Asia' },
+  { code: 'kashmir', name: 'Cachemira', region: 'Asia' },
+  { code: 'uyghur', name: 'Uigures (Xinjiang)', region: 'Asia' },
+  { code: 'tibet', name: 'Tíbet', region: 'Asia' },
+  // América
+  { code: 'brazil', name: 'Brasil', region: 'América del Sur' },
+  { code: 'argentina', name: 'Argentina', region: 'América del Sur' },
+  { code: 'colombia', name: 'Colombia', region: 'América del Sur' },
+  { code: 'chile', name: 'Chile', region: 'América del Sur' },
+  { code: 'peru', name: 'Perú', region: 'América del Sur' },
+  { code: 'venezuela', name: 'Venezuela', region: 'América del Sur' },
+  { code: 'bolivia', name: 'Bolivia', region: 'América del Sur' },
+  { code: 'paraguay', name: 'Paraguay', region: 'América del Sur' },
+  { code: 'uruguay', name: 'Uruguay', region: 'América del Sur' },
+  { code: 'ecuador', name: 'Ecuador', region: 'América del Sur' },
+  { code: 'trinidad-tobago', name: 'Trinidad y Tobago', region: 'Caribe' },
+  { code: 'costa-rica', name: 'Costa Rica', region: 'Centroamérica' },
+  { code: 'panama', name: 'Panamá', region: 'Centroamérica' },
+  { code: 'cuba', name: 'Cuba', region: 'Caribe' },
+  { code: 'guyana', name: 'Guyana', region: 'América del Sur' },
+  { code: 'suriname', name: 'Surinam', region: 'América del Sur' },
+  { code: 'mexico', name: 'México', region: 'América del Norte' },
+  { code: 'haiti', name: 'Haití', region: 'Caribe' }
+];
+
+async function isDbConnected() {
   try {
-    const [rows] = await pool.query('SELECT code, name_es as name, region FROM predefined_countries ORDER BY region, name_es');
-    res.json({ countries: rows });
-  } catch (error) {
-    console.error('Error fetching predefined countries:', error);
-    res.status(500).json({ error: 'Error al obtener países' });
+    const conn = await pool.getConnection();
+    conn.release();
+    return true;
+  } catch {
+    return false;
   }
+}
+
+router.get('/predefined-countries', authenticateToken, async (req, res) => {
+  if (await isDbConnected()) {
+    try {
+      const [rows] = await pool.query('SELECT code, name_es as name, region FROM predefined_countries ORDER BY region, name_es');
+      if (rows.length > 0) {
+        return res.json({ countries: rows });
+      }
+    } catch (error) {
+      console.error('Error fetching predefined countries from DB:', error.message);
+    }
+  }
+  
+  res.json({ countries: PREDEFINED_COUNTRIES.sort((a, b) => {
+    if (a.region < b.region) return -1;
+    if (a.region > b.region) return 1;
+    return a.name.localeCompare(b.name);
+  })});
 });
 
 router.get('/countries', authenticateToken, async (req, res) => {
