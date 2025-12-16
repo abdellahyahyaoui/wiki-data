@@ -769,6 +769,69 @@ router.put('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyI
   }
 });
 
+// DELETE testimony
+router.delete('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  const { countryCode, witnessId, testimonyId } = req.params;
+  const lang = req.query.lang || 'es';
+
+  try {
+    const [countries] = await pool.query(
+      'SELECT id FROM countries WHERE code = ? AND lang = ?',
+      [countryCode, lang]
+    );
+
+    if (countries.length === 0) {
+      return res.status(404).json({ error: 'País no encontrado' });
+    }
+
+    const [witnesses] = await pool.query(
+      'SELECT id FROM witnesses WHERE country_id = ? AND witness_id = ?',
+      [countries[0].id, witnessId]
+    );
+
+    if (witnesses.length === 0) {
+      return res.status(404).json({ error: 'Testigo no encontrado' });
+    }
+
+    await pool.query(
+      'DELETE FROM testimonies WHERE witness_id = ? AND testimony_id = ?',
+      [witnesses[0].id, testimonyId]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting testimony:', error);
+    res.status(500).json({ error: 'Error al eliminar testimonio' });
+  }
+});
+
+// DELETE witness
+router.delete('/countries/:countryCode/testimonies/:witnessId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  const { countryCode, witnessId } = req.params;
+  const lang = req.query.lang || 'es';
+
+  try {
+    const [countries] = await pool.query(
+      'SELECT id FROM countries WHERE code = ? AND lang = ?',
+      [countryCode, lang]
+    );
+
+    if (countries.length === 0) {
+      return res.status(404).json({ error: 'País no encontrado' });
+    }
+
+    await pool.query(
+      'DELETE FROM witnesses WHERE country_id = ? AND witness_id = ?',
+      [countries[0].id, witnessId]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting witness:', error);
+    res.status(500).json({ error: 'Error al eliminar testigo' });
+  }
+});
+
 router.get('/countries/:countryCode/resistance', authenticateToken, async (req, res) => {
   const { countryCode } = req.params;
   const lang = req.query.lang || 'es';

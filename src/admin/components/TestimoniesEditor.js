@@ -274,6 +274,48 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     }
   }
 
+  async function handleDeleteWitness(witnessId) {
+    if (!confirm('¿Estás seguro de eliminar este testigo y todos sus testimonios?')) return;
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${witnessId}?lang=${lang}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      if (res.ok) {
+        setSelectedWitness(null);
+        setWitnessDetail(null);
+        loadWitnesses();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al eliminar');
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+    }
+  }
+
+  async function handleDeleteTestimony(testimonyId) {
+    if (!confirm('¿Estás seguro de eliminar este testimonio?')) return;
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimonyId}?lang=${lang}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      if (res.ok) {
+        loadWitnessDetail(selectedWitness);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al eliminar');
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+    }
+  }
+
   const canCreate = user.role === 'admin' || user.permissions?.canCreate;
   const canEdit = user.role === 'admin' || user.permissions?.canEdit;
 
@@ -351,11 +393,18 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
                     <p className="admin-witness-bio">{witnessDetail.bio}</p>
                   </div>
                 </div>
-                {canEdit && (
-                  <button onClick={openEditWitnessModal} className="admin-btn-secondary">
-                    Editar Testigo
-                  </button>
-                )}
+                <div className="admin-btn-group">
+                  {canEdit && (
+                    <button onClick={openEditWitnessModal} className="admin-btn-secondary">
+                      Editar Testigo
+                    </button>
+                  )}
+                  {user.role === 'admin' && (
+                    <button onClick={() => handleDeleteWitness(witnessDetail.id)} className="admin-btn-danger">
+                      Eliminar
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="admin-testimonies-section">

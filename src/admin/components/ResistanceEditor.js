@@ -274,6 +274,48 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     }
   }
 
+  async function handleDeleteResistor(resistorId) {
+    if (!confirm('¿Estás seguro de eliminar esta persona/grupo y todas sus entradas?')) return;
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${resistorId}?lang=${lang}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      if (res.ok) {
+        setSelectedResistor(null);
+        setResistorDetail(null);
+        loadResistors();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al eliminar');
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+    }
+  }
+
+  async function handleDeleteEntry(entryId) {
+    if (!confirm('¿Estás seguro de eliminar esta entrada?')) return;
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entryId}?lang=${lang}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      if (res.ok) {
+        loadResistorDetail(selectedResistor);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Error al eliminar');
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+    }
+  }
+
   const canCreate = user.role === 'admin' || user.permissions?.canCreate;
   const canEdit = user.role === 'admin' || user.permissions?.canEdit;
 
@@ -351,11 +393,18 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
                     <p className="admin-witness-bio">{resistorDetail.bio}</p>
                   </div>
                 </div>
-                {canEdit && (
-                  <button onClick={openEditResistorModal} className="admin-btn-secondary">
-                    Editar
-                  </button>
-                )}
+                <div className="admin-btn-group">
+                  {canEdit && (
+                    <button onClick={openEditResistorModal} className="admin-btn-secondary">
+                      Editar
+                    </button>
+                  )}
+                  {user.role === 'admin' && (
+                    <button onClick={() => handleDeleteResistor(resistorDetail.id)} className="admin-btn-danger">
+                      Eliminar
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="admin-testimonies-section">
