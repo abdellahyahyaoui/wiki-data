@@ -1,7 +1,5 @@
 // src/utils/apiBase.js
-const API_BASE =
-  process.env.NODE_ENV === 'production'
-    ? 'https://wiki-data-qxef.onrender.com'
-    : 'http://localhost:5000';
+// Use empty string to make relative API calls to the same origin
+const API_BASE = '';
 
 export default API_BASE;
