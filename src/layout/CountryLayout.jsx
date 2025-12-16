@@ -96,7 +96,16 @@ export default function CountryLayout() {
     }
   }
 
-  if (loading) return <div className="country-loading">Cargando país {code}...</div>
+  if (loading)
+  return (
+    <div className="country-loading">
+      <div className="country-loading-logo" />
+      <div className="country-loading-text">
+        Cargando país {code}…
+      </div>
+    </div>
+  )
+
   if (!meta) return <div className="country-loading">No se encontraron datos para {code}</div>
 
  if (isMobile && meta) {

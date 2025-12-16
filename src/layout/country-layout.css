@@ -72,18 +72,48 @@
 }
 
 .country-loading {
-  padding: 60px 40px;
-  text-align: center;
-  font-size: 16px;
-  color: #999;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  gap: 20px;
+
+  text-align: center;
+  font-size: 16px;
+  color: #9ca3af; /* gris elegante */
   font-style: italic;
+
+  padding: 40px 20px;
+}
+
+.country-loading-logo {
+  width: 140px;
+  height: 140px;
+
   background-image: url("/src/images/logo_mobil.png");
   background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
+
+.country-loading-text {
+  max-width: 280px;
+  line-height: 1.4;
+}
+
+/* 📱 Mobile adjustments */
+@media (max-width: 480px) {
+  .country-loading-logo {
+    width: 110px;
+    height: 110px;
+  }
+
+  .country-loading-text {
+    font-size: 14px;
+  }
+}
+
 
 /* Responsive: Tablet view */
 @media (max-width: 1024px) {
@@ -116,10 +146,10 @@
   flex-direction: column-reverse;
   }
 
-  .country-loading {
+  /* .country-loading {
     padding: 40px 20px;
     font-size: 14px;
-  }
+  } */
 }
 
 /* Refined mobile header for Wikipedia aesthetic */
