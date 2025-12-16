@@ -14,56 +14,28 @@ import API_BASE from '../utils/apiBase';
 
 import './admin.css';
 
-const AVAILABLE_COUNTRIES = [
-  { code: 'palestine', name: 'Palestina', region: 'middle-east' },
-  { code: 'libya', name: 'Libia', region: 'arab' },
-  { code: 'morocco', name: 'Marruecos', region: 'arab' },
-  { code: 'algeria', name: 'Argelia', region: 'arab' },
-  { code: 'tunisia', name: 'Túnez', region: 'arab' },
-  { code: 'egypt', name: 'Egipto', region: 'arab' },
-  { code: 'sudan', name: 'Sudán', region: 'arab' },
-  { code: 'mauritania', name: 'Mauritania', region: 'arab' },
-  { code: 'yemen', name: 'Yemen', region: 'arab' },
-  { code: 'syria', name: 'Siria', region: 'arab' },
-  { code: 'iraq', name: 'Irak', region: 'arab' },
-  { code: 'jordan', name: 'Jordania', region: 'arab' },
-  { code: 'lebanon', name: 'Líbano', region: 'arab' },
-  { code: 'saudi', name: 'Arabia Saudí', region: 'arab' },
-  { code: 'uae', name: 'Emiratos Árabes', region: 'arab' },
-  { code: 'qatar', name: 'Qatar', region: 'arab' },
-  { code: 'kuwait', name: 'Kuwait', region: 'arab' },
-  { code: 'oman', name: 'Omán', region: 'arab' },
-  { code: 'bahrain', name: 'Baréin', region: 'arab' },
-  { code: 'iran', name: 'Irán', region: 'middle-east' },
-  { code: 'turkey', name: 'Turquía', region: 'middle-east' },
-  { code: 'spain', name: 'España', region: 'europe' },
-  { code: 'france', name: 'Francia', region: 'europe' },
-  { code: 'germany', name: 'Alemania', region: 'europe' },
-  { code: 'uk', name: 'Reino Unido', region: 'europe' },
-  { code: 'italy', name: 'Italia', region: 'europe' },
-  { code: 'poland', name: 'Polonia', region: 'europe' },
-  { code: 'ukraine', name: 'Ucrania', region: 'europe' },
-  { code: 'russia', name: 'Rusia', region: 'europe' },
-  { code: 'mexico', name: 'México', region: 'latam' },
-  { code: 'colombia', name: 'Colombia', region: 'latam' },
-  { code: 'venezuela', name: 'Venezuela', region: 'latam' },
-  { code: 'brazil', name: 'Brasil', region: 'latam' },
-  { code: 'argentina', name: 'Argentina', region: 'latam' },
-  { code: 'chile', name: 'Chile', region: 'latam' },
-  { code: 'peru', name: 'Perú', region: 'latam' },
-  { code: 'cuba', name: 'Cuba', region: 'latam' },
-  { code: 'guatemala', name: 'Guatemala', region: 'latam' },
-  { code: 'honduras', name: 'Honduras', region: 'latam' },
-  { code: 'nicaragua', name: 'Nicaragua', region: 'latam' },
-  { code: 'el-salvador', name: 'El Salvador', region: 'latam' }
-];
-
 const AVAILABLE_LANGUAGES = [
   { code: 'es', name: 'Español' },
   { code: 'en', name: 'English' },
   { code: 'fr', name: 'Français' },
   { code: 'ar', name: 'العربية' }
 ];
+
+const REGION_LABELS = {
+  'Oriente Medio': 'Oriente Medio',
+  'Norte de África': 'Norte de África',
+  'África Oriental': 'África Oriental',
+  'Europa': 'Europa',
+  'África': 'África',
+  'Asia': 'Asia',
+  'Asia Central': 'Asia Central',
+  'Sudeste Asiático': 'Sudeste Asiático',
+  'Oceanía': 'Oceanía',
+  'Norteamérica': 'Norteamérica',
+  'Centroamérica': 'Centroamérica',
+  'Sudamérica': 'Sudamérica',
+  'Caribe': 'Caribe'
+};
 
 export default function AdminCountry() {
   const { countryCode: urlCountryCode } = useParams();
@@ -72,21 +44,47 @@ export default function AdminCountry() {
   const [country, setCountry] = useState(null);
   const [activeSection, setActiveSection] = useState('description');
   const [loading, setLoading] = useState(true);
+  const [loadingPredefined, setLoadingPredefined] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState(urlCountryCode || 'palestine');
   const [selectedLang, setSelectedLang] = useState('es');
   const [availableCountries, setAvailableCountries] = useState([]);
+  const [predefinedCountries, setPredefinedCountries] = useState([]);
 
   useEffect(() => {
-    loadCountry();
-  }, [selectedCountry, selectedLang]);
+    loadPredefinedCountries();
+  }, []);
+
+  useEffect(() => {
+    if (!loadingPredefined) {
+      loadCountry();
+    }
+  }, [selectedCountry, selectedLang, loadingPredefined, predefinedCountries]);
+
+  async function loadPredefinedCountries() {
+    setLoadingPredefined(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/cms/predefined-countries`, {
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPredefinedCountries(data.countries || []);
+      } else {
+        console.error('Failed to load predefined countries:', res.status);
+      }
+    } catch (error) {
+      console.error('Error loading predefined countries:', error);
+    }
+    setLoadingPredefined(false);
+  }
 
   async function loadCountry() {
     setLoading(true);
     try {
-const res = await fetch(
-  `${API_BASE}/api/cms/countries?lang=${selectedLang}`,
-  { headers: getAuthHeaders() }
-);
+      const res = await fetch(
+        `${API_BASE}/api/cms/countries?lang=${selectedLang}`,
+        { headers: getAuthHeaders() }
+      );
       if (res.ok) {
         const data = await res.json();
         setAvailableCountries(data.countries || []);
@@ -94,7 +92,7 @@ const res = await fetch(
         if (found) {
           setCountry(found);
         } else {
-          const countryInfo = AVAILABLE_COUNTRIES.find(c => c.code === selectedCountry);
+          const countryInfo = predefinedCountries.find(c => c.code === selectedCountry);
           setCountry({
             code: selectedCountry,
             name: countryInfo?.name || selectedCountry,
@@ -104,7 +102,7 @@ const res = await fetch(
       }
     } catch (error) {
       console.error('Error loading country:', error);
-      const countryInfo = AVAILABLE_COUNTRIES.find(c => c.code === selectedCountry);
+      const countryInfo = predefinedCountries.find(c => c.code === selectedCountry);
       setCountry({
         code: selectedCountry,
         name: countryInfo?.name || selectedCountry,
@@ -119,11 +117,11 @@ const res = await fetch(
     navigate(`/admin/country/${newCountry}`, { replace: true });
   }
 
-  if (loading && !country) {
+  if (loadingPredefined || (loading && !country)) {
     return <div className="admin-loading">Cargando...</div>;
   }
 
-  const countryName = country?.name || AVAILABLE_COUNTRIES.find(c => c.code === selectedCountry)?.name || selectedCountry;
+  const countryName = country?.name || predefinedCountries.find(c => c.code === selectedCountry)?.name || selectedCountry;
 
   const sections = [
     { id: 'description', label: 'Descripción', icon: '📖' },
@@ -138,12 +136,11 @@ const res = await fetch(
     { id: 'videos', label: 'Videos', icon: '🎬' }
   ];
 
-  const groupedCountries = {
-    'Oriente Medio': AVAILABLE_COUNTRIES.filter(c => c.region === 'middle-east'),
-    'Países Árabes': AVAILABLE_COUNTRIES.filter(c => c.region === 'arab'),
-    'Europa': AVAILABLE_COUNTRIES.filter(c => c.region === 'europe'),
-    'Latinoamérica': AVAILABLE_COUNTRIES.filter(c => c.region === 'latam')
-  };
+  const uniqueRegions = [...new Set(predefinedCountries.map(c => c.region))].sort();
+  const groupedCountries = {};
+  uniqueRegions.forEach(region => {
+    groupedCountries[REGION_LABELS[region] || region] = predefinedCountries.filter(c => c.region === region);
+  });
 
   return (
     <div className="admin-container">
