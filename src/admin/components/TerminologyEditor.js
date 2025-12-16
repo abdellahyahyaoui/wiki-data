@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import API_BASE from '../../utils/apiBase';
+
 
 const CATEGORIES = [
   { value: 'general', label: 'General' },
@@ -36,7 +38,7 @@ export default function TerminologyEditor({ lang = 'es' }) {
 
   async function loadTerms() {
     try {
-      const res = await fetch(`/api/cms/terminology?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/terminology?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -83,7 +85,7 @@ export default function TerminologyEditor({ lang = 'es' }) {
     const method = editingTerm ? 'PUT' : 'POST';
 
     try {
-      const res = await fetch(url, {
+      const res = await fetch(`${API_BASE}${url}`, {
         method,
         headers: {
           ...getAuthHeaders(),
@@ -112,7 +114,7 @@ export default function TerminologyEditor({ lang = 'es' }) {
     if (!window.confirm('¿Eliminar este término?')) return;
 
     try {
-      const res = await fetch(`/api/cms/terminology/${termId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/terminology/${termId}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });

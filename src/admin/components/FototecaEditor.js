@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import API_BASE from '../../utils/apiBase';
 
 export default function FototecaEditor({ countryCode, mediaType = null }) {
   const { user, getAuthHeaders } = useAuth();
@@ -28,7 +29,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
 
   async function loadItems() {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/fototeca`, { 
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/fototeca`, { 
         headers: getAuthHeaders() 
       });
       if (res.ok) {
@@ -48,7 +49,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
   async function loadGalleryImages() {
     setLoadingGallery(true);
     try {
-      const res = await fetch('/api/cms/gallery/images', { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/api/cms/gallery/images`, { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         setGalleryImages(data.images || []);
@@ -92,7 +93,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
     uploadFormData.append('images', file);
 
     try {
-      const res = await fetch('/api/upload/images', {
+      const res = await fetch(`${API_BASE}/api/upload/images`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: uploadFormData
@@ -134,7 +135,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
         ? `/api/cms/countries/${countryCode}/fototeca/${editingItem.id}`
         : `/api/cms/countries/${countryCode}/fototeca`;
 
-      const res = await fetch(url, {
+     const res = await fetch(`${API_BASE}${url}`, {
         method,
         headers: {
           ...getAuthHeaders(),
@@ -159,7 +160,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
     if (!window.confirm(`¿Eliminar "${item.title}"?`)) return;
 
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/fototeca/${item.id}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/fototeca/${item.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });

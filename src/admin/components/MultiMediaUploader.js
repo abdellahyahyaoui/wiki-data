@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import API_BASE from '../../utils/apiBase';
 
 export default function MultiMediaUploader({ value = [], onChange, allowedTypes = ['image', 'video', 'audio'] }) {
   const { getAuthHeaders } = useAuth();
@@ -17,7 +18,7 @@ export default function MultiMediaUploader({ value = [], onChange, allowedTypes 
       formData.append('file', file);
 
       try {
-        const res = await fetch('/api/upload/media', {
+        const res = await fetch(`${API_BASE}/api/upload/medi`, {
           method: 'POST',
           headers: getAuthHeaders(),
           body: formData

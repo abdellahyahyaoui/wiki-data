@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ImageUploader from './ImageUploader';
 import RichContentEditor from './RichContentEditor';
+import API_BASE from '../../utils/apiBase';
 
 export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
   const { user, getAuthHeaders } = useAuth();
@@ -42,7 +43,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
   async function loadSectionHeader() {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/section-headers/testimonies?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/section-headers/testimonies?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -58,7 +59,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
   async function saveSectionHeader() {
     try {
-      await fetch(`/api/cms/countries/${countryCode}/section-headers/testimonies?lang=${lang}`, {
+      await fetch(`${API_BASE}/api/cms/countries/${countryCode}/section-headers/testimonies?lang=${lang}`, {
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),
@@ -73,7 +74,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
   async function loadWitnesses() {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/testimonies?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -88,7 +89,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
   async function loadWitnessDetail(witnessId) {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/testimonies/${witnessId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${witnessId}?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -142,7 +143,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
   async function openEditTestimonyModal(testimony) {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimony.id}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimony.id}?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       
@@ -202,7 +203,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     };
 
     try {
-      const res = await fetch(url, {
+  const res = await fetch(`${API_BASE}${url}`, {
         method,
         headers: {
           ...getAuthHeaders(),
@@ -248,7 +249,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
       : `/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony?lang=${lang}`;
 
     try {
-      const res = await fetch(url, {
+     const res = await fetch(`${API_BASE}${url}`, {
         method: isEdit ? 'PUT' : 'POST',
         headers: {
           ...getAuthHeaders(),

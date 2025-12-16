@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import API_BASE from '../../utils/apiBase';
 
 export default function MediaEditor({ countryCode }) {
   const { getAuthHeaders } = useAuth();
@@ -14,7 +15,7 @@ export default function MediaEditor({ countryCode }) {
 
   async function loadMedia() {
     try {
-      const res = await fetch('/api/upload/list', { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/api/upload/list`, { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         setImages(data.images || []);
@@ -38,7 +39,7 @@ export default function MediaEditor({ countryCode }) {
     }
 
     try {
-      const res = await fetch('/api/upload/images', {
+      const res = await fetch(`${API_BASE}/api/upload/images`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: formData
@@ -60,7 +61,7 @@ export default function MediaEditor({ countryCode }) {
     if (!window.confirm('¿Eliminar este archivo?')) return;
 
     try {
-      const res = await fetch(`/api/upload/${filename}`, {
+      const res = await fetch(`${API_BASE}/api/upload/${filename}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });

@@ -81,6 +81,8 @@
   justify-content: center;
   min-height: 400px;
   font-style: italic;
+  background-image: url("/src/images/logo_mobil.png");
+  background-repeat: no-repeat;
 }
 
 /* Responsive: Tablet view */

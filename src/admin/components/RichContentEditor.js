@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import API_BASE from '../../utils/apiBase';
 
 export default function RichContentEditor({ blocks = [], onChange, allowAudio = true }) {
   const { getAuthHeaders } = useAuth();
@@ -70,9 +71,9 @@ export default function RichContentEditor({ blocks = [], onChange, allowAudio = 
     }
 
     try {
-      let endpoint = '/api/upload/image';
-      if (type === 'video') endpoint = '/api/upload/video';
-      else if (type === 'audio') endpoint = '/api/upload/media';
+      let endpoint = `${API_BASE}/api/upload/image`;
+      if (type === 'video') endpoint = `${API_BASE}/api/upload/video`;
+      else if (type === 'audio') endpoint = `${API_BASE}/api/upload/media`;
       
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -102,7 +103,7 @@ export default function RichContentEditor({ blocks = [], onChange, allowAudio = 
     setTargetMediaType(mediaType);
     
     try {
-      const res = await fetch('/api/upload/list', { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/api/upload/list`, { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         const allItems = [

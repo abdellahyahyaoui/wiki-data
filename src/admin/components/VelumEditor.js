@@ -167,7 +167,7 @@ export default function VelumEditor({ countryCode, lang = 'es' }) {
     if (!window.confirm(`¿Eliminar "${article.title}"?`)) return;
 
     try {
-      const res = await fetch(`/api/cms/velum/${article.id}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/velum/${article.id}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });

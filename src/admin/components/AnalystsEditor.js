@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import ImageUploader from './ImageUploader';
+import API_BASE from '../../utils/apiBase';
 
 export default function AnalystsEditor({ countryCode }) {
   const { user, getAuthHeaders } = useAuth();
@@ -21,7 +22,7 @@ export default function AnalystsEditor({ countryCode }) {
 
   async function loadAnalysts() {
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/analysts?lang=es`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/analysts?lang=es`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -54,7 +55,7 @@ export default function AnalystsEditor({ countryCode }) {
     };
 
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/analysts?lang=es`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/analysts?lang=es`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),

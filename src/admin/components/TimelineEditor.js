@@ -149,7 +149,7 @@ export default function TimelineEditor({ countryCode }) {
     };
 
     try {
-      const res = await fetch(url, {
+       const res = await fetch(`${API_BASE}${url}`, {
         method,
         headers: {
           ...getAuthHeaders(),
@@ -178,7 +178,7 @@ export default function TimelineEditor({ countryCode }) {
     if (!window.confirm(`¿Eliminar "${item.title}"?`)) return;
 
     try {
-      const res = await fetch(`/api/cms/countries/${countryCode}/timeline/${item.id}?lang=es`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/timeline/${item.id}?lang=es`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });

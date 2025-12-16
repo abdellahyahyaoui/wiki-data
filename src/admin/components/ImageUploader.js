@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import API_BASE from '../../utils/apiBase';
 
 export default function ImageUploader({ value, onChange, currentImage, onImageChange }) {
   const { getAuthHeaders } = useAuth();
@@ -23,7 +24,7 @@ export default function ImageUploader({ value, onChange, currentImage, onImageCh
     formData.append('image', file);
 
     try {
-      const res = await fetch('/api/upload/image', {
+      const res = await fetch(`${API_BASE}/api/upload/image`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: formData
@@ -44,7 +45,7 @@ export default function ImageUploader({ value, onChange, currentImage, onImageCh
 
   async function openGallery() {
     try {
-      const res = await fetch('/api/upload/list', { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/api/upload/list`, { headers: getAuthHeaders() });
       if (res.ok) {
         const data = await res.json();
         setGallery(data.images || []);

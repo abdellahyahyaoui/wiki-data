@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import API_BASE from '../../utils/apiBase';
 
 export default function GalleryManager({ onSelect, selectMode = false, mediaFilter = null }) {
   const { getAuthHeaders } = useAuth();
@@ -20,7 +21,7 @@ export default function GalleryManager({ onSelect, selectMode = false, mediaFilt
 
   async function loadItems() {
     try {
-      const res = await fetch('/api/upload/list', {
+      const res = await fetch(`${API_BASE}/api/upload/list`, {
         headers: getAuthHeaders()
       });
       if (res.ok) {
@@ -49,7 +50,7 @@ export default function GalleryManager({ onSelect, selectMode = false, mediaFilt
     }
 
     try {
-      const res = await fetch('/api/upload/images', {
+      const res = await fetch(`${API_BASE}/api/upload/images`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: formData
@@ -69,7 +70,7 @@ export default function GalleryManager({ onSelect, selectMode = false, mediaFilt
     if (!window.confirm('¿Eliminar este archivo de la galería?')) return;
 
     try {
-      const res = await fetch(`/api/upload/${filename}`, {
+      const res = await fetch(`${API_BASE}/api/upload/${filename}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
