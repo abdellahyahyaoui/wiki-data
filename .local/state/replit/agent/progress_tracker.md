@@ -6,3 +6,4 @@
 [x] 6. Fix velum and terminology sections to use API instead of static files
 [x] 7. Add new API endpoints for terminology index and category/letter
 [x] 8. Fix API_BASE to use local server instead of external URL
+[x] 9. Built React application and verified frontend is working
