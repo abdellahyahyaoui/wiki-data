@@ -147,9 +147,17 @@
 
 
 .mobile-logo-large {
-  font-size: 1.8rem;
-  cursor: pointer;
-  flex: 1;
+   display: flex;
+  align-items: center;
+  gap: 1px;
+  width: 80px;
+  height: 90px;
+
+  background-image: url("/src/images/logo_mobil.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  scale: 1.2;
   text-align: left;
 }
 
@@ -200,6 +208,7 @@
   border-bottom: 1px solid #a2a9b1;
   padding-bottom: 0.5rem;
   width: 100%;
+  margin-top: 10px;
 }
 
 .mobile-menu-toggle {
@@ -325,34 +334,60 @@
     overflow-y: auto;
   }
 }
-.menu-button-fixed {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 12000;
-
-  padding: 15px 10px;
+/* Estilo básico del botón (circular y con fondo negro) */
+.menu-button {
   border-radius: 50%;
-
- background:#07202bc4;
-  font-family: 'Cormorant Garamond';
-font-style: italic;
-  color: #e8eaea;
-  font-size: 15px;
-  font-weight: 900;
-  /* font-family: Cormorant Garamond,serif; */
-  cursor: pointer;
-border: none;
-  transition: background .20s ease, transform .18s ease;
+    padding: 14px 10px;
+    background: #0c3344f2;
+    position: fixed;
+    right: 0;
+    margin: 21px;
+    margin-top: 22px;
+    border: none;
 }
+
 
 /* Hover elegante */
 .menu-button-fixed:hover {
   background: linear-gradient(145deg, #1a1b1b, #2c2d2e);
-  transform: scale(1.02);
+  transform: scale(1.12);
 }
 
-/* Activo (estado cerrar) */
+/* Estilo de las tres líneas en blanco */
+.menu-icon {
+  position: relative;
+  width: 30px;  /* Ancho de las líneas */
+  height: 20px;  /* Altura de las líneas */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.line {
+  width: 100%;
+  height: 4px;  /* Grosor de las líneas */
+  background-color: #fff;  /* Líneas blancas */
+  transition: all 0.3s ease;  /* Transición suave */
+}
+
+/* Efecto cuando el menú está abierto (estado "cerrar") */
+.menu-button-fixed.close-mode .line:nth-child(1) {
+  transform: rotate(45deg);
+  position: absolute;
+  top: 0;
+}
+
+.menu-button-fixed.close-mode .line:nth-child(2) {
+  opacity: 0;  /* Desaparece la línea del medio */
+}
+
+.menu-button-fixed.close-mode .line:nth-child(3) {
+  transform: rotate(-45deg);
+  position: absolute;
+  bottom: 0;
+}
+
+/* Activo (estado "cerrar") */
 .menu-button-fixed.close-mode {
   background: linear-gradient(145deg, #131313, #0d0d0d);
   border: 1px solid #4d4d4d;
@@ -361,5 +396,5 @@ border: none;
 
 .menu-button-fixed.close-mode:hover {
   background: linear-gradient(145deg, #1c1c1c, #111111);
-      padding: 4px 15px;
+  padding: 4px 15px;
 }

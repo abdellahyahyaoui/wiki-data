@@ -1,0 +1,36 @@
+{
+  "short_name": "Wiki conflicts",
+  "name": "Wiki conflicts",
+  "icons": [
+    {
+      "src": "images/w.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "images/w.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "images/w.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "images/w.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "images/w.png",  
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000"
+}

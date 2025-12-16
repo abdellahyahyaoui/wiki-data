@@ -178,7 +178,7 @@ function Home() {
   return (
     <div className="home-container">
 
-      <Link to="/admin/login" className="admin-button">Admin</Link>
+      {/* <Link to="/admin/login" className="admin-button">Admin</Link> */}
 
       <div className="title-block">
         <h1 className="title-main">

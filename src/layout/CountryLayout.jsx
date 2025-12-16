@@ -107,14 +107,18 @@ export default function CountryLayout() {
       <div className="mobile-wiki-header">
         <div className="mobile-header-top-row">
           <div className="mobile-logo-large" onClick={() => navigate("/")}>
-            <span className="logo-wiki">Wiki</span>
-            <span className="logo-conflicts">Conflicts</span>
+            {/* <span className="logo-wiki">Wiki</span>
+            <span className="logo-conflicts">Conflicts</span> */}
           </div>
 <button
-  className={`menu-button-fixed ${isMenuOpen ? "close-mode" : ""}`}
+  className={`menu-button ${isMenuOpen ? "open" : ""}`}
   onClick={() => setIsMenuOpen(prev => !prev)}
 >
-  {isMenuOpen ? "Cerrar" : "Menú"}
+  <div className="menu-icon">
+    <div className="line"></div>
+    <div className="line"></div>
+    <div className="line"></div>
+  </div>
 </button>
 
 

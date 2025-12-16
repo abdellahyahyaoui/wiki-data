@@ -372,10 +372,10 @@ font-family: Cormorant Garamond,serif;
   padding: 20px 24px;
   border-bottom: none;
   border-left: none;
-  background: #fff;
+  background: #07202b0d;
   margin-bottom: 1.5rem;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 50px 0px 50px 0px;
+  box-shadow: 0 2px 8px #0c334442;
 }
 
 .analysis-card.timeline-card:hover {

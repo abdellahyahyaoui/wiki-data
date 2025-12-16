@@ -7,12 +7,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 0px 24px;
   gap: 20px;
   position: sticky;
   top: 0;
   z-index: 100;
-  align-items: flex-start;
+  align-items: center;
+      padding-bottom: 0;
 }
 
 /* === LEFT SECTION: LOGO + QUOTE === */
@@ -26,14 +27,22 @@
 }
 
 .header-left:focus {
-  box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
+  box-shadow: 0 0 0 3px #ffffff;
   border-radius: 6px;
 }
 
 .header-logo {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 1px;
+  width: 150px;
+  height: 120px;
+
+  background-image: url("/src/images/logo_web.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  
 }
 
 .logo-wiki {
@@ -84,14 +93,14 @@
   outline: none;
   font-size: 14px;
   background: #f8f8f8;
-  transition: box-shadow 0.18s, border-color 0.18s, background 0.18s;
+  transition: box-shadow 0.18s, border-color 0.18s, #0c3344 0.18s;
   /* font-family: Cormorant Garamond, serif; */
 }
 
 .header-search:focus {
   border-color:  #1d546b;
   background: #fff;
-  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.08);
+
 }
 
 .header-search::placeholder {
@@ -105,6 +114,10 @@
   align-items: center;
   gap: 20px;
   flex-shrink: 0;
+     
+    display: flex;
+    height: 120px;
+
 }
 
 /* -------- RED LANGUAGE SELECTOR -------- */
@@ -206,29 +219,30 @@
 
 /* -------- COLLABORATE BUTTON -------- */
 .collaborate-button {
-font-style: italic;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    /* border: none; */
-    /* border-radius: 9999px; */
-    padding: 0.4rem 1rem;
-    /* background: #174052; */
-    color: #123544;
-    font-weight: 800;
-    font-size: 1.25rem;
-    letter-spacing: 0.5px;
+
+       align-items: center;
+    /* border: 3px double #07202b; */
+    color: #fff;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    /* box-shadow: 0px 2px 1px 0px #1d546b; */
+    display: inline-flex;
+    font-family: poppins;
+    font-size: 0.8rem;
+    font-weight: 500;
+    justify-content: center;
+    letter-spacing: .5px;
+    padding: 27px 5px;
     text-decoration: none;
-    font-family: 'Cormorant Garamond';
+    transition: all .2s ease-in-out;
+ 
+    border-radius: 50%;
+    scale: 0.8;
+    background: #07202b;
 }
 
 .collaborate-button:hover {
-  transform: scale(1.05);
+  transform: scale(1.15);
  text-decoration: none;
- border-bottom: 1px solid #143847;
+ border-bottom: 2px solid #0b1e27;
 }
 
 /* -------- GREEN LANGUAGE SELECTOR -------- */

@@ -60,10 +60,10 @@ export default function CountryHeader({ onHomeClick = () => {}, onSearch = () =>
         style={{ cursor: "pointer" }}
       >
         <div className="header-logo">
-          <span className="logo-wiki">Wiki</span>
-          <span className="logo-conflicts">conflicts</span>
+          {/* <span className="logo-wiki">Wiki</span>
+          <span className="logo-conflicts">conflicts</span> */}
         </div>
-        <div className="header-quote">“La memoria de las víctimas es nuestra responsabilidad.”</div>
+        {/* <div className="header-quote">“La memoria de las víctimas es nuestra responsabilidad.”</div> */}
       </div>
 
       <div className="header-center">
@@ -89,7 +89,7 @@ export default function CountryHeader({ onHomeClick = () => {}, onSearch = () =>
         >
           {t("collaborate")}
         </a>
-
+{/* 
         <button
           className="language-button-green"
           onClick={toggleMenu}
@@ -98,7 +98,7 @@ export default function CountryHeader({ onHomeClick = () => {}, onSearch = () =>
           aria-label="Seleccionar idioma"
         >
          idioma
-        </button>
+        </button> */}
 
         <div className={`language-dropdown ${open ? "open" : ""}`} role="menu">
           {LANGS.map((l) => (
