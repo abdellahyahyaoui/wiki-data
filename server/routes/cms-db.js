@@ -941,6 +941,157 @@ router.post('/countries/:countryCode/resistance/:resistorId/entry', authenticate
   }
 });
 
+// GET individual resistance entry
+router.get('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, async (req, res) => {
+  const { countryCode, resistorId, entryId } = req.params;
+  const lang = req.query.lang || 'es';
+
+  try {
+    const [countries] = await pool.query(
+      'SELECT id FROM countries WHERE code = ? AND lang = ?',
+      [countryCode, lang]
+    );
+
+    if (countries.length === 0) {
+      return res.status(404).json({ error: 'País no encontrado' });
+    }
+
+    const [resistors] = await pool.query(
+      'SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?',
+      [countries[0].id, resistorId]
+    );
+
+    if (resistors.length === 0) {
+      return res.status(404).json({ error: 'Resistor no encontrado' });
+    }
+
+    const [entries] = await pool.query(
+      'SELECT * FROM resistance_entries WHERE resistor_id = ? AND entry_id = ?',
+      [resistors[0].id, entryId]
+    );
+
+    if (entries.length === 0) {
+      return res.status(404).json({ error: 'Entrada no encontrada' });
+    }
+
+    const entry = entries[0];
+    res.json({
+      id: entry.entry_id,
+      title: entry.title,
+      summary: entry.summary,
+      date: entry.date,
+      paragraphs: typeof entry.paragraphs === 'string' ? JSON.parse(entry.paragraphs) : entry.paragraphs || [],
+      contentBlocks: typeof entry.content_blocks === 'string' ? JSON.parse(entry.content_blocks) : entry.content_blocks || [],
+      media: typeof entry.media === 'string' ? JSON.parse(entry.media) : entry.media || []
+    });
+  } catch (error) {
+    console.error('Error fetching resistance entry:', error);
+    res.status(500).json({ error: 'Error al obtener entrada' });
+  }
+});
+
+// PUT update resistance entry
+router.put('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  const { countryCode, resistorId, entryId } = req.params;
+  const lang = req.query.lang || 'es';
+  const { title, summary, date, paragraphs, contentBlocks, media } = req.body;
+
+  try {
+    const [countries] = await pool.query(
+      'SELECT id FROM countries WHERE code = ? AND lang = ?',
+      [countryCode, lang]
+    );
+
+    if (countries.length === 0) {
+      return res.status(404).json({ error: 'País no encontrado' });
+    }
+
+    const [resistors] = await pool.query(
+      'SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?',
+      [countries[0].id, resistorId]
+    );
+
+    if (resistors.length === 0) {
+      return res.status(404).json({ error: 'Resistor no encontrado' });
+    }
+
+    await pool.query(
+      `UPDATE resistance_entries SET title = ?, summary = ?, date = ?, paragraphs = ?, content_blocks = ?, media = ?
+       WHERE resistor_id = ? AND entry_id = ?`,
+      [title, summary, date, JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), 
+       JSON.stringify(media || []), resistors[0].id, entryId]
+    );
+
+    res.json({ success: true, item: { id: entryId, title, summary, date, media } });
+  } catch (error) {
+    console.error('Error updating resistance entry:', error);
+    res.status(500).json({ error: 'Error al actualizar entrada' });
+  }
+});
+
+// DELETE resistance entry
+router.delete('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  const { countryCode, resistorId, entryId } = req.params;
+  const lang = req.query.lang || 'es';
+
+  try {
+    const [countries] = await pool.query(
+      'SELECT id FROM countries WHERE code = ? AND lang = ?',
+      [countryCode, lang]
+    );
+
+    if (countries.length === 0) {
+      return res.status(404).json({ error: 'País no encontrado' });
+    }
+
+    const [resistors] = await pool.query(
+      'SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?',
+      [countries[0].id, resistorId]
+    );
+
+    if (resistors.length === 0) {
+      return res.status(404).json({ error: 'Resistor no encontrado' });
+    }
+
+    await pool.query(
+      'DELETE FROM resistance_entries WHERE resistor_id = ? AND entry_id = ?',
+      [resistors[0].id, entryId]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting resistance entry:', error);
+    res.status(500).json({ error: 'Error al eliminar entrada' });
+  }
+});
+
+// DELETE resistor
+router.delete('/countries/:countryCode/resistance/:resistorId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  const { countryCode, resistorId } = req.params;
+  const lang = req.query.lang || 'es';
+
+  try {
+    const [countries] = await pool.query(
+      'SELECT id FROM countries WHERE code = ? AND lang = ?',
+      [countryCode, lang]
+    );
+
+    if (countries.length === 0) {
+      return res.status(404).json({ error: 'País no encontrado' });
+    }
+
+    await pool.query(
+      'DELETE FROM resistors WHERE country_id = ? AND resistor_id = ?',
+      [countries[0].id, resistorId]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting resistor:', error);
+    res.status(500).json({ error: 'Error al eliminar resistor' });
+  }
+});
+
 router.get('/countries/:countryCode/fototeca', authenticateToken, async (req, res) => {
   const { countryCode } = req.params;
   const lang = req.query.lang || 'es';
