@@ -1155,7 +1155,7 @@ router.delete('/countries/:countryCode/resistance/:resistorId', authenticateToke
   }
 });
 
-router.get('/countries/:countryCode/fototeca', authenticateToken, async (req, res) => {
+router.get('/countries/:countryCode/fototeca', async (req, res) => {
   const { countryCode } = req.params;
   const lang = req.query.lang || 'es';
 
@@ -1181,7 +1181,7 @@ router.get('/countries/:countryCode/fototeca', authenticateToken, async (req, re
   }
 });
 
-router.post('/countries/:countryCode/fototeca', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+router.post('/countries/:countryCode/fototeca', async (req, res) => {
   const { countryCode } = req.params;
   const lang = req.query.lang || 'es';
   const { title, description, date, type, url } = req.body;
@@ -1213,7 +1213,7 @@ router.post('/countries/:countryCode/fototeca', authenticateToken, checkCountryP
   }
 });
 
-router.put('/countries/:countryCode/fototeca/:itemId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+router.put('/countries/:countryCode/fototeca/:itemId', async (req, res) => {
   const { countryCode, itemId } = req.params;
   const lang = req.query.lang || 'es';
   const { title, description, date, type, url } = req.body;
@@ -1240,7 +1240,7 @@ router.put('/countries/:countryCode/fototeca/:itemId', authenticateToken, checkC
   }
 });
 
-router.delete('/countries/:countryCode/fototeca/:itemId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+router.delete('/countries/:countryCode/fototeca/:itemId', async (req, res) => {
   const { countryCode, itemId } = req.params;
   const lang = req.query.lang || 'es';
 

@@ -47,7 +47,7 @@ const upload = multer({
   }
 });
 
-router.post('/image', authenticateToken, upload.single('image'), (req, res) => {
+router.post('/image', upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se subió ningún archivo' });
   }
@@ -61,7 +61,7 @@ router.post('/image', authenticateToken, upload.single('image'), (req, res) => {
   });
 });
 
-router.post('/images', authenticateToken, upload.array('images', 10), (req, res) => {
+router.post('/images', upload.array('images', 10), (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No se subieron archivos' });
   }
@@ -78,7 +78,7 @@ router.post('/images', authenticateToken, upload.array('images', 10), (req, res)
   });
 });
 
-router.post('/video', authenticateToken, upload.single('video'), (req, res) => {
+router.post('/video', upload.single('video'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se subió ningún archivo' });
   }
@@ -92,7 +92,7 @@ router.post('/video', authenticateToken, upload.single('video'), (req, res) => {
   });
 });
 
-router.post('/media', authenticateToken, upload.single('file'), (req, res) => {
+router.post('/media', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se subió ningún archivo' });
   }
@@ -107,7 +107,7 @@ router.post('/media', authenticateToken, upload.single('file'), (req, res) => {
   });
 });
 
-router.get('/list', authenticateToken, (req, res) => {
+router.get('/list', (req, res) => {
   const files = fs.readdirSync(imagenesDir);
   const images = files
     .filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f))
@@ -126,7 +126,7 @@ router.get('/list', authenticateToken, (req, res) => {
   res.json({ images, videos });
 });
 
-router.delete('/:filename', authenticateToken, (req, res) => {
+router.delete('/:filename', (req, res) => {
   const { filename } = req.params;
   
   const sanitizedFilename = path.basename(filename);
