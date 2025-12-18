@@ -84,6 +84,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
 
   async function handleFileUpload(e) {
     const file = e.target.files?.[0];
+    console.log('handleFileUpload called:', file?.name, file?.size);
     if (!file) return;
 
     setUploading(true);
@@ -91,19 +92,29 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
     uploadFormData.append('images', file);
 
     try {
+      console.log('Uploading to:', `${API_BASE}/api/upload/images`);
       const res = await fetch(`${API_BASE}/api/upload/images`, {
         method: 'POST',
         body: uploadFormData
       });
 
+      console.log('Upload response status:', res.status, res.statusText);
+      const data = await res.json();
+      console.log('Upload response data:', data);
+      
       if (res.ok) {
-        const data = await res.json();
         if (data.files && data.files.length > 0) {
-          setFormData(prev => ({ ...prev, url: data.files[0].url }));
-          console.log('Imagen subida:', data.files[0].url);
+          const url = data.files[0].url;
+          console.log('Setting URL:', url);
+          setFormData(prev => ({ ...prev, url }));
+          console.log('✅ Imagen subida:', url);
+        } else {
+          console.error('No files in response:', data);
+          alert('Error: No se recibió la URL del archivo');
         }
       } else {
-        alert('Error al subir archivo');
+        console.error('Upload failed:', data);
+        alert('Error al subir archivo: ' + (data.error || 'desconocido'));
       }
     } catch (error) {
       console.error('Error uploading:', error);
