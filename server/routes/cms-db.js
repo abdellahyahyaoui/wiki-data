@@ -397,4 +397,81 @@ router.put('/countries/:countryCode/section-headers/:sectionId', authenticateTok
   }
 });
 
+// GET countries for admin panel
+router.get('/countries', authenticateToken, async (req, res) => {
+  const lang = req.query.lang || 'es';
+  const connection = await pool.getConnection();
+  try {
+    const [countries] = await connection.query(
+      'SELECT code, name FROM countries WHERE lang = ? ORDER BY name',
+      [lang]
+    );
+    res.json({ 
+      countries: countries.map(c => ({
+        code: c.code,
+        name: c.name,
+        sections: [
+          { id: 'description', label: 'Descripción del conflicto' },
+          { id: 'timeline', label: 'Timeline' },
+          { id: 'testimonies', label: 'Testimonios' },
+          { id: 'resistance', label: 'Resistencia' },
+          { id: 'media-gallery', label: 'Fototeca' }
+        ]
+      }))
+    });
+  } catch (error) {
+    console.error('Error fetching countries:', error);
+    res.status(500).json({ error: 'Error al obtener países' });
+  } finally {
+    connection.release();
+  }
+});
+
+// GET predefined countries (available to create)
+router.get('/predefined-countries', authenticateToken, async (req, res) => {
+  const predefinedCountries = [
+    { code: 'palestine', name: 'Palestina', region: 'Oriente Medio' },
+    { code: 'lebanon', name: 'Líbano', region: 'Oriente Medio' },
+    { code: 'yemen', name: 'Yemen', region: 'Oriente Medio' },
+    { code: 'syria', name: 'Siria', region: 'Oriente Medio' },
+    { code: 'egypt', name: 'Egipto', region: 'Oriente Medio' },
+    { code: 'sudan', name: 'Sudán', region: 'Oriente Medio' },
+    { code: 'libya', name: 'Libya', region: 'Oriente Medio' },
+    { code: 'colombia', name: 'Colombia', region: 'América Latina' },
+    { code: 'venezuela', name: 'Venezuela', region: 'América Latina' },
+    { code: 'ukraine', name: 'Ucrania', region: 'Europa' },
+    { code: 'afghanistan', name: 'Afganistán', region: 'Asia' },
+    { code: 'myanmar', name: 'Myanmar', region: 'Asia' },
+    { code: 'algeria', name: 'Argelia', region: 'Oriente Medio' },
+    { code: 'spain', name: 'España', region: 'Europa' },
+    { code: 'morocco', name: 'Morocco', region: 'Oriente Medio' }
+  ];
+  res.json({ countries: predefinedCountries });
+});
+
+// POST create new country
+router.post('/countries', authenticateToken, checkPermission('create'), async (req, res) => {
+  const { code, name, lang = 'es' } = req.body;
+  if (!code || !name) {
+    return res.status(400).json({ error: 'Código y nombre son requeridos' });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    await connection.query(
+      'INSERT INTO countries (code, name, lang) VALUES (?, ?, ?)',
+      [code, name, lang]
+    );
+    res.json({ success: true, country: { code, name } });
+  } catch (error) {
+    if (error.message.includes('Duplicate entry')) {
+      return res.status(400).json({ error: 'El país ya existe' });
+    }
+    console.error('Error creating country:', error);
+    res.status(500).json({ error: 'Error al crear país' });
+  } finally {
+    connection.release();
+  }
+});
+
 module.exports = router;
