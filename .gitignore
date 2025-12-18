@@ -6,3 +6,5 @@ build/
 *.log
 server/data/users.json
 server/data/jwt-secret.key
+.local/
+.replit
