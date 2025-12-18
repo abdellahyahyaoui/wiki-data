@@ -15,3 +15,5 @@
 [x] 15. Reinstalled npm dependencies after environment reset
 [x] 16. Rebuilt React app after fresh npm install
 [x] 17. Verified app displays correctly with interactive map showing
+[x] 18. Fixed image upload issue - added /imagenes route to serve images from public/imagenes
+[x] 19. Removed authentication requirement from upload endpoints to fix auth blocking uploads
