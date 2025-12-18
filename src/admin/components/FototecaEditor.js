@@ -29,9 +29,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
 
   async function loadItems() {
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/fototeca`, { 
-        headers: getAuthHeaders() 
-      });
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/fototeca`);
       if (res.ok) {
         const data = await res.json();
         let allItems = data.items || [];
@@ -49,7 +47,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
   async function loadGalleryImages() {
     setLoadingGallery(true);
     try {
-      const res = await fetch(`${API_BASE}/api/cms/gallery/images`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/api/cms/gallery/images`);
       if (res.ok) {
         const data = await res.json();
         setGalleryImages(data.images || []);
@@ -95,7 +93,6 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
     try {
       const res = await fetch(`${API_BASE}/api/upload/images`, {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: uploadFormData
       });
 
@@ -103,12 +100,14 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
         const data = await res.json();
         if (data.files && data.files.length > 0) {
           setFormData(prev => ({ ...prev, url: data.files[0].url }));
+          console.log('Imagen subida:', data.files[0].url);
         }
       } else {
         alert('Error al subir archivo');
       }
     } catch (error) {
       console.error('Error uploading:', error);
+      alert('Error al subir: ' + error.message);
     }
     setUploading(false);
   }
@@ -138,7 +137,6 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
      const res = await fetch(`${API_BASE}${url}`, {
         method,
         headers: {
-          ...getAuthHeaders(),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -161,8 +159,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
 
     try {
       const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/fototeca/${item.id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
+        method: 'DELETE'
       });
 
       if (res.ok) {

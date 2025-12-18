@@ -1,4 +1,3 @@
-ry:', error);
     res.status(500).json({ error: 'Error al leer galería' });
   }
 });
