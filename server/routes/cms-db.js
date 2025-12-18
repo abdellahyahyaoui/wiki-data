@@ -45,7 +45,7 @@ router.post('/countries/:countryCode/fototeca', async (req, res) => {
 
     const itemId = uuidv4();
     await connection.query(
-      'INSERT INTO fototeca (id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      "INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [itemId, countries[0].id, title, description || '', date || '', type || 'image', url]
     );
 
@@ -71,7 +71,7 @@ router.put('/countries/:countryCode/fototeca/:itemId', async (req, res) => {
     }
 
     await connection.query(
-      'UPDATE fototeca SET title = ?, description = ?, date = ?, type = ?, url = ? WHERE id = ? AND country_id = ?',
+      'UPDATE fototeca SET title = ?, description = ?, date = ?, type = ?, url = ? WHERE item_id = ? AND country_id = ?',
       [title, description, date, type, url, itemId, countries[0].id]
     );
 
@@ -95,7 +95,7 @@ router.delete('/countries/:countryCode/fototeca/:itemId', async (req, res) => {
       return res.status(404).json({ error: 'País no encontrado' });
     }
 
-    await connection.query('DELETE FROM fototeca WHERE id = ? AND country_id = ?', [itemId, countries[0].id]);
+    await connection.query('DELETE FROM fototeca WHERE item_id = ? AND country_id = ?', [itemId, countries[0].id]);
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting fototeca item:', error);
