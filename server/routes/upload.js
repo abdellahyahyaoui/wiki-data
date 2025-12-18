@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { authenticateToken } = require('../middleware/auth');
+const { pool } = require('../db');
 
 const router = express.Router();
 
@@ -61,16 +62,39 @@ router.post('/image', upload.single('image'), (req, res) => {
   });
 });
 
-router.post('/images', upload.array('images', 10), (req, res) => {
+router.post('/images', upload.array('images', 10), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No se subieron archivos' });
   }
 
+  const countryCode = req.query.countryCode || req.body.countryCode;
   const uploaded = req.files.map(file => ({
     filename: file.filename,
     url: `/imagenes/${file.filename}`,
     size: file.size
   }));
+
+  // Registrar en MySQL si es para un país específico
+  if (countryCode) {
+    try {
+      const connection = await pool.getConnection();
+      const [countries] = await connection.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [countryCode]);
+      
+      if (countries.length > 0) {
+        const countryId = countries[0].id;
+        for (const file of req.files) {
+          const itemId = uuidv4();
+          await connection.query(
+            "INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [itemId, countryId, file.originalname, '', new Date().toISOString().split('T')[0], 'image', `/imagenes/${file.filename}`]
+          );
+        }
+      }
+      connection.release();
+    } catch (error) {
+      console.error('Error registering images in DB:', error);
+    }
+  }
 
   res.json({
     success: true,
