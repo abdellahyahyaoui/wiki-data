@@ -8,7 +8,7 @@ const fs = require('fs');
 
 const { testConnection, initDatabase } = require('./db');
 const authRoutes = require('./routes/auth');
-const cmsRoutes = require('./routes/cms');
+const cmsRoutes = require('./routes/cms-db');
 const uploadRoutes = require('./routes/upload');
 const publicApiRoutes = require('./routes/public-api');
 
