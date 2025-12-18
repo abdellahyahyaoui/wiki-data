@@ -128,23 +128,23 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
         if (categoryData) setAvailableLetters(categoryData.letters.map((l) => l.toUpperCase()))
         setView("letters")
       } else if (section === "testimonies") {
-        loadSectionHeader(section)
+        // loadSectionHeader(section)
         const testimoniesData = await getTestimonies(countryCode, lang)
         setItems(testimoniesData || [])
         setView(testimoniesData?.length ? "grid" : "empty")
       } else if (section === "analysts") {
-        loadSectionHeader(section)
+        // loadSectionHeader(section)
         const analystsData = await getAnalysts(countryCode, lang)
         setItems(analystsData || [])
         setView(analystsData?.length ? "grid" : "empty")
       } else if (section === "genocides") {
-        loadSectionHeader(section)
+        // loadSectionHeader(section)
         const res = await fetch(`/data/${lang}/${countryCode}/${section}.index.json`)
         const json = res.ok ? await res.json() : { items: [] }
         setItems(json.items || [])
         setView(json.items?.length ? "grid" : "empty")
       } else if (section === "resistance") {
-        loadSectionHeader("resistance")
+        // loadSectionHeader("resistance")
         const resistanceData = await getResistance(countryCode, lang)
         setItems(resistanceData || [])
         setView(resistanceData?.length ? "grid" : "empty")
@@ -687,12 +687,18 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
   if (view === "grid") {
     return (
       <div className="content-inner">
-        {(sectionHeader.title || sectionHeader.description) && (
-          <div className="section-header-block">
-            {sectionHeader.title && <h2 className="section-title">{sectionHeader.title}</h2>}
-            {sectionHeader.description && <p className="section-description">{sectionHeader.description}</p>}
-          </div>
-        )}
+        {/* {(t(section) || t(`${section}-description`)) && ( */}
+
+         <div className="section-header-block">
+  <h2 className="section-title">
+    {t(section)}
+  </h2>
+  <p className="section-description">
+    {t(`${section}-description`)}
+  </p>
+</div>
+
+        {/* )} */}
         {searchTerm && (
           <div className="search-results-info">
             {t("showing-results")} {filteredItems.length} {t("of")} {items.length} {t("for-search-term")} "{searchTerm}"

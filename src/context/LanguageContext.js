@@ -38,6 +38,10 @@ const translations = {
     "velum-bibliography": "Bibliografia",
     "velum-no-articles": "No hay articulos disponibles",
     Terminologia: "Terminologia",
+     "testimonies": "Testimonios",
+  "testimonies-description": "Relatos directos de víctimas y testigos del conflicto",
+  "resistance": "Resistencia",
+  "resistance-description": "Personas y grupos que luchan por la justicia y los derechos humanos"
   },
   en: {
     "search-placeholder": "Search WikiConflicts...",
