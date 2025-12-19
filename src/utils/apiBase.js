@@ -1,9 +1,6 @@
 // src/utils/apiBase.js
-// Use empty string for relative API calls - works in both local and production
-// when the frontend and backend are served from the same origin
-const API_BASE =
-  process.env.NODE_ENV === "production"
-    ? "https://wiki-data-qxef.onrender.com"
-    : "http://localhost:5000";
+// Use relative paths for API calls - works in both local development and production
+// since frontend and backend are served from the same origin
+const API_BASE = "";
 
 export default API_BASE;

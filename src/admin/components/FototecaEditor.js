@@ -49,7 +49,9 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
   async function loadGalleryImages() {
     setLoadingGallery(true);
     try {
-      const res = await fetch(`${API_BASE}/api/upload/list`);
+      const res = await fetch(`${API_BASE}/api/upload/list`, {
+        headers: getAuthHeaders()
+      });
       if (res.ok) {
         const data = await res.json();
         const images = (data.images || []).map(img => ({ url: img.url, name: img.filename || img.name }));
@@ -219,10 +221,16 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
         <div className="admin-modal-overlay" onClick={() => setShowGallery(false)}>
           <div className="admin-modal admin-modal-gallery" onClick={e => e.stopPropagation()}>
             <h3>Seleccionar de galería</h3>
-            <div className="admin-gallery-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', maxHeight: '400px', overflowY: 'auto' }}>
+            <div className="admin-gallery-grid" style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', 
+              gap: '10px', 
+              maxHeight: '400px', 
+              overflowY: 'auto' 
+            }}>
               {galleryImages.map((img, i) => (
                 <div key={i} onClick={() => { setFormData({...formData, url: img.url}); setShowGallery(false); }} style={{ cursor: 'pointer' }}>
-                  <img src={img.url} alt={img.name} style={{ width: '100%', height: '80px', objectFit: 'cover' }} />
+                  <img src={img.url} alt={img.name} style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
                 </div>
               ))}
             </div>
