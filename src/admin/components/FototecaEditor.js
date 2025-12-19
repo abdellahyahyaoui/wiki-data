@@ -291,6 +291,18 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
                     </label>
                     {uploading && <span className="admin-uploading">Subiendo...</span>}
                   </div>
+                  {formData.type === 'video' && (
+                    <div className="admin-youtube-input" style={{ marginTop: '10px', display: 'flex', gap: '5px' }}>
+                      <input 
+                        type="text"
+                        placeholder="Pegar URL de YouTube..."
+                        className="admin-input-small"
+                        value={formData.url.includes('youtube.com') || formData.url.includes('youtu.be') ? formData.url : ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                      />
+                      <span style={{ fontSize: '12px', color: '#666', alignSelf: 'center' }}>🎬 YouTube</span>
+                    </div>
+                  )}
                   {formData.type === 'image' && (
                     <button 
                       type="button" 
