@@ -32,7 +32,8 @@ export default function MultiMediaUploader({ value = [], onChange, allowedTypes 
           newMedia.push({
             url: data.url,
             type: fileType,
-            caption: ''
+            caption: '',
+            cloudinaryId: data.filename // Store filename/public_id if needed
           });
         }
       } catch (error) {
@@ -44,6 +45,19 @@ export default function MultiMediaUploader({ value = [], onChange, allowedTypes 
     setUploading(false);
     e.target.value = '';
   }
+
+  const [ytUrl, setYtUrl] = useState('');
+
+  const addYoutubeVideo = () => {
+    if (!ytUrl.trim()) return;
+    // Basic YouTube URL check
+    if (ytUrl.includes('youtube.com') || ytUrl.includes('youtu.be')) {
+      onChange([...value, { url: ytUrl.trim(), type: 'video', caption: '', isExternal: true }]);
+      setYtUrl('');
+    } else {
+      alert('Por favor ingresa una URL de YouTube válida');
+    }
+  };
 
   function updateCaption(index, caption) {
     const updated = [...value];
@@ -150,6 +164,28 @@ export default function MultiMediaUploader({ value = [], onChange, allowedTypes 
       </div>
 
       <div className="admin-media-url-inputs">
+        <div className="admin-url-input-row youtube-integration">
+          <input
+            type="text"
+            placeholder="Pegar URL de YouTube..."
+            value={ytUrl}
+            onChange={(e) => setYtUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addYoutubeVideo();
+              }
+            }}
+          />
+          <button 
+            type="button" 
+            onClick={addYoutubeVideo}
+            className="admin-btn-add-url youtube"
+            title="Agregar Video de YouTube"
+          >
+            🎬 YouTube
+          </button>
+        </div>
         <div className="admin-url-input-row">
           <input
             type="text"

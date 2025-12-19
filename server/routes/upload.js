@@ -86,20 +86,25 @@ router.post('/youtube', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'URL de YouTube requerida' });
 
   try {
-    if (countryCode) {
-      const connection = await pool.getConnection();
-      const [countries] = await connection.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [countryCode]);
-      
-      if (countries.length > 0) {
-        const countryId = countries[0].id;
-        const itemId = uuidv4();
-        await connection.query(
-          "INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [itemId, countryId, title || 'Video YouTube', description || '', new Date().toISOString().split('T')[0], 'video', url]
-        );
-      }
-      connection.release();
+    const connection = await pool.getConnection();
+    const [countries] = await connection.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [countryCode]);
+    
+    if (countries.length > 0) {
+      const countryId = countries[0].id;
+      const itemId = uuidv4();
+      await connection.query(
+        "INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [itemId, countryId, title || 'Video YouTube', description || '', new Date().toISOString().split('T')[0], 'video', url]
+      );
+    } else {
+      // Fallback or generic insert if no countryCode provided or found
+      const itemId = uuidv4();
+      await connection.query(
+        "INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [itemId, null, title || 'Video YouTube', description || '', new Date().toISOString().split('T')[0], 'video', url]
+      );
     }
+    connection.release();
     res.json({ success: true, url });
   } catch (error) {
     res.status(500).json({ error: error.message });
