@@ -198,33 +198,33 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
         
         setItems(mediaItems)
         setView(mediaItems.length ? "fototeca" : "empty")
-      } else if (["media-gallery-images", "media-gallery-videos"].includes(section)) {
-        let mediaItems = []
+      // } else if (["media-gallery-images", "media-gallery-videos"].includes(section)) {
+      //   let mediaItems = []
 
-        if (section === "media-gallery-images") {
-          const resImages = await fetch(`/data/${lang}/${countryCode}/media/images.json`)
-          const imagesJson = resImages.ok ? await resImages.json() : { images: [] }
-          mediaItems = (imagesJson.images || []).map((img) => ({
-            ...img,
-            url: img.url || img.image || "/placeholder.svg",
-            type: "image",
-          }))
-        } else if (section === "media-gallery-videos") {
-          const resVideos = await fetch(`/data/${lang}/${countryCode}/media/videos.json`)
-          const videosJson = resVideos.ok ? await resVideos.json() : { videos: [] }
-          mediaItems = (videosJson.videos || []).map((vid) => ({
-            ...vid,
-            url: vid.url || vid.video,
-            type: "video",
-          }))
-        }
+      //   if (section === "media-gallery-images") {
+      //     const resImages = await fetch(`/data/${lang}/${countryCode}/media/images.json`)
+      //     const imagesJson = resImages.ok ? await resImages.json() : { images: [] }
+      //     mediaItems = (imagesJson.images || []).map((img) => ({
+      //       ...img,
+      //       url: img.url || img.image || "/placeholder.svg",
+      //       type: "image",
+      //     }))
+      //   } else if (section === "media-gallery-videos") {
+      //     const resVideos = await fetch(`/data/${lang}/${countryCode}/media/videos.json`)
+      //     const videosJson = resVideos.ok ? await resVideos.json() : { videos: [] }
+      //     mediaItems = (videosJson.videos || []).map((vid) => ({
+      //       ...vid,
+      //       url: vid.url || vid.video,
+      //       type: "video",
+      //     }))
+      //   }
 
-        if (mediaItems.length > 0) {
-          setItems(mediaItems)
-          setView("media-gallery")
-        } else {
-          setView("empty")
-        }
+      //   if (mediaItems.length > 0) {
+      //     setItems(mediaItems)
+      //     setView("media-gallery")
+      //   } else {
+      //     setView("empty")
+      //   }
       } else if (section === "description") {
         const descriptionData = await getDescription(countryCode, lang)
         if (!descriptionData || (!descriptionData.chapters && !descriptionData.title)) {

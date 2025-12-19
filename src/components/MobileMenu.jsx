@@ -86,12 +86,13 @@ export default function MobileMenu({ countryName, sections = [], onClose, onSele
             </button>
 
             <div className={`submenu ${openFototeca ? "submenu-open" : ""}`}>
-              <button className="submenu-item" onClick={() => handleSelect("media-gallery-images")}>
-                Fotos
-              </button>
-              <button className="submenu-item" onClick={() => handleSelect("media-gallery-videos")}>
-                Vídeos
-              </button>
+              <button className="submenu-item" onClick={() => handleSelect("fototeca-photos")}>
+  Fotos
+</button>
+<button className="submenu-item" onClick={() => handleSelect("fototeca-videos")}>
+  Vídeos
+</button>
+
             </div>
           </div>
 
