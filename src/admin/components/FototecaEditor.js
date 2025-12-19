@@ -47,15 +47,21 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
   async function loadGalleryImages() {
     setLoadingGallery(true);
     try {
-      const res = await fetch(`${API_BASE}/api/cms/gallery/images`);
+      const res = await fetch(`${API_BASE}/api/upload/list`);
       if (res.ok) {
         const data = await res.json();
-        setGalleryImages(data.images || []);
+        const images = (data.images || []).map(img => ({ url: img.url, name: img.filename || img.name }));
+        setGalleryImages(images);
       }
     } catch (error) {
       console.error('Error loading gallery:', error);
     }
     setLoadingGallery(false);
+  }
+
+  function openGalleryPicker() {
+    loadGalleryImages();
+    setShowGallery(true);
   }
 
   function openAddModal() {
@@ -193,9 +199,9 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
             <div className="admin-form-group">
               <label>Archivo / URL</label>
               <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                <button className="admin-btn-secondary" onClick={() => document.getElementById('file-input').click()}>📁 Subir</button>
+                <button type="button" className="admin-btn-secondary" onClick={() => document.getElementById('file-input').click()}>📁 Subir</button>
                 <input id="file-input" type="file" style={{ display: 'none' }} onChange={handleFileUpload} />
-                {formData.type === 'image' && <button className="admin-btn-secondary" onClick={openGalleryPicker}>🖼️ Galería</button>}
+                {formData.type === 'image' && <button type="button" className="admin-btn-secondary" onClick={openGalleryPicker}>🖼️ Galería</button>}
               </div>
               <input type="text" placeholder="O pega URL (Cloudinary o YouTube)" value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} style={{ width: '100%', padding: '8px' }} />
             </div>

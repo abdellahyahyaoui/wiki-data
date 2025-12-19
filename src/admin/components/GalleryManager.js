@@ -82,6 +82,7 @@ export default function GalleryManager({ onSelect, selectMode = false, mediaFilt
   }
 
   function getFileType(url) {
+    if (!url) return 'other';
     const ext = url.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return 'image';
     if (['mp4', 'webm', 'mov', 'avi'].includes(ext)) return 'video';

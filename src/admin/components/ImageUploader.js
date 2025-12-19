@@ -26,7 +26,6 @@ export default function ImageUploader({ value, onChange, currentImage, onImageCh
     try {
       const res = await fetch(`${API_BASE}/api/upload/image`, {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: formData
       });
 

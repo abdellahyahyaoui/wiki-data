@@ -27,18 +27,24 @@ router.get('/list', async (req, res) => {
   }
 });
 
-router.post('/image', upload.single('image'), (req, res) => {
+router.post('/image', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se subió ningún archivo' });
   }
 
-  res.json({
-    success: true,
-    filename: req.file.filename,
-    url: req.file.path,
-    size: req.file.size,
-    files: [{ url: req.file.path, filename: req.file.filename }]
-  });
+  try {
+    const url = req.file.path || req.file.secure_url;
+    res.json({
+      success: true,
+      filename: req.file.filename || req.file.original_filename,
+      url: url,
+      size: req.file.size,
+      files: [{ url: url, filename: req.file.filename || req.file.original_filename }]
+    });
+  } catch (error) {
+    console.error('Error in upload endpoint:', error);
+    res.status(500).json({ error: 'Error procesando upload', details: error.message });
+  }
 });
 
 router.post('/images', upload.array('images', 10), async (req, res) => {
