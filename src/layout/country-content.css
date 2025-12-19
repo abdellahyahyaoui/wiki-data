@@ -941,16 +941,53 @@ font-family: Cormorant Garamond,serif;
 
 @media (max-width: 768px) {
   .fototeca-container {
-    padding: 16px;
+    padding: 16px 12px;
+    margin: 0;
+  }
+
+  .fototeca-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
   }
 
   .fototeca-header h2 {
     font-size: 1.8rem;
+    margin-bottom: 4px;
+  }
+
+  .fototeca-header p {
+    font-size: 0.95rem;
   }
 
   .fototeca-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 0;
+  }
+
+  .fototeca-item {
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .fototeca-media {
+    aspect-ratio: 16/10;
+    min-height: 120px;
+  }
+
+  .fototeca-info {
+    padding: 12px;
+  }
+
+  .fototeca-date {
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+
+  .fototeca-title {
+    font-size: 0.95rem;
+    line-height: 1.2;
+    margin: 0;
   }
 
   .fototeca-detail-title {
@@ -959,6 +996,36 @@ font-family: Cormorant Garamond,serif;
 
   .fototeca-detail-description {
     font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .fototeca-container {
+    padding: 12px 8px;
+    margin: 0;
+  }
+
+  .fototeca-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .fototeca-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .fototeca-media {
+    min-height: 100px;
+  }
+
+  .fototeca-info {
+    padding: 10px;
+  }
+
+  .play-overlay {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
   }
 }
 

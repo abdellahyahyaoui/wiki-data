@@ -50,16 +50,21 @@ export default function GalleryManager({ onSelect, selectMode = false, mediaFilt
     try {
       const res = await fetch(`${API_BASE}/api/upload/images`, {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: formData
       });
 
       if (res.ok) {
+        await new Promise(r => setTimeout(r, 500));
         loadItems();
         setShowUploadModal(false);
+      } else {
+        const error = await res.json();
+        console.error('Upload error:', error);
+        alert('Error al subir: ' + (error.error || 'Error desconocido'));
       }
     } catch (error) {
       console.error('Error uploading:', error);
+      alert('Error al subir archivo');
     }
     setUploading(false);
   }

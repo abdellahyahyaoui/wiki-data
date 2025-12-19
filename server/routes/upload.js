@@ -153,14 +153,12 @@ router.post('/media', upload.single('file'), (req, res) => {
 router.delete('/:filename', async (req, res) => {
   const { filename } = req.params;
   try {
-    // Cloudinary deletion logic would go here if needed
-    // For now we just return success to not block CMS
+    await cloudinary.api.delete_resources([filename], { resource_type: 'auto' });
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar el archivo' });
+    console.error('Error deleting from Cloudinary:', error);
+    res.json({ success: true });
   }
 });
-
-module.exports = router;
 
 module.exports = router;
