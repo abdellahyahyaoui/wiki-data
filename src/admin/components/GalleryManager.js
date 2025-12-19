@@ -21,9 +21,7 @@ export default function GalleryManager({ onSelect, selectMode = false, mediaFilt
 
   async function loadItems() {
     try {
-      const res = await fetch(`${API_BASE}/api/upload/list`, {
-        headers: getAuthHeaders()
-      });
+      const res = await fetch(`${API_BASE}/api/upload/list`);
       if (res.ok) {
         const data = await res.json();
         const allItems = [

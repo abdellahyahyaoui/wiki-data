@@ -16,6 +16,17 @@ const upload = multer({
   }
 });
 
+router.get('/list', async (req, res) => {
+  try {
+    const [items] = await pool.query('SELECT url, title as name, type FROM fototeca WHERE type IN ("image", "video") ORDER BY created_at DESC LIMIT 100');
+    const images = items.filter(i => i.type === 'image');
+    const videos = items.filter(i => i.type === 'video');
+    res.json({ images, videos });
+  } catch (error) {
+    res.json({ images: [], videos: [] });
+  }
+});
+
 router.post('/image', upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se subió ningún archivo' });
@@ -25,7 +36,8 @@ router.post('/image', upload.single('image'), (req, res) => {
     success: true,
     filename: req.file.filename,
     url: req.file.path,
-    size: req.file.size
+    size: req.file.size,
+    files: [{ url: req.file.path, filename: req.file.filename }]
   });
 });
 

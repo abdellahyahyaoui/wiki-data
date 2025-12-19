@@ -45,7 +45,7 @@ export default function ImageUploader({ value, onChange, currentImage, onImageCh
 
   async function openGallery() {
     try {
-      const res = await fetch(`${API_BASE}/api/upload/list`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/api/upload/list`);
       if (res.ok) {
         const data = await res.json();
         setGallery(data.images || []);
