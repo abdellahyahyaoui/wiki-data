@@ -48,42 +48,49 @@ router.post('/image', upload.single('image'), async (req, res) => {
 });
 
 router.post('/images', upload.array('images', 10), async (req, res) => {
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: 'No se subieron archivos' });
-  }
-
-  const countryCode = req.query.countryCode || req.body.countryCode;
-  const uploaded = req.files.map(file => ({
-    filename: file.filename,
-    url: file.path,
-    size: file.size
-  }));
-
-  if (countryCode) {
-    try {
-      const connection = await pool.getConnection();
-      const [countries] = await connection.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [countryCode]);
-      
-      if (countries.length > 0) {
-        const countryId = countries[0].id;
-        for (const file of req.files) {
-          const itemId = uuidv4();
-          await connection.query(
-            "INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [itemId, countryId, file.originalname, '', new Date().toISOString().split('T')[0], 'image', file.path]
-          );
-        }
-      }
-      connection.release();
-    } catch (error) {
-      console.error('Error registering images in DB:', error);
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No se subieron archivos' });
     }
-  }
 
-  res.json({
-    success: true,
-    files: uploaded
-  });
+    const countryCode = req.query.countryCode || req.body.countryCode;
+    const uploaded = req.files.map(file => ({
+      filename: file.filename || file.original_filename,
+      url: file.path || file.secure_url,
+      size: file.size
+    }));
+
+    if (countryCode && req.files.length > 0) {
+      try {
+        const connection = await pool.getConnection();
+        const [countries] = await connection.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [countryCode]);
+        
+        if (countries.length > 0) {
+          const countryId = countries[0].id;
+          for (const file of req.files) {
+            const itemId = uuidv4();
+            const fileUrl = file.path || file.secure_url;
+            const fileName = file.originalname || file.original_filename;
+            await connection.query(
+              "INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)",
+              [itemId, countryId, fileName, '', new Date().toISOString().split('T')[0], 'image', fileUrl]
+            );
+          }
+        }
+        connection.release();
+      } catch (dbError) {
+        console.error('Error registering images in DB:', dbError);
+      }
+    }
+
+    res.json({
+      success: true,
+      files: uploaded
+    });
+  } catch (error) {
+    console.error('Error in /images endpoint:', error);
+    res.status(500).json({ error: 'Error subiendo archivos', details: error.message });
+  }
 });
 
 router.post('/video', upload.single('video'), (req, res) => {
