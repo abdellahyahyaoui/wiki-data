@@ -108,20 +108,131 @@ router.delete('/countries/:countryCode/fototeca/:itemId', async (req, res) => {
 // Get gallery images (no auth needed)
 router.get('/gallery/images', async (req, res) => {
   try {
-    const files = fs.readdirSync('public/imagenes').filter(f => /\.(jpg|jpeg|png|gif)$/i.test(f));
-    res.json({ 
-      images: files.map(f => ({
-        name: f,
-        url: `/imagenes/${f}`
-      }))
-    });
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT DISTINCT url as url, title as name FROM fototeca WHERE type = "image" ORDER BY created_at DESC LIMIT 50');
+    connection.release();
+    res.json({ images: rows });
   } catch (error) {
-    console.error('Error reading gallery:', error);
+    console.error('Error fetching gallery:', error);
     res.status(500).json({ error: 'Error al leer galería' });
   }
 });
 
-// ===== OTROS ENDPOINTS (CON AUTENTICACIÓN) =====
+// GET testimonies for a country
+router.get('/countries/:countryCode/testimonies', async (req, res) => {
+  const { countryCode } = req.params;
+  const connection = await pool.getConnection();
+  try {
+    const [countries] = await connection.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [countryCode]);
+    if (countries.length === 0) {
+      return res.json({ items: [] });
+    }
+    const [witnesses] = await connection.query(
+      'SELECT id, name, bio, image, social FROM witnesses WHERE country_id = ?',
+      [countries[0].id]
+    );
+    res.json({ 
+      items: witnesses.map(w => ({
+        ...w,
+        social: typeof w.social === 'string' ? JSON.parse(w.social) : w.social || {}
+      }))
+    });
+  } catch (error) {
+    console.error('Error fetching witnesses:', error);
+    res.status(500).json({ error: 'Error al obtener testimonios' });
+  } finally {
+    connection.release();
+  }
+});
+
+// GET witness detail
+router.get('/countries/:countryCode/testimonies/:witnessId', async (req, res) => {
+  const { countryCode, witnessId } = req.params;
+  const connection = await pool.getConnection();
+  try {
+    const [witnesses] = await connection.query(
+      'SELECT id, name, bio, image, social FROM witnesses WHERE id = ?',
+      [witnessId]
+    );
+    if (witnesses.length === 0) {
+      return res.status(404).json({ error: 'Testigo no encontrado' });
+    }
+    
+    const [testimonies] = await connection.query(
+      'SELECT id, title, summary, date, content_blocks as contentBlocks, media FROM testimonies WHERE witness_id = ?',
+      [witnessId]
+    );
+
+    res.json({
+      ...witnesses[0],
+      social: typeof witnesses[0].social === 'string' ? JSON.parse(witnesses[0].social) : witnesses[0].social || {},
+      testimonies: testimonies.map(t => ({
+        ...t,
+        contentBlocks: typeof t.contentBlocks === 'string' ? JSON.parse(t.contentBlocks) : t.contentBlocks || [],
+        media: typeof t.media === 'string' ? JSON.parse(t.media) : t.media || []
+      }))
+    });
+  } catch (error) {
+    console.error('Error fetching witness detail:', error);
+    res.status(500).json({ error: 'Error al obtener detalle' });
+  } finally {
+    connection.release();
+  }
+});
+
+// GET specific testimony
+router.get('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', async (req, res) => {
+  const { testimonyId } = req.params;
+  const connection = await pool.getConnection();
+  try {
+    const [testimonies] = await connection.query(
+      'SELECT * FROM testimonies WHERE id = ?',
+      [testimonyId]
+    );
+    if (testimonies.length === 0) {
+      return res.status(404).json({ error: 'Testimonio no encontrado' });
+    }
+    const t = testimonies[0];
+    res.json({
+      ...t,
+      contentBlocks: typeof t.content_blocks === 'string' ? JSON.parse(t.content_blocks) : t.content_blocks || [],
+      media: typeof t.media === 'string' ? JSON.parse(t.media) : t.media || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener testimonio' });
+  } finally {
+    connection.release();
+  }
+});
+
+// DELETE testimony
+router.delete('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', async (req, res) => {
+  const { testimonyId } = req.params;
+  const connection = await pool.getConnection();
+  try {
+    await connection.query('DELETE FROM testimonies WHERE id = ?', [testimonyId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar testimonio' });
+  } finally {
+    connection.release();
+  }
+});
+
+// DELETE witness
+router.delete('/countries/:countryCode/testimonies/:witnessId', async (req, res) => {
+  const { witnessId } = req.params;
+  const connection = await pool.getConnection();
+  try {
+    await connection.query('DELETE FROM testimonies WHERE witness_id = ?', [witnessId]);
+    await connection.query('DELETE FROM witnesses WHERE id = ?', [witnessId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar testigo' });
+  } finally {
+    connection.release();
+  }
+});
 
 router.get('/pending', authenticateToken, async (req, res) => {
   if (req.user.role !== 'admin') {

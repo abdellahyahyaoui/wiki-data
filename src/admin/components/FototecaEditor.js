@@ -201,7 +201,7 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
               {item.type === 'image' ? (
                 <img src={item.url} alt={item.title} />
               ) : (
-                <video src={item.url} />
+                <video src={item.url.includes("youtube.com") || item.url.includes("youtu.be") ? "" : item.url} poster={item.url.includes("youtube.com") || item.url.includes("youtu.be") ? "https://img.youtube.com/vi/" + (item.url.includes("v=") ? item.url.split("v=")[1].split("&")[0] : item.url.split("/").pop()) + "/0.jpg" : ""} />
               )}
               <span className="admin-fototeca-type">{item.type === 'image' ? '🖼️' : '🎬'}</span>
             </div>
