@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "id": "img-palestine-001",
+      "title": "Documentación visual",
+      "description": "Archivo fotográfico del conflicto",
+      "date": "2023-08-10",
+      "type": "image",
+      "url": "/imagenes/3.png"
+    },
+    {
+      "id": "img-palestine-002",
+      "title": "Testimonio gráfico",
+      "description": "Registro visual de eventos",
+      "date": "2023-07-05",
+      "type": "image",
+      "url": "/imagenes/4.png"
+    },
+    {
+      "id": "vid-palestine-001",
+      "title": "Documental",
+      "description": "Video testimonio",
+      "date": "2023-09-15",
+      "type": "video",
+      "url": "https://vimeo.com/76979871"
+    }
+  ]
+}

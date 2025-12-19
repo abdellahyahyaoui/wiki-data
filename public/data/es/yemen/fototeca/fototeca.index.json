@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "id": "img-yemen-001",
+      "title": "Documentación visual",
+      "description": "Archivo fotográfico",
+      "date": "2023-07-22",
+      "type": "image",
+      "url": "/imagenes/7.png"
+    },
+    {
+      "id": "vid-yemen-001",
+      "title": "Video documental",
+      "description": "Testimonio audiovisual",
+      "date": "2023-08-05",
+      "type": "video",
+      "url": "https://youtu.be/hLQl3WQQoQ0"
+    }
+  ]
+}

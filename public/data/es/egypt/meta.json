@@ -1,0 +1,12 @@
+{
+  "code": "egypt",
+  "name": "Egipto",
+  "sections": [
+    {"id": "description", "label": "Descripción del Conflicto"},
+    {"id": "timeline", "label": "Cronología"},
+    {"id": "testimonies", "label": "Testimonios"},
+    {"id": "resistance", "label": "Resistencia"},
+    {"id": "fototeca", "label": "Fototeca"},
+    {"id": "analysts", "label": "Análisis"}
+  ]
+}
