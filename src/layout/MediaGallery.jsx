@@ -13,17 +13,26 @@ function getVideoType(url) {
 
 function getEmbedUrl(url, type) {
   if (type === 'youtube') {
-    const videoId = url.includes('youtu.be') 
-      ? url.split('youtu.be/')[1]?.split('?')[0]
-      : url.split('v=')[1]?.split('&')[0]
-    return `https://www.youtube.com/embed/${videoId}`
+    let videoId = null
+    if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0]
+    } else if (url.includes('v=')) {
+      videoId = url.split('v=')[1]?.split('&')[0]
+    } else if (url.includes('embed/')) {
+      videoId = url.split('embed/')[1]?.split('?')[0]?.split('&')[0]
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url
   }
   if (type === 'vimeo') {
-    const videoId = url.split('vimeo.com/')[1]?.split('?')[0]
-    return `https://player.vimeo.com/video/${videoId}`
+    const videoId = url.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]
+    return videoId ? `https://player.vimeo.com/video/${videoId}` : url
   }
   if (type === 'instagram') {
-    return url.replace('instagram.com', 'instagram.com/p').replace(/\/$/, '') + '/embed/'
+    const cleanUrl = url.replace(/\/$/, '')
+    if (!cleanUrl.includes('/embed')) {
+      return cleanUrl + '/embed/'
+    }
+    return cleanUrl
   }
   return url
 }

@@ -419,14 +419,25 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
                 <div className="admin-testimonies-list">
                   {witnessDetail.testimonies?.map(t => (
-                    <div key={t.id} className="admin-testimony-card" onClick={() => canEdit && openEditTestimonyModal(t)}>
-                      <h5>{t.title}</h5>
-                      <p>{t.summary}</p>
-                      <span className="admin-testimony-date">{t.date}</span>
-                      {((t.media && t.media.length > 0) || (t.contentBlocks && t.contentBlocks.length > 0)) && (
-                        <span className="admin-testimony-media-count">
-                          Contenido multimedia incluido
-                        </span>
+                    <div key={t.id} className="admin-testimony-card">
+                      <div onClick={() => canEdit && openEditTestimonyModal(t)} style={{ cursor: 'pointer', flex: 1 }}>
+                        <h5>{t.title}</h5>
+                        <p>{t.summary}</p>
+                        <span className="admin-testimony-date">{t.date}</span>
+                        {((t.media && t.media.length > 0) || (t.contentBlocks && t.contentBlocks.length > 0)) && (
+                          <span className="admin-testimony-media-count">
+                            Contenido multimedia incluido
+                          </span>
+                        )}
+                      </div>
+                      {user.role === 'admin' && (
+                        <button 
+                          onClick={() => handleDeleteTestimony(t.id)} 
+                          className="admin-btn-danger small"
+                          style={{ whiteSpace: 'nowrap', marginLeft: '8px' }}
+                        >
+                          Eliminar
+                        </button>
                       )}
                     </div>
                   ))}

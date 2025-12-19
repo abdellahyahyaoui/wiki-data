@@ -419,14 +419,25 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
 
                 <div className="admin-testimonies-list">
                   {resistorDetail.entries?.map(entry => (
-                    <div key={entry.id} className="admin-testimony-card" onClick={() => canEdit && openEditEntryModal(entry)}>
-                      <h5>{entry.title}</h5>
-                      <p>{entry.summary}</p>
-                      <span className="admin-testimony-date">{entry.date}</span>
-                      {((entry.media && entry.media.length > 0) || (entry.contentBlocks && entry.contentBlocks.length > 0)) && (
-                        <span className="admin-testimony-media-count">
-                          Contenido multimedia incluido
-                        </span>
+                    <div key={entry.id} className="admin-testimony-card">
+                      <div onClick={() => canEdit && openEditEntryModal(entry)} style={{ cursor: 'pointer', flex: 1 }}>
+                        <h5>{entry.title}</h5>
+                        <p>{entry.summary}</p>
+                        <span className="admin-testimony-date">{entry.date}</span>
+                        {((entry.media && entry.media.length > 0) || (entry.contentBlocks && entry.contentBlocks.length > 0)) && (
+                          <span className="admin-testimony-media-count">
+                            Contenido multimedia incluido
+                          </span>
+                        )}
+                      </div>
+                      {user.role === 'admin' && (
+                        <button 
+                          onClick={() => handleDeleteEntry(entry.id)} 
+                          className="admin-btn-danger small"
+                          style={{ whiteSpace: 'nowrap', marginLeft: '8px' }}
+                        >
+                          Eliminar
+                        </button>
                       )}
                     </div>
                   ))}

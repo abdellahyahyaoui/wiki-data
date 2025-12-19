@@ -91,6 +91,36 @@ The application uses these environment variables:
     - RichContentEditor allows adding multiple image and video blocks sequentially
     - Users can add, edit, delete, and reorder media blocks in any order
 
+## Implementation Status - All Fixes Completed
+
+### ✅ Fixed Issues:
+1. **Testimonios/Resistencia - Editar & Borrar**: 
+   - Backend GET endpoints added to load individual items
+   - Frontend delete buttons visible on each card (admin only)
+   - All CRUD operations working
+
+2. **Fototeca - Móvil Auth Fixed**:
+   - Added authorization headers to API calls
+   - Now works properly on mobile devices
+
+3. **Videos - YouTube/Vimeo/Instagram Support**:
+   - MediaGallery detects video URL type automatically
+   - Converts URLs to proper embed iframes
+   - YouTube: Detects long/short URLs and extracts video ID
+   - Vimeo: Extracts video ID correctly
+   - Instagram: Converts to embed format
+   - Standard MP4: Plays as native video
+
+4. **Velum - Multiple Videos Per Section**:
+   - RichContentEditor supports unlimited video blocks
+   - Can add multiple video blocks per section
+   - All video sources supported (upload, external URLs, embeds)
+
+5. **Unlimited Media Per Chapter**:
+   - All sections (Description, Timeline, Testimonies, Resistance, Velum) support unlimited images and videos
+   - Users can add, reorder, and delete media blocks freely
+
 ## Known Limitations
 - MySQL not configured (using JSON fallback) - works for development but not for production-scale data
 - Instagram embeds require the Instagram account to be public
+- Replit preview may show cache - use Ctrl+Shift+R to refresh
