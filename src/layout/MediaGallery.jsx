@@ -11,17 +11,17 @@ function getVideoType(url) {
   return 'standard'
 }
 
+// Use same robust function as CMS
+function getYoutubeEmbedUrl(url) {
+  if (!url) return ''
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+  const match = url.match(regExp)
+  return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null
+}
+
 function getEmbedUrl(url, type) {
   if (type === 'youtube') {
-    let videoId = null
-    if (url.includes('youtu.be/')) {
-      videoId = url.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0]
-    } else if (url.includes('v=')) {
-      videoId = url.split('v=')[1]?.split('&')[0]
-    } else if (url.includes('embed/')) {
-      videoId = url.split('embed/')[1]?.split('?')[0]?.split('&')[0]
-    }
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : url
+    return getYoutubeEmbedUrl(url) || url
   }
   if (type === 'vimeo') {
     const videoId = url.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]
@@ -50,12 +50,10 @@ export default function MediaGallery({ items }) {
 
   const openItem = (index) => {
     setSelectedIndex(index)
-    document.body.style.overflow = "hidden"
   }
 
   const closeItem = () => {
     setSelectedIndex(null)
-    document.body.style.overflow = "auto"
   }
 
   const prevItem = () => setSelectedIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1))
