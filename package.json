@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "react-scripts build",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "dev": "npm run build && node server/index.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
