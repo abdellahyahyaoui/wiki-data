@@ -3,6 +3,31 @@
 import { useState } from "react"
 import "./media-gallery.css"
 
+function getVideoType(url) {
+  if (!url) return null
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
+  if (url.includes('vimeo.com')) return 'vimeo'
+  if (url.includes('instagram.com')) return 'instagram'
+  return 'standard'
+}
+
+function getEmbedUrl(url, type) {
+  if (type === 'youtube') {
+    const videoId = url.includes('youtu.be') 
+      ? url.split('youtu.be/')[1]?.split('?')[0]
+      : url.split('v=')[1]?.split('&')[0]
+    return `https://www.youtube.com/embed/${videoId}`
+  }
+  if (type === 'vimeo') {
+    const videoId = url.split('vimeo.com/')[1]?.split('?')[0]
+    return `https://player.vimeo.com/video/${videoId}`
+  }
+  if (type === 'instagram') {
+    return url.replace('instagram.com', 'instagram.com/p').replace(/\/$/, '') + '/embed/'
+  }
+  return url
+}
+
 export default function MediaGallery({ items }) {
   const [selectedIndex, setSelectedIndex] = useState(null)
 
@@ -38,35 +63,46 @@ export default function MediaGallery({ items }) {
     <div className="media-gallery" onKeyDown={handleKeyDown} role="region" aria-label="Media gallery">
       {/* GRID DE MINIATURAS */}
       <div className="media-grid">
-        {items.map((item, index) => (
-          <div
-            key={item.id}
-            className="media-card"
-            onClick={() => openItem(index)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault()
-                openItem(index)
-              }
-            }}
-            role="button"
-            tabIndex={0}
-            aria-label={`Open ${item.title}`}
-          >
-            {item.type === "image" && (
-              <img
-                src={item.url || "/placeholder.svg"}
-                alt={item.title}
-                className="media-thumb"
-                onError={(e) => {
-                  e.target.src = "/placeholder.svg?height=200&width=300&text=Imagen+no+disponible"
-                }}
-              />
-            )}
-            {item.type === "video" && <video src={item.url} className="media-thumb" muted preload="metadata" />}
-            <div className="media-title">{item.title}</div>
-          </div>
-        ))}
+        {items.map((item, index) => {
+          const videoType = item.type === "video" ? getVideoType(item.url) : null
+          return (
+            <div
+              key={item.id}
+              className="media-card"
+              onClick={() => openItem(index)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault()
+                  openItem(index)
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={`Open ${item.title}`}
+            >
+              {item.type === "image" && (
+                <img
+                  src={item.url || "/placeholder.svg"}
+                  alt={item.title}
+                  className="media-thumb"
+                  onError={(e) => {
+                    e.target.src = "/placeholder.svg?height=200&width=300&text=Imagen+no+disponible"
+                  }}
+                />
+              )}
+              {item.type === "video" && (
+                <div className="media-thumb media-video-thumb">
+                  {videoType === 'youtube' || videoType === 'vimeo' || videoType === 'instagram' ? (
+                    <div className="media-video-icon">▶ {videoType.toUpperCase()}</div>
+                  ) : (
+                    <video src={item.url} className="media-thumb" muted preload="metadata" />
+                  )}
+                </div>
+              )}
+              <div className="media-title">{item.title}</div>
+            </div>
+          )
+        })}
       </div>
 
       {/* MODAL DE DETALLE */}
@@ -110,9 +146,43 @@ export default function MediaGallery({ items }) {
               />
             )}
             {items[selectedIndex].type === "video" && (
-              <video className="media-full" controls>
-                <source src={items[selectedIndex].url} type="video/mp4" />
-              </video>
+              <>
+                {getVideoType(items[selectedIndex].url) === 'youtube' && (
+                  <iframe
+                    className="media-full"
+                    src={getEmbedUrl(items[selectedIndex].url, 'youtube')}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={items[selectedIndex].title}
+                  />
+                )}
+                {getVideoType(items[selectedIndex].url) === 'vimeo' && (
+                  <iframe
+                    className="media-full"
+                    src={getEmbedUrl(items[selectedIndex].url, 'vimeo')}
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    title={items[selectedIndex].title}
+                  />
+                )}
+                {getVideoType(items[selectedIndex].url) === 'instagram' && (
+                  <iframe
+                    className="media-full"
+                    src={getEmbedUrl(items[selectedIndex].url, 'instagram')}
+                    frameBorder="0"
+                    scrolling="no"
+                    allowFullScreen
+                    title={items[selectedIndex].title}
+                  />
+                )}
+                {getVideoType(items[selectedIndex].url) === 'standard' && (
+                  <video className="media-full" controls>
+                    <source src={items[selectedIndex].url} type="video/mp4" />
+                  </video>
+                )}
+              </>
             )}
             <h3 className="media-detail-title">{items[selectedIndex].title}</h3>
           </div>

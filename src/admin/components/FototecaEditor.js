@@ -29,7 +29,9 @@ export default function FototecaEditor({ countryCode, mediaType = null }) {
 
   async function loadItems() {
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/fototeca`);
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/fototeca`, {
+        headers: getAuthHeaders()
+      });
       if (res.ok) {
         const data = await res.json();
         let allItems = data.items || [];

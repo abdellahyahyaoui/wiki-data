@@ -71,3 +71,26 @@ The application uses these environment variables:
   - Configured Express server on port 5000
   - Running with JSON file fallback (no MySQL configured)
   - Set up autoscale deployment configuration
+
+- 2025-12-19: Fixed CMS functionality and media support
+  - **Backend**: Added 2 missing GET endpoints:
+    - `GET /api/cms/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId` - Load individual testimony for editing
+    - `GET /api/cms/countries/:countryCode/resistance/:resistorId/entry/:entryId` - Load individual resistance entry for editing
+  - **Frontend CMS**: 
+    - Fixed Fototeca authentication on mobile by adding headers to API calls
+    - Video blocks now fully support URL pasting in all sections
+  - **Frontend Web**:
+    - Enhanced MediaGallery to detect and embed external videos:
+      - YouTube videos: Converted to embed iframes
+      - Vimeo videos: Converted to embed iframes  
+      - Instagram posts: Converted to embed iframes
+      - Standard videos: Played as HTML5 video elements
+    - Video thumbnails now show provider label (YouTube/Vimeo/Instagram)
+  - **Multi-media support**:
+    - All sections (Description, Timeline, Testimonies, Resistance) now support unlimited images and videos per chapter
+    - RichContentEditor allows adding multiple image and video blocks sequentially
+    - Users can add, edit, delete, and reorder media blocks in any order
+
+## Known Limitations
+- MySQL not configured (using JSON fallback) - works for development but not for production-scale data
+- Instagram embeds require the Instagram account to be public

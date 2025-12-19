@@ -488,6 +488,33 @@ router.put('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyI
   }
 });
 
+router.get('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, witnessId, testimonyId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [witnesses] = await pool.query('SELECT id FROM witnesses WHERE country_id = ? AND witness_id = ?', [countryId, witnessId]);
+    if (witnesses.length === 0) return res.status(404).json({ error: 'Testigo no encontrado' });
+
+    const [testimonies] = await pool.query('SELECT * FROM testimonies WHERE witness_id = ? AND testimony_id = ?', [witnesses[0].id, testimonyId]);
+    if (testimonies.length === 0) return res.status(404).json({ error: 'Testimonio no encontrado' });
+
+    const t = testimonies[0];
+    res.json({
+      id: t.testimony_id,
+      title: t.title,
+      summary: t.summary,
+      date: t.date,
+      paragraphs: typeof t.paragraphs === 'string' ? JSON.parse(t.paragraphs) : t.paragraphs || [],
+      contentBlocks: typeof t.content_blocks === 'string' ? JSON.parse(t.content_blocks) : t.content_blocks || [],
+      media: typeof t.media === 'string' ? JSON.parse(t.media) : t.media || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.delete('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
   try {
     const { countryCode, witnessId, testimonyId } = req.params;
@@ -701,6 +728,33 @@ router.put('/countries/:countryCode/resistance/:resistorId/entry/:entryId', auth
       [title, summary || '', date || '', JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(media || []), resistors[0].id, entryId]
     );
     res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, resistorId, entryId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [resistors] = await pool.query('SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?', [countryId, resistorId]);
+    if (resistors.length === 0) return res.status(404).json({ error: 'Resistor no encontrado' });
+
+    const [entries] = await pool.query('SELECT * FROM resistance_entries WHERE resistor_id = ? AND entry_id = ?', [resistors[0].id, entryId]);
+    if (entries.length === 0) return res.status(404).json({ error: 'Entrada no encontrada' });
+
+    const e = entries[0];
+    res.json({
+      id: e.entry_id,
+      title: e.title,
+      summary: e.summary,
+      date: e.date,
+      paragraphs: typeof e.paragraphs === 'string' ? JSON.parse(e.paragraphs) : e.paragraphs || [],
+      contentBlocks: typeof e.content_blocks === 'string' ? JSON.parse(e.content_blocks) : e.content_blocks || [],
+      media: typeof e.media === 'string' ? JSON.parse(e.media) : e.media || []
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
