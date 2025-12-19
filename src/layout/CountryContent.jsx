@@ -8,6 +8,40 @@ import "./timeline.css"
 import MediaGallery from "./MediaGallery"
 import ChaptersOverlay from "../components/ChaptersOverlay"
 
+// Video type detector and embed URL generator
+function getVideoType(url) {
+  if (!url) return null
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
+  if (url.includes('vimeo.com')) return 'vimeo'
+  if (url.includes('instagram.com')) return 'instagram'
+  return 'standard'
+}
+
+function getYoutubeEmbedUrl(url) {
+  if (!url) return ''
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+  const match = url.match(regExp)
+  return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null
+}
+
+function getEmbedUrl(url, type) {
+  if (type === 'youtube') {
+    return getYoutubeEmbedUrl(url) || url
+  }
+  if (type === 'vimeo') {
+    const videoId = url.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]
+    return videoId ? `https://player.vimeo.com/video/${videoId}` : url
+  }
+  if (type === 'instagram') {
+    const cleanUrl = url.replace(/\/$/, '')
+    if (!cleanUrl.includes('/embed')) {
+      return cleanUrl + '/embed/'
+    }
+    return cleanUrl
+  }
+  return url
+}
+
 export default function CountryContent({ countryCode, section, searchTerm = "" }) {
   const { lang, t } = useLanguage()
   const [loading, setLoading] = useState(true)
@@ -1274,7 +1308,15 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
                   <img src={item.url} alt={item.title} />
                 ) : (
                   <div className="fototeca-video-thumb">
-                    <video src={item.url} />
+                    {getVideoType(item.url) === 'youtube' ? (
+                      <iframe width="100%" height="100%" src={getEmbedUrl(item.url, 'youtube')} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={item.title} style={{objectFit: 'cover'}} />
+                    ) : getVideoType(item.url) === 'vimeo' ? (
+                      <iframe width="100%" height="100%" src={getEmbedUrl(item.url, 'vimeo')} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={item.title} style={{objectFit: 'cover'}} />
+                    ) : getVideoType(item.url) === 'instagram' ? (
+                      <iframe width="100%" height="100%" src={getEmbedUrl(item.url, 'instagram')} frameBorder="0" scrolling="no" allowFullScreen title={item.title} style={{objectFit: 'cover'}} />
+                    ) : (
+                      <video src={item.url} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                    )}
                     <div className="play-overlay">▶</div>
                   </div>
                 )}
@@ -1300,8 +1342,14 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
           <div className="fototeca-detail-media">
             {selectedItem.type === "image" ? (
               <img src={selectedItem.url} alt={selectedItem.title} />
+            ) : getVideoType(selectedItem.url) === 'youtube' ? (
+              <iframe width="100%" height="600" src={getEmbedUrl(selectedItem.url, 'youtube')} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={selectedItem.title} />
+            ) : getVideoType(selectedItem.url) === 'vimeo' ? (
+              <iframe width="100%" height="600" src={getEmbedUrl(selectedItem.url, 'vimeo')} frameBorder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen title={selectedItem.title} />
+            ) : getVideoType(selectedItem.url) === 'instagram' ? (
+              <iframe width="100%" height="600" src={getEmbedUrl(selectedItem.url, 'instagram')} frameBorder="0" scrolling="no" allowFullScreen title={selectedItem.title} />
             ) : (
-              <video src={selectedItem.url} controls autoPlay />
+              <video src={selectedItem.url} controls autoPlay style={{width: '100%', height: '100%'}} />
             )}
           </div>
           <div className="fototeca-detail-info">
