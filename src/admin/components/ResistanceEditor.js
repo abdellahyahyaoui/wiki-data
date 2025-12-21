@@ -155,7 +155,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
       
       setEditingEntry(fullEntry);
       setEntryForm({
-        id: fullEntry.id,
+        id: fullEntry.entry_id,
         title: fullEntry.title || '',
         summary: fullEntry.summary || '',
         date: fullEntry.date || '',
@@ -167,7 +167,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
       console.error('Error loading entry:', error);
       setEditingEntry(entry);
       setEntryForm({
-        id: entry.id,
+        id: entry.entry_id,
         title: entry.title || '',
         summary: entry.summary || '',
         date: entry.date || '',
