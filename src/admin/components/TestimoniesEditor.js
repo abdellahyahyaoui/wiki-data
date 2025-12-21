@@ -143,7 +143,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
   async function openEditTestimonyModal(testimony) {
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimony.id}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimony.testimony_id}?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       
@@ -243,9 +243,9 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
       media: testimonyForm.media || []
     };
 
-    const isEdit = editingTestimony && editingTestimony.id;
+    const isEdit = editingTestimony && editingTestimony.testimony_id;
     const url = isEdit
-      ? `/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${editingTestimony.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${editingTestimony.testimony_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony?lang=${lang}`;
 
     try {
@@ -296,11 +296,11 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteTestimony(testimonyId) {
+  async function handleDeleteTestimony(testimonyIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar este testimonio?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimonyId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimonyIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -419,7 +419,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
                 <div className="admin-testimonies-list">
                   {witnessDetail.testimonies?.map(t => (
-                    <div key={t.id} className="admin-testimony-card">
+                    <div key={t.testimony_id} className="admin-testimony-card">
                       <div onClick={() => canEdit && openEditTestimonyModal(t)} style={{ cursor: 'pointer', flex: 1 }}>
                         <h5>{t.title}</h5>
                         <p>{t.summary}</p>
@@ -432,7 +432,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
                       </div>
                       {user.role === 'admin' && (
                         <button 
-                          onClick={() => handleDeleteTestimony(t.id)} 
+                          onClick={() => handleDeleteTestimony(t.testimony_id)} 
                           className="admin-btn-danger small"
                           style={{ whiteSpace: 'nowrap', marginLeft: '8px' }}
                         >

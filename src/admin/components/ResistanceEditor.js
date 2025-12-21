@@ -143,7 +143,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
 
   async function openEditEntryModal(entry) {
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entry.id}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entry.entry_id}?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       
@@ -243,9 +243,9 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
       media: entryForm.media || []
     };
 
-    const isEdit = editingEntry && editingEntry.id;
+    const isEdit = editingEntry && editingEntry.entry_id;
     const url = isEdit
-      ? `/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${editingEntry.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${editingEntry.entry_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry?lang=${lang}`;
 
     try {
@@ -296,11 +296,11 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteEntry(entryId) {
+  async function handleDeleteEntry(entryIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar esta entrada?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entryId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entryIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -419,7 +419,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
 
                 <div className="admin-testimonies-list">
                   {resistorDetail.entries?.map(entry => (
-                    <div key={entry.id} className="admin-testimony-card">
+                    <div key={entry.entry_id} className="admin-testimony-card">
                       <div onClick={() => canEdit && openEditEntryModal(entry)} style={{ cursor: 'pointer', flex: 1 }}>
                         <h5>{entry.title}</h5>
                         <p>{entry.summary}</p>
@@ -432,7 +432,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
                       </div>
                       {user.role === 'admin' && (
                         <button 
-                          onClick={() => handleDeleteEntry(entry.id)} 
+                          onClick={() => handleDeleteEntry(entry.entry_id)} 
                           className="admin-btn-danger small"
                           style={{ whiteSpace: 'nowrap', marginLeft: '8px' }}
                         >
