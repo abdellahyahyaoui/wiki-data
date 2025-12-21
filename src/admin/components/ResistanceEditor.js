@@ -118,7 +118,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     if (!resistorDetail) return;
     setEditingResistor(resistorDetail);
     setResistorForm({
-      id: resistorDetail.id,
+      id: resistorDetail.resistor_id,
       name: resistorDetail.name || '',
       bio: resistorDetail.bio || '',
       image: resistorDetail.image || '',
@@ -143,7 +143,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
 
   async function openEditEntryModal(entry) {
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entry.id}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entry.entry_id}?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       
@@ -155,7 +155,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
       
       setEditingEntry(fullEntry);
       setEntryForm({
-        id: fullEntry.id,
+        id: fullEntry.entry_id,
         title: fullEntry.title || '',
         summary: fullEntry.summary || '',
         date: fullEntry.date || '',
@@ -167,7 +167,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
       console.error('Error loading entry:', error);
       setEditingEntry(entry);
       setEntryForm({
-        id: entry.id,
+        id: entry.entry_id,
         title: entry.title || '',
         summary: entry.summary || '',
         date: entry.date || '',
@@ -179,20 +179,40 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
   }
 
   function convertParagraphsToBlocks(paragraphs) {
-    if (!paragraphs || paragraphs.length === 0) return [];
-    return paragraphs.map((p, i) => ({
-      id: `block-${i}`,
-      type: 'text',
-      content: p,
-      position: 'center'
-    }));
+    // Handle null/undefined
+    if (!paragraphs) return [];
+    
+    // Parse JSON string if needed
+    let parsedParagraphs = paragraphs;
+    if (typeof paragraphs === 'string') {
+      try {
+        parsedParagraphs = JSON.parse(paragraphs);
+      } catch {
+        return [];
+      }
+    }
+    
+    // Ensure it's an array
+    if (!Array.isArray(parsedParagraphs)) {
+      return [];
+    }
+    
+    // Filter out empty strings and convert to blocks
+    return parsedParagraphs
+      .filter(p => p && p.trim && p.trim().length > 0)
+      .map((p, i) => ({
+        id: `block-${i}`,
+        type: 'text',
+        content: p,
+        position: 'center'
+      }));
   }
 
   async function handleResistorSubmit(e) {
     e.preventDefault();
     
     const url = editingResistor
-      ? `/api/cms/countries/${countryCode}/resistance/${editingResistor.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/resistance/${editingResistor.resistor_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/resistance?lang=${lang}`;
     
     const method = editingResistor ? 'PUT' : 'POST';
@@ -221,7 +241,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
         }
         loadResistors();
         if (editingResistor) {
-          loadResistorDetail(editingResistor.id);
+          loadResistorDetail(editingResistor.resistor_id);
         }
       } else {
         alert(data.error || 'Error al guardar');
@@ -243,9 +263,9 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
       media: entryForm.media || []
     };
 
-    const isEdit = editingEntry && editingEntry.id;
+    const isEdit = editingEntry && editingEntry.entry_id;
     const url = isEdit
-      ? `/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${editingEntry.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${editingEntry.entry_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry?lang=${lang}`;
 
     try {
@@ -274,11 +294,11 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteResistor(resistorId) {
+  async function handleDeleteResistor(resistorIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar esta persona/grupo y todas sus entradas?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${resistorId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${resistorIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -296,11 +316,11 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteEntry(entryId) {
+  async function handleDeleteEntry(entryIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar esta entrada?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entryId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${selectedResistor}/entry/${entryIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -400,7 +420,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
                     </button>
                   )}
                   {user.role === 'admin' && (
-                    <button onClick={() => handleDeleteResistor(resistorDetail.id)} className="admin-btn-danger">
+                    <button onClick={() => handleDeleteResistor(resistorDetail.resistor_id)} className="admin-btn-danger">
                       Eliminar
                     </button>
                   )}
@@ -419,7 +439,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
 
                 <div className="admin-testimonies-list">
                   {resistorDetail.entries?.map(entry => (
-                    <div key={entry.id} className="admin-testimony-card">
+                    <div key={entry.entry_id} className="admin-testimony-card">
                       <div onClick={() => canEdit && openEditEntryModal(entry)} style={{ cursor: 'pointer', flex: 1 }}>
                         <h5>{entry.title}</h5>
                         <p>{entry.summary}</p>
@@ -432,7 +452,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
                       </div>
                       {user.role === 'admin' && (
                         <button 
-                          onClick={() => handleDeleteEntry(entry.id)} 
+                          onClick={() => handleDeleteEntry(entry.entry_id)} 
                           className="admin-btn-danger small"
                           style={{ whiteSpace: 'nowrap', marginLeft: '8px' }}
                         >

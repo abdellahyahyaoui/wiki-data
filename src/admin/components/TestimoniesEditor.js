@@ -118,7 +118,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     if (!witnessDetail) return;
     setEditingWitness(witnessDetail);
     setWitnessForm({
-      id: witnessDetail.id,
+      id: witnessDetail.witness_id,
       name: witnessDetail.name || '',
       bio: witnessDetail.bio || '',
       image: witnessDetail.image || '',
@@ -143,7 +143,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
   async function openEditTestimonyModal(testimony) {
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimony.id}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimony.testimony_id}?lang=${lang}`, {
         headers: getAuthHeaders()
       });
       
@@ -179,20 +179,40 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
   }
 
   function convertParagraphsToBlocks(paragraphs) {
-    if (!paragraphs || paragraphs.length === 0) return [];
-    return paragraphs.map((p, i) => ({
-      id: `block-${i}`,
-      type: 'text',
-      content: p,
-      position: 'center'
-    }));
+    // Handle null/undefined
+    if (!paragraphs) return [];
+    
+    // Parse JSON string if needed
+    let parsedParagraphs = paragraphs;
+    if (typeof paragraphs === 'string') {
+      try {
+        parsedParagraphs = JSON.parse(paragraphs);
+      } catch {
+        return [];
+      }
+    }
+    
+    // Ensure it's an array
+    if (!Array.isArray(parsedParagraphs)) {
+      return [];
+    }
+    
+    // Filter out empty strings and convert to blocks
+    return parsedParagraphs
+      .filter(p => p && p.trim && p.trim().length > 0)
+      .map((p, i) => ({
+        id: `block-${i}`,
+        type: 'text',
+        content: p,
+        position: 'center'
+      }));
   }
 
   async function handleWitnessSubmit(e) {
     e.preventDefault();
     
     const url = editingWitness
-      ? `/api/cms/countries/${countryCode}/testimonies/${editingWitness.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/testimonies/${editingWitness.witness_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/testimonies?lang=${lang}`;
     
     const method = editingWitness ? 'PUT' : 'POST';
@@ -221,7 +241,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
         }
         loadWitnesses();
         if (editingWitness) {
-          loadWitnessDetail(editingWitness.id);
+          loadWitnessDetail(editingWitness.witness_id);
         }
       } else {
         alert(data.error || 'Error al guardar');
@@ -243,9 +263,9 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
       media: testimonyForm.media || []
     };
 
-    const isEdit = editingTestimony && editingTestimony.id;
+    const isEdit = editingTestimony && editingTestimony.testimony_id;
     const url = isEdit
-      ? `/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${editingTestimony.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${editingTestimony.testimony_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony?lang=${lang}`;
 
     try {
@@ -274,11 +294,11 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteWitness(witnessId) {
+  async function handleDeleteWitness(witnessIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar este testigo y todos sus testimonios?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${witnessId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${witnessIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -296,11 +316,11 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteTestimony(testimonyId) {
+  async function handleDeleteTestimony(testimonyIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar este testimonio?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimonyId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${selectedWitness}/testimony/${testimonyIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -400,7 +420,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
                     </button>
                   )}
                   {user.role === 'admin' && (
-                    <button onClick={() => handleDeleteWitness(witnessDetail.id)} className="admin-btn-danger">
+                    <button onClick={() => handleDeleteWitness(witnessDetail.witness_id)} className="admin-btn-danger">
                       Eliminar
                     </button>
                   )}
@@ -419,7 +439,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
 
                 <div className="admin-testimonies-list">
                   {witnessDetail.testimonies?.map(t => (
-                    <div key={t.id} className="admin-testimony-card">
+                    <div key={t.testimony_id} className="admin-testimony-card">
                       <div onClick={() => canEdit && openEditTestimonyModal(t)} style={{ cursor: 'pointer', flex: 1 }}>
                         <h5>{t.title}</h5>
                         <p>{t.summary}</p>
@@ -432,7 +452,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
                       </div>
                       {user.role === 'admin' && (
                         <button 
-                          onClick={() => handleDeleteTestimony(t.id)} 
+                          onClick={() => handleDeleteTestimony(t.testimony_id)} 
                           className="admin-btn-danger small"
                           style={{ whiteSpace: 'nowrap', marginLeft: '8px' }}
                         >
