@@ -118,7 +118,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     if (!resistorDetail) return;
     setEditingResistor(resistorDetail);
     setResistorForm({
-      id: resistorDetail.id,
+      id: resistorDetail.resistor_id,
       name: resistorDetail.name || '',
       bio: resistorDetail.bio || '',
       image: resistorDetail.image || '',
@@ -192,7 +192,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     e.preventDefault();
     
     const url = editingResistor
-      ? `/api/cms/countries/${countryCode}/resistance/${editingResistor.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/resistance/${editingResistor.resistor_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/resistance?lang=${lang}`;
     
     const method = editingResistor ? 'PUT' : 'POST';
@@ -221,7 +221,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
         }
         loadResistors();
         if (editingResistor) {
-          loadResistorDetail(editingResistor.id);
+          loadResistorDetail(editingResistor.resistor_id);
         }
       } else {
         alert(data.error || 'Error al guardar');
@@ -274,11 +274,11 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteResistor(resistorId) {
+  async function handleDeleteResistor(resistorIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar esta persona/grupo y todas sus entradas?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${resistorId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/resistance/${resistorIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -400,7 +400,7 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
                     </button>
                   )}
                   {user.role === 'admin' && (
-                    <button onClick={() => handleDeleteResistor(resistorDetail.id)} className="admin-btn-danger">
+                    <button onClick={() => handleDeleteResistor(resistorDetail.resistor_id)} className="admin-btn-danger">
                       Eliminar
                     </button>
                   )}

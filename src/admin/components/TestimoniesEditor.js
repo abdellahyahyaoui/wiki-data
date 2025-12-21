@@ -118,7 +118,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     if (!witnessDetail) return;
     setEditingWitness(witnessDetail);
     setWitnessForm({
-      id: witnessDetail.id,
+      id: witnessDetail.witness_id,
       name: witnessDetail.name || '',
       bio: witnessDetail.bio || '',
       image: witnessDetail.image || '',
@@ -192,7 +192,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     e.preventDefault();
     
     const url = editingWitness
-      ? `/api/cms/countries/${countryCode}/testimonies/${editingWitness.id}?lang=${lang}`
+      ? `/api/cms/countries/${countryCode}/testimonies/${editingWitness.witness_id}?lang=${lang}`
       : `/api/cms/countries/${countryCode}/testimonies?lang=${lang}`;
     
     const method = editingWitness ? 'PUT' : 'POST';
@@ -221,7 +221,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
         }
         loadWitnesses();
         if (editingWitness) {
-          loadWitnessDetail(editingWitness.id);
+          loadWitnessDetail(editingWitness.witness_id);
         }
       } else {
         alert(data.error || 'Error al guardar');
@@ -274,11 +274,11 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
     }
   }
 
-  async function handleDeleteWitness(witnessId) {
+  async function handleDeleteWitness(witnessIdToDelete) {
     if (!confirm('¿Estás seguro de eliminar este testigo y todos sus testimonios?')) return;
     
     try {
-      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${witnessId}?lang=${lang}`, {
+      const res = await fetch(`${API_BASE}/api/cms/countries/${countryCode}/testimonies/${witnessIdToDelete}?lang=${lang}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -400,7 +400,7 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
                     </button>
                   )}
                   {user.role === 'admin' && (
-                    <button onClick={() => handleDeleteWitness(witnessDetail.id)} className="admin-btn-danger">
+                    <button onClick={() => handleDeleteWitness(witnessDetail.witness_id)} className="admin-btn-danger">
                       Eliminar
                     </button>
                   )}
