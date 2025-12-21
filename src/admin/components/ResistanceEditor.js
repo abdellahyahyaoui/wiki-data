@@ -179,8 +179,19 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
   }
 
   function convertParagraphsToBlocks(paragraphs) {
-    if (!paragraphs || paragraphs.length === 0) return [];
-    return paragraphs.map((p, i) => ({
+    // Parse JSON string if needed
+    let parsedParagraphs = paragraphs;
+    if (typeof paragraphs === 'string') {
+      try {
+        parsedParagraphs = JSON.parse(paragraphs);
+      } catch {
+        return [];
+      }
+    }
+    
+    if (!parsedParagraphs || !Array.isArray(parsedParagraphs) || parsedParagraphs.length === 0) return [];
+    
+    return parsedParagraphs.map((p, i) => ({
       id: `block-${i}`,
       type: 'text',
       content: p,
