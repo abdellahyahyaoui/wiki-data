@@ -179,6 +179,9 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
   }
 
   function convertParagraphsToBlocks(paragraphs) {
+    // Handle null/undefined
+    if (!paragraphs) return [];
+    
     // Parse JSON string if needed
     let parsedParagraphs = paragraphs;
     if (typeof paragraphs === 'string') {
@@ -189,14 +192,20 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
       }
     }
     
-    if (!parsedParagraphs || !Array.isArray(parsedParagraphs) || parsedParagraphs.length === 0) return [];
+    // Ensure it's an array
+    if (!Array.isArray(parsedParagraphs)) {
+      return [];
+    }
     
-    return parsedParagraphs.map((p, i) => ({
-      id: `block-${i}`,
-      type: 'text',
-      content: p,
-      position: 'center'
-    }));
+    // Filter out empty strings and convert to blocks
+    return parsedParagraphs
+      .filter(p => p && p.trim && p.trim().length > 0)
+      .map((p, i) => ({
+        id: `block-${i}`,
+        type: 'text',
+        content: p,
+        position: 'center'
+      }));
   }
 
   async function handleWitnessSubmit(e) {
