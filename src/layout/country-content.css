@@ -55,16 +55,16 @@ font-family: Cormorant Garamond,serif;
 }
 
 .alphabet-bar .letter.has-content {
-  color: #1a1a1a;
-  background: #fff;
+  color: #ffffff;
+  background: #061b23;
   border: 1px solid #d0d0d0;
  font-family: Cormorant Garamond,serif;
   border-radius: 30px;
 }
 
 .alphabet-bar .letter.has-content:hover {
-  background: #061b23;
-  color: #fff;
+  background: #14526b;
+  color: #fafcfd;
   border-color: #061b23;
   transform: scale(1.08);
 }
@@ -861,7 +861,7 @@ font-family: Cormorant Garamond,serif;
 }
 
 .fototeca-item:hover .play-overlay {
-  transform: translate(-50%, -50%) scale(1.1);
+  transform: translate(-50%, -50%) scale(1);
   background: rgba(139, 0, 0, 1);
 }
 
@@ -894,17 +894,22 @@ font-family: Cormorant Garamond,serif;
 }
 
 .fototeca-detail-media {
-  width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  height: auto;
+  max-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
 }
 
-.fototeca-detail-media img,
-.fototeca-detail-media video {
+
+.fototeca-detail-media video,
+.fototeca-detail-media iframe,
+.fototeca-detail-media img {
+  max-height: 70vh;
   width: 100%;
-  display: block;
+  /* object-fit: contain; */
+   border-radius: 8px;
 }
 
 .fototeca-detail-info {

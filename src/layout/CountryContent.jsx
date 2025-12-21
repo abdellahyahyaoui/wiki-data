@@ -1498,11 +1498,11 @@ const [isChaptersPanelOpen, setChaptersPanelOpen] = useState(false)
             )}
           </header>
 
-          {selectedItem.abstract && (
+          {/* {selectedItem.abstract && (
             <div className="velum-abstract-section">
               <p className={`velum-abstract-text velum-drop-cap ${isArabic ? 'amiri-font' : ''}`}>{selectedItem.abstract}</p>
             </div>
-          )}
+          )} */}
 
           {selectedItem.sections && selectedItem.sections.length > 0 && (
             <div className="velum-content-sections">

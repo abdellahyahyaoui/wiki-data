@@ -99,11 +99,16 @@
 }
 
 .media-full {
-  max-width: 100%;
-  max-height: 80vh;
+  width: 100%;
+  max-width: 960px;   /* controla lo grande que se ve */
+  max-height: 70vh;   /* evita que ocupe toda la pantalla */
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;     /* centra horizontalmente */
+  display: block;
   border-radius: 8px;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
 }
+
 
 .media-detail-title {
   color: #fff;

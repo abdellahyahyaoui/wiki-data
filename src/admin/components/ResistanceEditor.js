@@ -153,13 +153,17 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
         fullEntry = { ...entry, ...data };
       }
       
+      const blocks = fullEntry.contentBlocks && fullEntry.contentBlocks.length > 0 
+        ? fullEntry.contentBlocks 
+        : convertParagraphsToBlocks(fullEntry.paragraphs);
+      
       setEditingEntry(fullEntry);
       setEntryForm({
-        id: fullEntry.entry_id,
+        id: fullEntry.entry_id || fullEntry.id,
         title: fullEntry.title || '',
         summary: fullEntry.summary || '',
         date: fullEntry.date || '',
-        contentBlocks: fullEntry.contentBlocks || convertParagraphsToBlocks(fullEntry.paragraphs),
+        contentBlocks: blocks,
         media: fullEntry.media || []
       });
       setShowEntryModal(true);
@@ -285,6 +289,14 @@ export default function ResistanceEditor({ countryCode, lang = 'es' }) {
         if (data.pending) {
           alert('Cambio enviado para aprobación');
         }
+        // Update local state immediately for instant UI feedback
+        const updatedEntries = resistorDetail.entries.map(e => 
+          e.entry_id === editingEntry.entry_id 
+            ? { ...e, ...body }
+            : e
+        );
+        setResistorDetail({ ...resistorDetail, entries: updatedEntries });
+        // Also refresh from server for consistency
         loadResistorDetail(selectedResistor);
       } else {
         alert(data.error || 'Error al guardar');

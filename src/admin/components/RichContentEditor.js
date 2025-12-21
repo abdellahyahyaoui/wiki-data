@@ -13,8 +13,7 @@ export default function RichContentEditor({ blocks = [], onChange, allowAudio = 
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (!initializedRef.current && (!blocks || blocks.length === 0)) {
-      initializedRef.current = true;
+    if (!blocks || blocks.length === 0) {
       const initialBlock = {
         id: Date.now().toString(),
         type: 'text',
@@ -24,7 +23,7 @@ export default function RichContentEditor({ blocks = [], onChange, allowAudio = 
       };
       onChange([initialBlock]);
     }
-  }, []);
+  }, [blocks, onChange]);
 
   function addBlock(type) {
     const newBlock = {

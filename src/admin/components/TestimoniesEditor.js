@@ -153,13 +153,17 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
         fullTestimony = { ...testimony, ...data };
       }
       
+      const blocks = fullTestimony.contentBlocks && fullTestimony.contentBlocks.length > 0 
+        ? fullTestimony.contentBlocks 
+        : convertParagraphsToBlocks(fullTestimony.paragraphs);
+      
       setEditingTestimony(fullTestimony);
       setTestimonyForm({
-        id: fullTestimony.id,
+        id: fullTestimony.testimony_id || fullTestimony.id,
         title: fullTestimony.title || '',
         summary: fullTestimony.summary || '',
         date: fullTestimony.date || '',
-        contentBlocks: fullTestimony.contentBlocks || convertParagraphsToBlocks(fullTestimony.paragraphs),
+        contentBlocks: blocks,
         media: fullTestimony.media || []
       });
       setShowTestimonyModal(true);
@@ -285,6 +289,14 @@ export default function TestimoniesEditor({ countryCode, lang = 'es' }) {
         if (data.pending) {
           alert('Cambio enviado para aprobación');
         }
+        // Update local state immediately for instant UI feedback
+        const updatedTestimonies = witnessDetail.testimonies.map(t => 
+          t.testimony_id === editingTestimony.testimony_id 
+            ? { ...t, ...body }
+            : t
+        );
+        setWitnessDetail({ ...witnessDetail, testimonies: updatedTestimonies });
+        // Also refresh from server for consistency
         loadWitnessDetail(selectedWitness);
       } else {
         alert(data.error || 'Error al guardar');
