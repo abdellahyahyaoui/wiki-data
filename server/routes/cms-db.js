@@ -1368,6 +1368,12 @@ router.post('/ai/save', authenticateToken, async (req, res) => {
   }
 });
 
+const OpenAI = require('openai');
+const openai = new OpenAI({
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+});
+
 router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
   try {
     const { countryCode } = req.params;
@@ -1385,14 +1391,13 @@ router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
     const [existingTerms] = await pool.query('SELECT term FROM terminology WHERE lang = ?', [lang]);
     const termList = existingTerms.map(t => t.term.toLowerCase());
 
-    // 3. Prompt Detallado (Aquí es donde la IA hace el trabajo pesado)
-    // Nota: Para la implementación real usarías la integración de OpenAI de Replit
+    // 3. Prompt Detallado
     const prompt = `
       Actúa como un experto historiador y analista de conflictos. 
       Analiza el siguiente contenido sobre el conflicto en ${countryCode}.
       
       OBJETIVOS:
-      1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: No resumas. Extrae y organiza TODA la información relevante.
+      1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: No resumas. Extrae y organiza TODA la información relevante al español.
       2. TERMINOLOGÍA: Identifica términos clave (Personajes, Organizaciones, Conceptos). 
          NO INCLUYAS estos términos si ya existen: ${termList.join(', ')}.
       3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada.
@@ -1400,32 +1405,36 @@ router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
          Crea perfiles completos (Nombre, Bio, Relato/Acción).
       5. SIN DUPLICIDAD: Si la información se repite en los textos de entrada, únala en una sola entrada coherente.
       
+      Responde EXCLUSIVAMENTE en formato JSON con la siguiente estructura:
+      {
+        "terminology": [{"term": "...", "definition": "...", "category": "..."}],
+        "timeline": [{"date": "...", "title": "...", "summary": "..."}],
+        "testimonies": [{"name": "...", "bio": "...", "testimony": "..."}],
+        "resistance": [{"name": "...", "bio": "...", "action": "..."}],
+        "description": "..."
+      }
+
       TEXTO DE ENTRADA:
       ${fullText}
     `;
 
-    // Simulación de respuesta estructurada (En producción aquí llamarías a OpenAI)
-    const processedResult = {
-      terminology: [
-        { term: "Nuevo Término Detectado", definition: "Definición extraída íntegra y traducida.", category: "conceptos" }
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "Eres un asistente que extrae datos históricos estructurados en JSON." },
+        { role: "user", content: prompt }
       ],
-      timeline: [
-        { date: "Fecha Detectada", title: "Título del Evento", summary: "Descripción detallada extraída." }
-      ],
-      testimonies: [
-        { name: "Nombre del Testigo", bio: "Biografía detectada", testimony: "Relato íntegro traducido" }
-      ],
-      resistance: [
-        { name: "Nombre del Movimiento/Persona", bio: "Perfil detallado", action: "Acción o historia de resistencia" }
-      ],
-      description: "Toda la información narrativa organizada por capítulos..."
-    };
+      response_format: { type: "json_object" }
+    });
+
+    const processedResult = JSON.parse(completion.choices[0].message.content);
 
     // Marcar como procesado
     await pool.query('UPDATE ai_raw_data SET status = "processed" WHERE country_code = ?', [countryCode]);
 
     res.json(processedResult);
   } catch (error) {
+    console.error("AI Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
