@@ -17,7 +17,7 @@ async function savePendingChange(change) {
     await connection.query(
       `INSERT INTO pending_changes (change_id, type, section, country_code, lang, item_id, data, user_id, user_name, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-      [uuidv4(), change.type, change.section, country_code || null, change.lang || 'es', 
+      [uuidv4(), change.type, change.section, change.country_code || null, change.lang || 'es', 
        change.itemId || change.articleId || change.termId || null, JSON.stringify(change.data), 
        change.userId, change.userName]
     );
@@ -236,7 +236,7 @@ router.get('/ai/history/:countryCode', authenticateToken, async (req, res) => {
       'SELECT id, content, created_at FROM ai_raw_data WHERE country_code = ? AND status = "pending" ORDER BY created_at DESC',
       [req.params.countryCode]
     );
-    res.json(rows);
+    res.json({ history: rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
