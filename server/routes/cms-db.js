@@ -1396,13 +1396,13 @@ router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
       Analiza el siguiente contenido sobre el conflicto en ${countryCode}.
       
       OBJETIVOS:
-      1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: No resumas. Extrae y organiza TODA la información relevante al español.
+      1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: Traduce TODA la información al español de forma natural y profesional. No resumas excesivamente, mantén los detalles importantes.
       2. TERMINOLOGÍA: Identifica términos clave (Personajes, Organizaciones, Conceptos). 
          NO INCLUYAS estos términos si ya existen: ${termList.join(', ')}.
-      3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada.
+      3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada en español.
       4. TESTIMONIOS Y RESISTENCIA: Identifica relatos de testigos o acciones de movimientos de resistencia.
-         Crea perfiles completos (Nombre, Bio, Relato/Acción).
-      5. SIN DUPLICIDAD: Si la información se repite en los textos de entrada, únala en una sola entrada coherente.
+         Crea perfiles completos (Nombre, Bio, Relato/Acción) traducidos al español.
+      5. SIN DUPLICIDAD: Si la información se repite en los textos de entrada, únala en una sola entrada coherente y bien redactada.
       
       Responde EXCLUSIVAMENTE en formato JSON con la siguiente estructura:
       {
@@ -1413,7 +1413,7 @@ router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
         "description": "..."
       }
 
-      TEXTO DE ENTRADA:
+      TEXTO DE ENTRADA (Puede estar en inglés u otros idiomas):
       ${fullText}
     `;
 
