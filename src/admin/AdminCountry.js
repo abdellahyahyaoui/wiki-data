@@ -233,7 +233,7 @@ export default function AdminCountry() {
             <FototecaEditor countryCode={selectedCountry} mediaType="video" lang={selectedLang} />
           )}
           {activeSection === 'ai-lab' && (
-            <div className="admin-editor">
+            <div className="admin-editor" style={{ display: 'block', visibility: 'visible', opacity: 1, minHeight: '500px' }}>
               <AILaboratory countryCode={selectedCountry} />
             </div>
           )}
