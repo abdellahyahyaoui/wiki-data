@@ -15,13 +15,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
 
   const fetchHistory = async () => {
     try {
-      const { getAuthHeaders } = await import('../../context/AuthContext').then(m => {
-        // This is a bit hacky for a component but we need the headers
-        // Better: AILaboratory should be inside the AuthProvider context
-        return { getAuthHeaders: () => ({ 'Authorization': `Bearer ${localStorage.getItem('token')}` }) };
-      });
-
-      const res = await fetch(`/api/ai/history/${countryCode}`, {
+      const res = await fetch(`/api/cms/ai/history/${countryCode}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -36,7 +30,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
   const handleSave = async () => {
     if (!text.trim()) return;
     try {
-      await fetch(`/api/ai/save`, {
+      await fetch(`/api/cms/ai/save`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -54,7 +48,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
   const handleProcess = async () => {
     setIsProcessing(true);
     try {
-      const res = await fetch(`/api/ai/process/${countryCode}`, { 
+      const res = await fetch(`/api/cms/ai/process/${countryCode}`, { 
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
