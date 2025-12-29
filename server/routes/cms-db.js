@@ -1418,7 +1418,7 @@ router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
     `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: "Eres un asistente que extrae datos históricos estructurados en JSON." },
         { role: "user", content: prompt }
