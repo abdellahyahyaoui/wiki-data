@@ -1,0 +1,200 @@
+"use client"
+
+import { useState } from "react"
+import "./media-gallery.css"
+
+function getVideoType(url) {
+  if (!url) return null
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube'
+  if (url.includes('vimeo.com')) return 'vimeo'
+  if (url.includes('instagram.com')) return 'instagram'
+  return 'standard'
+}
+
+// Use same robust function as CMS
+function getYoutubeEmbedUrl(url) {
+  if (!url) return ''
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+  const match = url.match(regExp)
+  return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null
+}
+
+function getEmbedUrl(url, type) {
+  if (type === 'youtube') {
+    return getYoutubeEmbedUrl(url) || url
+  }
+  if (type === 'vimeo') {
+    const videoId = url.split('vimeo.com/')[1]?.split('?')[0]?.split('/')[0]
+    return videoId ? `https://player.vimeo.com/video/${videoId}` : url
+  }
+  if (type === 'instagram') {
+    const cleanUrl = url.replace(/\/$/, '')
+    if (!cleanUrl.includes('/embed')) {
+      return cleanUrl + '/embed/'
+    }
+    return cleanUrl
+  }
+  return url
+}
+
+export default function MediaGallery({ items }) {
+  const [selectedIndex, setSelectedIndex] = useState(null)
+
+  if (!items || items.length === 0) {
+    return (
+      <div className="media-empty">
+        <p>No hay contenido multimedia disponible en esta sección.</p>
+      </div>
+    )
+  }
+
+  const openItem = (index) => {
+    setSelectedIndex(index)
+  }
+
+  const closeItem = () => {
+    setSelectedIndex(null)
+  }
+
+  const prevItem = () => setSelectedIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1))
+  const nextItem = () => setSelectedIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1))
+
+  const handleKeyDown = (e) => {
+    if (selectedIndex === null) return
+    if (e.key === "ArrowLeft") prevItem()
+    if (e.key === "ArrowRight") nextItem()
+    if (e.key === "Escape") closeItem()
+  }
+
+  return (
+    <div className="media-gallery" onKeyDown={handleKeyDown} role="region" aria-label="Media gallery">
+      {/* GRID DE MINIATURAS */}
+      <div className="media-grid">
+        {items.map((item, index) => {
+          const videoType = item.type === "video" ? getVideoType(item.url) : null
+          return (
+            <div
+              key={item.id}
+              className="media-card"
+              onClick={() => openItem(index)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault()
+                  openItem(index)
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={`Open ${item.title}`}
+            >
+              {item.type === "image" && (
+                <img
+                  src={item.url || "/placeholder.svg"}
+                  alt={item.title}
+                  className="media-thumb"
+                  onError={(e) => {
+                    e.target.src = "/placeholder.svg?height=200&width=300&text=Imagen+no+disponible"
+                  }}
+                />
+              )}
+              {item.type === "video" && (
+                <div className="media-thumb media-video-thumb">
+                  {videoType === 'youtube' || videoType === 'vimeo' || videoType === 'instagram' ? (
+                    <div className="media-video-icon">▶ {videoType.toUpperCase()}</div>
+                  ) : (
+                    <video src={item.url} className="media-thumb" muted preload="metadata" />
+                  )}
+                </div>
+              )}
+              <div className="media-title">{item.title}</div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* MODAL DE DETALLE */}
+      {selectedIndex !== null && (
+        <div className="media-modal" onClick={closeItem} role="dialog" aria-modal="true">
+          <button className="media-close" onClick={closeItem} aria-label="Close media viewer" title="Close (Esc)">
+            ×
+          </button>
+          <button
+            className="media-prev"
+            onClick={(e) => {
+              e.stopPropagation()
+              prevItem()
+            }}
+            aria-label="Previous item"
+            title="Previous (Arrow Left)"
+          >
+            ‹
+          </button>
+          <button
+            className="media-next"
+            onClick={(e) => {
+              e.stopPropagation()
+              nextItem()
+            }}
+            aria-label="Next item"
+            title="Next (Arrow Right)"
+          >
+            ›
+          </button>
+
+          <div className="media-detail-content" onClick={(e) => e.stopPropagation()}>
+            {items[selectedIndex].type === "image" && (
+              <img
+                src={items[selectedIndex].url || "/placeholder.svg"}
+                alt={items[selectedIndex].title}
+                className="media-full"
+                onError={(e) => {
+                  e.target.src = "/placeholder.svg?height=600&width=800&text=Imagen+no+disponible"
+                }}
+              />
+            )}
+            {items[selectedIndex].type === "video" && (
+              <>
+                {getVideoType(items[selectedIndex].url) === 'youtube' && (
+                  <iframe
+                    className="media-full"
+                    src={getEmbedUrl(items[selectedIndex].url, 'youtube')}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={items[selectedIndex].title}
+                  />
+                )}
+                {getVideoType(items[selectedIndex].url) === 'vimeo' && (
+                  <iframe
+                    className="media-full"
+                    src={getEmbedUrl(items[selectedIndex].url, 'vimeo')}
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    title={items[selectedIndex].title}
+                  />
+                )}
+                {getVideoType(items[selectedIndex].url) === 'instagram' && (
+                  <iframe
+                    className="media-full"
+                    src={getEmbedUrl(items[selectedIndex].url, 'instagram')}
+                    frameBorder="0"
+                    scrolling="no"
+                    allowFullScreen
+                    title={items[selectedIndex].title}
+                  />
+                )}
+                {getVideoType(items[selectedIndex].url) === 'standard' && (
+                  <video className="media-full" controls>
+                    <source src={items[selectedIndex].url} type="video/mp4" />
+                  </video>
+                )}
+              </>
+            )}
+            <h3 className="media-detail-title">{items[selectedIndex].title}</h3>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

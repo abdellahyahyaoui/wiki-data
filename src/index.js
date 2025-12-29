@@ -3,16 +3,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { LanguageProvider } from "./context/LanguageContext";
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import './suppressWarnings';
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import "./suppressWarnings";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <LanguageProvider>
     <App />
-  </LanguageProvider>
+  </LanguageProvider>,
 );
-
-// Registrar el Service Worker solo en producción
-if (process.env.NODE_ENV === 'production') {
-  serviceWorkerRegistration.register();
-}
