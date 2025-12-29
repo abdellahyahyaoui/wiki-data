@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API_BASE from '../utils/apiBase';
+import AILaboratory from './pages/AILaboratory';
 
 import './admin.css';
 
@@ -14,6 +15,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [showNewCountry, setShowNewCountry] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [showAILab, setShowAILab] = useState(false);
+  const [aiLabCountry, setAiLabCountry] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -84,6 +87,28 @@ fetch(`${API_BASE}/api/cms/predefined-countries`, { headers: getAuthHeaders() })
   function handleLogout() {
     logout();
     navigate('/admin/login');
+  }
+
+  if (loading) {
+    return <div className="admin-loading">Cargando...</div>;
+  }
+
+  if (showAILab && aiLabCountry) {
+    return (
+      <div className="admin-container">
+        <header className="admin-header">
+          <div className="admin-header-left">
+            <h1>Wiki<span>Conflicts</span> AI Lab</h1>
+          </div>
+          <div className="admin-header-right">
+            <button onClick={() => setShowAILab(false)} className="admin-btn-secondary">Volver</button>
+          </div>
+        </header>
+        <main className="admin-main">
+          <AILaboratory countryCode={aiLabCountry} />
+        </main>
+      </div>
+    );
   }
 
   const existingCodes = countries.map(c => c.code);
@@ -197,13 +222,27 @@ fetch(`${API_BASE}/api/cms/predefined-countries`, { headers: getAuthHeaders() })
                   <p className="admin-country-sections">
                     {country.sections?.length || 0} secciones
                   </p>
-                  {hasAccess ? (
-                    <Link to={`/admin/country/${country.code}`} className="admin-btn-secondary">
-                      Gestionar
-                    </Link>
-                  ) : (
-                    <span className="admin-no-access">Sin acceso</span>
-                  )}
+                  <div style={{ display: 'flex', gap: '5px', marginTop: '10px' }}>
+                    {hasAccess ? (
+                      <>
+                        <Link to={`/admin/country/${country.code}`} className="admin-btn-secondary" style={{ flex: 1, textAlign: 'center' }}>
+                          Gestionar
+                        </Link>
+                        <button 
+                          onClick={() => {
+                            setAiLabCountry(country.code);
+                            setShowAILab(true);
+                          }} 
+                          className="admin-btn-primary" 
+                          style={{ flex: 1, fontSize: '0.8em' }}
+                        >
+                          IA Lab
+                        </button>
+                      </>
+                    ) : (
+                      <span className="admin-no-access">Sin acceso</span>
+                    )}
+                  </div>
                 </div>
               );
             })}
