@@ -1342,4 +1342,62 @@ router.put('/countries/:countryCode/section-headers/:section', authenticateToken
   }
 });
 
+// ==================== AI LABORATORY ====================
+router.get('/ai/history/:countryCode', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, content, created_at FROM ai_raw_data WHERE country_code = ? AND status = "pending" ORDER BY created_at DESC',
+      [req.params.countryCode]
+    );
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/ai/save', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, content } = req.body;
+    await pool.query(
+      'INSERT INTO ai_raw_data (country_code, content) VALUES (?, ?)',
+      [countryCode, content]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const [rows] = await pool.query(
+      'SELECT content FROM ai_raw_data WHERE country_code = ? AND status = "pending"',
+      [countryCode]
+    );
+    
+    if (rows.length === 0) return res.status(400).json({ error: 'No hay datos para procesar' });
+
+    const fullText = rows.map(r => r.content).join('\n\n');
+    
+    // Aquí implementaremos la llamada real a OpenAI en el siguiente paso o en modo autónomo
+    const simulatedResult = {
+      terminology: [
+        { term: "Ejemplo Extraído", definition: "Concepto identificado por la IA." }
+      ],
+      timeline: [
+        { date: "2025", title: "Hito Detectado", summary: "Resumen extraído de los textos." }
+      ],
+      description: "Este es un borrador organizado basado en tus textos acumulados..."
+    };
+
+    // Marcar como procesado (Opcional: podrías querer borrarlos o dejarlos)
+    await pool.query('UPDATE ai_raw_data SET status = "processed" WHERE country_code = ?', [countryCode]);
+
+    res.json(simulatedResult);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

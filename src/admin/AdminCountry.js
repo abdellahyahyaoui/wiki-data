@@ -10,6 +10,7 @@ import ResistanceEditor from './components/ResistanceEditor';
 import VelumEditor from './components/VelumEditor';
 import TerminologyEditor from './components/TerminologyEditor';
 import GalleryManager from './components/GalleryManager';
+import AILaboratory from './pages/AILaboratory';
 import API_BASE from '../utils/apiBase';
 
 import './admin.css';
@@ -133,7 +134,8 @@ export default function AdminCountry() {
     { id: 'analysts', label: 'Analistas', icon: '📊' },
     { id: 'gallery', label: 'Galería', icon: '🖼️' },
     { id: 'photos', label: 'Fotos', icon: '📷' },
-    { id: 'videos', label: 'Videos', icon: '🎬' }
+    { id: 'videos', label: 'Videos', icon: '🎬' },
+    { id: 'ai-lab', label: 'Laboratorio IA', icon: '🤖' }
   ];
 
   const uniqueRegions = [...new Set(predefinedCountries.map(c => c.region))].sort();
@@ -229,6 +231,9 @@ export default function AdminCountry() {
           )}
           {activeSection === 'videos' && (
             <FototecaEditor countryCode={selectedCountry} mediaType="video" lang={selectedLang} />
+          )}
+          {activeSection === 'ai-lab' && (
+            <AILaboratory />
           )}
         </main>
       </div>

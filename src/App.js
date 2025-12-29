@@ -7,6 +7,7 @@ import AdminDashboard from "./admin/AdminDashboard"
 import AdminCountry from "./admin/AdminCountry"
 import AdminUsers from "./admin/AdminUsers"
 import AdminPending from "./admin/AdminPending"
+import AILaboratory from "./admin/pages/AILaboratory"
 import "./App.css"
 
 function ProtectedRoute({ children }) {
@@ -49,6 +50,11 @@ function App() {
           <Route path="/admin/pending" element={
             <ProtectedRoute>
               <AdminPending />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/ai-lab/:countryCode" element={
+            <ProtectedRoute>
+              <AILaboratory />
             </ProtectedRoute>
           } />
         </Routes>
