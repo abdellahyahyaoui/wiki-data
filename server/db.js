@@ -324,6 +324,16 @@ async function initDatabase() {
       `);
     }
 
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS ai_raw_data (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        country_code VARCHAR(50) NOT NULL,
+        content TEXT NOT NULL,
+        status ENUM('pending', 'processed') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('Database tables initialized successfully');
     return true;
   } catch (error) {
