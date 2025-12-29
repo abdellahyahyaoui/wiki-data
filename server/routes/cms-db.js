@@ -255,6 +255,18 @@ router.post('/ai/save', authenticateToken, async (req, res) => {
   }
 });
 
+router.delete('/ai/history/:countryCode', authenticateToken, async (req, res) => {
+  try {
+    await pool.query(
+      'DELETE FROM ai_raw_data WHERE country_code = ?',
+      [req.params.countryCode]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const OpenAI = require('openai');
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

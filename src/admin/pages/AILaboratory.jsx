@@ -45,6 +45,21 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
     }
   };
 
+  const handleClear = async () => {
+    if (!window.confirm("¿Estás seguro de que quieres vaciar toda la materia prima acumulada para este país?")) return;
+    try {
+      await fetch(`/api/cms/ai/history/${countryCode}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      fetchHistory();
+    } catch (err) {
+      alert("Error al vaciar");
+    }
+  };
+
   const handleProcess = async () => {
     setIsProcessing(true);
     try {
@@ -90,7 +105,17 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
         <div className="history-section">
-          <h3>Materia Prima Acumulada</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <h3>Materia Prima Acumulada</h3>
+            {history.length > 0 && (
+              <button 
+                onClick={handleClear}
+                style={{ fontSize: '0.8em', padding: '5px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                Vaciar Todo
+              </button>
+            )}
+          </div>
           <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px' }}>
             {history.length === 0 ? <p>No hay textos acumulados.</p> : history.map(item => (
               <div key={item.id} style={{ marginBottom: '10px', padding: '10px', borderBottom: '1px solid #eee', fontSize: '0.9em' }}>
