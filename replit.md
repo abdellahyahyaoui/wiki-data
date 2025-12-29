@@ -66,6 +66,13 @@ The application uses these environment variables:
 - Password: `Admin1234!`
 
 ## Recent Changes
+- 2025-12-29: Fresh import configured for Replit environment
+  - Updated API base to use relative URLs for proper Replit proxy support
+  - Built React frontend to /build folder
+  - Configured Express server on port 5000 with host 0.0.0.0
+  - Running with JSON file fallback (no MySQL configured)
+  - Set up autoscale deployment with npm run build and node server/index.js
+
 - 2025-12-21: Refreshed import and configuration for Replit environment
   - Updated API base to use relative URLs for proper Replit proxy support
   - Built React frontend to /build folder
