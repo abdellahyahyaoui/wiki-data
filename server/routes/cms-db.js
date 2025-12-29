@@ -1371,30 +1371,60 @@ router.post('/ai/save', authenticateToken, async (req, res) => {
 router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
   try {
     const { countryCode } = req.params;
-    const [rows] = await pool.query(
+    const lang = req.query.lang || 'es';
+    
+    // 1. Obtener textos acumulados
+    const [rawRows] = await pool.query(
       'SELECT content FROM ai_raw_data WHERE country_code = ? AND status = "pending"',
       [countryCode]
     );
-    
-    if (rows.length === 0) return res.status(400).json({ error: 'No hay datos para procesar' });
+    if (rawRows.length === 0) return res.status(400).json({ error: 'No hay datos nuevos para procesar' });
+    const fullText = rawRows.map(r => r.content).join('\n\n');
 
-    const fullText = rows.map(r => r.content).join('\n\n');
-    
-    // Aquí implementaremos la llamada real a OpenAI en el siguiente paso o en modo autónomo
-    const simulatedResult = {
+    // 2. Obtener terminología existente para evitar duplicados
+    const [existingTerms] = await pool.query('SELECT term FROM terminology WHERE lang = ?', [lang]);
+    const termList = existingTerms.map(t => t.term.toLowerCase());
+
+    // 3. Prompt Detallado (Aquí es donde la IA hace el trabajo pesado)
+    // Nota: Para la implementación real usarías la integración de OpenAI de Replit
+    const prompt = `
+      Actúa como un experto historiador y analista de conflictos. 
+      Analiza el siguiente contenido sobre el conflicto en ${countryCode}.
+      
+      OBJETIVOS:
+      1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: No resumas. Extrae y organiza TODA la información relevante.
+      2. TERMINOLOGÍA: Identifica términos clave (Personajes, Organizaciones, Conceptos). 
+         NO INCLUYAS estos términos si ya existen: ${termList.join(', ')}.
+      3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada.
+      4. TESTIMONIOS Y RESISTENCIA: Identifica relatos de testigos o acciones de movimientos de resistencia.
+         Crea perfiles completos (Nombre, Bio, Relato/Acción).
+      5. SIN DUPLICIDAD: Si la información se repite en los textos de entrada, únala en una sola entrada coherente.
+      
+      TEXTO DE ENTRADA:
+      ${fullText}
+    `;
+
+    // Simulación de respuesta estructurada (En producción aquí llamarías a OpenAI)
+    const processedResult = {
       terminology: [
-        { term: "Ejemplo Extraído", definition: "Concepto identificado por la IA." }
+        { term: "Nuevo Término Detectado", definition: "Definición extraída íntegra y traducida.", category: "conceptos" }
       ],
       timeline: [
-        { date: "2025", title: "Hito Detectado", summary: "Resumen extraído de los textos." }
+        { date: "Fecha Detectada", title: "Título del Evento", summary: "Descripción detallada extraída." }
       ],
-      description: "Este es un borrador organizado basado en tus textos acumulados..."
+      testimonies: [
+        { name: "Nombre del Testigo", bio: "Biografía detectada", testimony: "Relato íntegro traducido" }
+      ],
+      resistance: [
+        { name: "Nombre del Movimiento/Persona", bio: "Perfil detallado", action: "Acción o historia de resistencia" }
+      ],
+      description: "Toda la información narrativa organizada por capítulos..."
     };
 
-    // Marcar como procesado (Opcional: podrías querer borrarlos o dejarlos)
+    // Marcar como procesado
     await pool.query('UPDATE ai_raw_data SET status = "processed" WHERE country_code = ?', [countryCode]);
 
-    res.json(simulatedResult);
+    res.json(processedResult);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
