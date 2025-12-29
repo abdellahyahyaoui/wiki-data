@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-const AILaboratory = () => {
-  const { countryCode } = useParams();
+const AILaboratory = ({ countryCode: propCountryCode }) => {
+  const { countryCode: paramsCountryCode } = useParams();
+  const countryCode = propCountryCode || paramsCountryCode;
   const [text, setText] = useState('');
   const [history, setHistory] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
