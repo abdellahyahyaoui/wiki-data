@@ -27,7 +27,36 @@ async function savePendingChange(change) {
   }
 }
 
-// ==================== TERMINOLOGY ====================
+// ==================== COUNTRIES ====================
+router.get('/countries', authenticateToken, async (req, res) => {
+  try {
+    const lang = req.query.lang || 'es';
+    const [rows] = await pool.query('SELECT * FROM countries WHERE lang = ? ORDER BY name', [lang]);
+    res.json({ countries: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries', authenticateToken, checkPermission('create'), async (req, res) => {
+  try {
+    const { code, name, lang } = req.body;
+    await pool.query('INSERT INTO countries (code, name, lang) VALUES (?, ?, ?)', [code, name, lang || 'es']);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/predefined-countries', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT code, name_es as name, region FROM predefined_countries ORDER BY name_es');
+    res.json({ countries: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get('/terminology', authenticateToken, async (req, res) => {
   try {
     const lang = req.query.lang || 'es';
