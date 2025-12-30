@@ -101,6 +101,67 @@ router.get('/predefined-countries', authenticateToken, async (req, res) => {
   }
 });
 
+// ==================== TIMELINE ====================
+router.get('/countries/:countryCode/timeline', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [rows] = await pool.query('SELECT * FROM timeline_events WHERE country_id = ? ORDER BY year, month', [countryId]);
+    res.json({ items: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== TESTIMONIES ====================
+router.get('/countries/:countryCode/testimonies', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [rows] = await pool.query('SELECT * FROM witnesses WHERE country_id = ? ORDER BY created_at DESC', [countryId]);
+    res.json({ items: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== RESISTANCE ====================
+router.get('/countries/:countryCode/resistance', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [rows] = await pool.query('SELECT * FROM resistors WHERE country_id = ? ORDER BY created_at DESC', [countryId]);
+    res.json({ items: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== ANALYSTS ====================
+router.get('/countries/:countryCode/analysts', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [rows] = await pool.query('SELECT * FROM analysts WHERE country_id = ? ORDER BY created_at DESC', [countryId]);
+    res.json({ items: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== DESCRIPTION ====================
+router.get('/countries/:countryCode/description', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [rows] = await pool.query('SELECT * FROM descriptions WHERE country_id = ?', [countryId]);
+    res.json(rows[0] || { title: '', chapters: [] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== TERMINOLOGY ====================
 router.get('/terminology', authenticateToken, async (req, res) => {
   try {
     const lang = req.query.lang || 'es';
@@ -336,12 +397,12 @@ router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
     // 3. Prompt Detallado
     const prompt = `
       Actúa como un experto historiador y analista de conflictos. 
-      Analiza el siguiente contenido sobre el conflicto en ${countryCode}.
+      Analiza el siguiente contenido sobre el conflicto en \${countryCode}.
       
       OBJETIVOS:
       1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: Traduce TODA la información al español de forma natural y profesional. No resumas excesivamente, mantén los detalles importantes.
       2. TERMINOLOGÍA: Identifica términos clave (Personajes, Organizaciones, Conceptos). 
-         NO INCLUYAS estos términos si ya existen: ${termList.join(', ')}.
+         NO INCLUYAS estos términos si ya existen: \${termList.join(', ')}.
       3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada en español.
       4. TESTIMONIOS Y RESISTENCIA: Identifica relatos de testigos o acciones de movimientos de resistencia.
          Crea perfiles completos (Nombre, Bio, Relato/Acción) traducidos al español.
@@ -357,7 +418,7 @@ router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
       }
 
       TEXTO DE ENTRADA (Puede estar en inglés u otros idiomas):
-      ${fullText}
+      \${fullText}
     `;
 
     const completion = await openai.chat.completions.create({
