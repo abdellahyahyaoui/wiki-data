@@ -31,20 +31,64 @@ async function savePendingChange(change) {
 router.get('/countries', authenticateToken, async (req, res) => {
   try {
     const lang = req.query.lang || 'es';
-    const [rows] = await pool.query('SELECT * FROM countries WHERE lang = ? ORDER BY name', [lang]);
+    const [rows] = await pool.query(`
+      SELECT c.*, 
+      (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', s.section_id, 'label', s.label)) 
+       FROM sections s WHERE s.country_id = c.id) as sections
+      FROM countries c 
+      WHERE c.lang = ? 
+      ORDER BY c.name
+    `, [lang]);
     res.json({ countries: rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/countries', authenticateToken, checkPermission('create'), async (req, res) => {
+router.get('/countries/:code', authenticateToken, async (req, res) => {
   try {
-    const { code, name, lang } = req.body;
-    await pool.query('INSERT INTO countries (code, name, lang) VALUES (?, ?, ?)', [code, name, lang || 'es']);
-    res.json({ success: true });
+    const { code } = req.params;
+    const [rows] = await pool.query('SELECT * FROM countries WHERE code = ?', [code]);
+    if (rows.length === 0) return res.status(404).json({ error: 'País no encontrado' });
+    
+    const country = rows[0];
+    const [sections] = await pool.query('SELECT section_id as id, label FROM sections WHERE country_id = ? ORDER BY sort_order', [country.id]);
+    
+    res.json({ ...country, sections });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries', authenticateToken, checkPermission('create'), async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+    const { code, name, lang } = req.body;
+    
+    const [result] = await connection.query('INSERT INTO countries (code, name, lang) VALUES (?, ?, ?)', [code, name, lang || 'es']);
+    const countryId = result.insertId;
+
+    // Crear secciones por defecto
+    const defaultSections = [
+      { id: 'description', label: 'Descripción' },
+      { id: 'timeline', label: 'Cronología' },
+      { id: 'testimonies', label: 'Testimonios' },
+      { id: 'resistance', label: 'Resistencia' },
+      { id: 'analysts', label: 'Análisis' }
+    ];
+
+    for (const sec of defaultSections) {
+      await connection.query('INSERT INTO sections (country_id, section_id, label) VALUES (?, ?, ?)', [countryId, sec.id, sec.label]);
+    }
+
+    await connection.commit();
+    res.json({ success: true });
+  } catch (error) {
+    await connection.rollback();
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
   }
 });
 
