@@ -1,9 +1,13 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
+console.log('OpenAI key loaded:', !!process.env.OPENAI_API_KEY);
+
 
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const path = require('path');
+
 const fs = require('fs');
 
 const { testConnection, initDatabase } = require('./db');
