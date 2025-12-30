@@ -314,7 +314,7 @@ router.get('/countries/:countryCode/testimonies', authenticateToken, async (req,
 router.post('/countries/:countryCode/testimonies', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
   try {
     const { countryCode } = req.params;
-    const { id, name, bio, image, social } = req.body;
+    const { id, name, image, bio, social } = req.body;
     if (!id || !name) return res.status(400).json({ error: 'ID y nombre requeridos' });
 
     const countryId = await getCountryId(countryCode);
@@ -326,7 +326,7 @@ router.post('/countries/:countryCode/testimonies', authenticateToken, checkCount
         section: 'testimonies',
         countryCode,
         itemId: id,
-        data: { id, name, bio, image, social },
+        data: { id, name, image, bio, social },
         userId: req.user.id,
         userName: req.user.name
       });
@@ -337,21 +337,29 @@ router.post('/countries/:countryCode/testimonies', authenticateToken, checkCount
       'INSERT INTO witnesses (country_id, witness_id, name, bio, image, social) VALUES (?, ?, ?, ?, ?, ?)',
       [countryId, id, name, bio || '', image || null, JSON.stringify(social || {})]
     );
-    res.json({ success: true, item: { id, name, bio, image, social } });
+    res.json({ success: true, item: { id, name, image } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.get('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, async (req, res) => {
+router.get('/countries/:countryCode/testimonies/:witnessId', authenticateToken, async (req, res) => {
   try {
-    const { testimonyId } = req.params;
-    const [rows] = await pool.query('SELECT * FROM testimonies WHERE testimony_id = ?', [testimonyId]);
-    if (rows.length === 0) return res.status(404).json({ error: 'Testimonio no encontrado' });
-    const t = rows[0];
+    const { countryCode, witnessId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [witnesses] = await pool.query('SELECT * FROM witnesses WHERE country_id = ? AND witness_id = ?', [countryId, witnessId]);
+    if (witnesses.length === 0) return res.status(404).json({ error: 'Testigo no encontrado' });
+    const [testimonies] = await pool.query('SELECT * FROM testimonies WHERE witness_id = ?', [witnesses[0].id]);
     res.json({
-      ...t,
-      contentBlocks: typeof t.content_blocks === 'string' ? JSON.parse(t.content_blocks) : t.content_blocks || []
+      ...witnesses[0],
+      social: typeof witnesses[0].social === 'string' ? JSON.parse(witnesses[0].social) : witnesses[0].social || {},
+      testimonies: testimonies.map(t => ({
+        ...t,
+        paragraphs: typeof t.paragraphs === 'string' ? JSON.parse(t.paragraphs) : t.paragraphs || [],
+        contentBlocks: typeof t.content_blocks === 'string' ? JSON.parse(t.content_blocks) : t.content_blocks || [],
+        media: typeof t.media === 'string' ? JSON.parse(t.media) : t.media || []
+      }))
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -413,13 +421,136 @@ router.delete('/countries/:countryCode/testimonies/:witnessId', authenticateToke
   }
 });
 
+router.post('/countries/:countryCode/testimonies/:witnessId/testimony', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode, witnessId } = req.params;
+    const { id, title, summary, date, paragraphs, contentBlocks, media } = req.body;
+    if (!id || !title) return res.status(400).json({ error: 'ID y título requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [witnesses] = await pool.query('SELECT id FROM witnesses WHERE country_id = ? AND witness_id = ?', [countryId, witnessId]);
+    if (witnesses.length === 0) return res.status(404).json({ error: 'Testigo no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'testimony',
+        countryCode,
+        itemId: id,
+        data: { id, title, summary, date, paragraphs, contentBlocks, media },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO testimonies (witness_id, testimony_id, title, summary, date, paragraphs, content_blocks, media) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [witnesses[0].id, id, title, summary || '', date || '', JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(media || [])]
+    );
+    res.json({ success: true, item: { id, title, summary, date } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, witnessId, testimonyId } = req.params;
+    const { title, summary, date, paragraphs, contentBlocks, media } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [witnesses] = await pool.query('SELECT id FROM witnesses WHERE country_id = ? AND witness_id = ?', [countryId, witnessId]);
+    if (witnesses.length === 0) return res.status(404).json({ error: 'Testigo no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'testimony',
+        countryCode,
+        itemId: testimonyId,
+        data: { title, summary, date, paragraphs, contentBlocks, media },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE testimonies SET title = ?, summary = ?, date = ?, paragraphs = ?, content_blocks = ?, media = ? WHERE witness_id = ? AND testimony_id = ?',
+      [title, summary || '', date || '', JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(media || []), witnesses[0].id, testimonyId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, witnessId, testimonyId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [witnesses] = await pool.query('SELECT id FROM witnesses WHERE country_id = ? AND witness_id = ?', [countryId, witnessId]);
+    if (witnesses.length === 0) return res.status(404).json({ error: 'Testigo no encontrado' });
+
+    const [testimonies] = await pool.query('SELECT * FROM testimonies WHERE witness_id = ? AND testimony_id = ?', [witnesses[0].id, testimonyId]);
+    if (testimonies.length === 0) return res.status(404).json({ error: 'Testimonio no encontrado' });
+
+    const t = testimonies[0];
+    res.json({
+      id: t.testimony_id,
+      title: t.title,
+      summary: t.summary,
+      date: t.date,
+      paragraphs: typeof t.paragraphs === 'string' ? JSON.parse(t.paragraphs) : t.paragraphs || [],
+      contentBlocks: typeof t.content_blocks === 'string' ? JSON.parse(t.content_blocks) : t.content_blocks || [],
+      media: typeof t.media === 'string' ? JSON.parse(t.media) : t.media || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, witnessId, testimonyId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [witnesses] = await pool.query('SELECT id FROM witnesses WHERE country_id = ? AND witness_id = ?', [countryId, witnessId]);
+    if (witnesses.length === 0) return res.status(404).json({ error: 'Testigo no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'testimony',
+        countryCode,
+        itemId: testimonyId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM testimonies WHERE witness_id = ? AND testimony_id = ?', [witnesses[0].id, testimonyId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ==================== RESISTANCE ====================
 router.get('/countries/:countryCode/resistance', authenticateToken, async (req, res) => {
   try {
     const countryId = await getCountryId(req.params.countryCode);
     if (!countryId) return res.json({ items: [] });
-    const [rows] = await pool.query('SELECT resistor_id as id, name, bio, image FROM resistors WHERE country_id = ? ORDER BY name', [countryId]);
-    res.json({ items: rows });
+    const [rows] = await pool.query('SELECT resistor_id as id, name, bio, image, social FROM resistors WHERE country_id = ? ORDER BY name', [countryId]);
+    res.json({ items: rows.map(r => ({ ...r, social: typeof r.social === 'string' ? JSON.parse(r.social) : r.social || {} })) });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -428,7 +559,7 @@ router.get('/countries/:countryCode/resistance', authenticateToken, async (req, 
 router.post('/countries/:countryCode/resistance', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
   try {
     const { countryCode } = req.params;
-    const { id, name, bio, image } = req.body;
+    const { id, name, bio, image, social } = req.body;
     if (!id || !name) return res.status(400).json({ error: 'ID y nombre requeridos' });
 
     const countryId = await getCountryId(countryCode);
@@ -440,7 +571,7 @@ router.post('/countries/:countryCode/resistance', authenticateToken, checkCountr
         section: 'resistance',
         countryCode,
         itemId: id,
-        data: { id, name, bio, image },
+        data: { id, name, bio, image, social },
         userId: req.user.id,
         userName: req.user.name
       });
@@ -448,24 +579,32 @@ router.post('/countries/:countryCode/resistance', authenticateToken, checkCountr
     }
 
     await pool.query(
-      'INSERT INTO resistors (country_id, resistor_id, name, bio, image) VALUES (?, ?, ?, ?, ?)',
-      [countryId, id, name, bio || '', image || null]
+      'INSERT INTO resistors (country_id, resistor_id, name, bio, image, social) VALUES (?, ?, ?, ?, ?, ?)',
+      [countryId, id, name, bio || '', image || null, JSON.stringify(social || {})]
     );
-    res.json({ success: true, item: { id, name, bio, image } });
+    res.json({ success: true, item: { id, name, bio, image, social } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.get('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, async (req, res) => {
+router.get('/countries/:countryCode/resistance/:resistorId', authenticateToken, async (req, res) => {
   try {
-    const { entryId } = req.params;
-    const [rows] = await pool.query('SELECT * FROM resistance_entries WHERE entry_id = ?', [entryId]);
-    if (rows.length === 0) return res.status(404).json({ error: 'Entrada no encontrada' });
-    const e = rows[0];
+    const { countryCode, resistorId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [resistors] = await pool.query('SELECT * FROM resistors WHERE country_id = ? AND resistor_id = ?', [countryId, resistorId]);
+    if (resistors.length === 0) return res.status(404).json({ error: 'Resistor no encontrado' });
+    const [entries] = await pool.query('SELECT * FROM resistance_entries WHERE resistor_id = ?', [resistors[0].id]);
     res.json({
-      ...e,
-      contentBlocks: typeof e.content_blocks === 'string' ? JSON.parse(e.content_blocks) : e.content_blocks || []
+      ...resistors[0],
+      social: typeof resistors[0].social === 'string' ? JSON.parse(resistors[0].social) : resistors[0].social || {},
+      entries: entries.map(e => ({
+        ...e,
+        paragraphs: typeof e.paragraphs === 'string' ? JSON.parse(e.paragraphs) : e.paragraphs || [],
+        contentBlocks: typeof e.content_blocks === 'string' ? JSON.parse(e.content_blocks) : e.content_blocks || [],
+        media: typeof e.media === 'string' ? JSON.parse(e.media) : e.media || []
+      }))
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -475,7 +614,7 @@ router.get('/countries/:countryCode/resistance/:resistorId/entry/:entryId', auth
 router.put('/countries/:countryCode/resistance/:resistorId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
   try {
     const { countryCode, resistorId } = req.params;
-    const { name, bio, image } = req.body;
+    const { name, bio, image, social } = req.body;
     const countryId = await getCountryId(countryCode);
     if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
 
@@ -485,7 +624,7 @@ router.put('/countries/:countryCode/resistance/:resistorId', authenticateToken, 
         section: 'resistance',
         countryCode,
         itemId: resistorId,
-        data: { name, bio, image },
+        data: { name, bio, image, social },
         userId: req.user.id,
         userName: req.user.name
       });
@@ -493,8 +632,8 @@ router.put('/countries/:countryCode/resistance/:resistorId', authenticateToken, 
     }
 
     await pool.query(
-      'UPDATE resistors SET name = ?, bio = ?, image = ? WHERE country_id = ? AND resistor_id = ?',
-      [name, bio || '', image, countryId, resistorId]
+      'UPDATE resistors SET name = ?, bio = ?, image = ?, social = ? WHERE country_id = ? AND resistor_id = ?',
+      [name, bio || '', image, JSON.stringify(social || {}), countryId, resistorId]
     );
     res.json({ success: true });
   } catch (error) {
@@ -527,13 +666,369 @@ router.delete('/countries/:countryCode/resistance/:resistorId', authenticateToke
   }
 });
 
+router.post('/countries/:countryCode/resistance/:resistorId/entry', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode, resistorId } = req.params;
+    const { id, title, summary, date, paragraphs, contentBlocks, media } = req.body;
+    if (!id || !title) return res.status(400).json({ error: 'ID y título requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [resistors] = await pool.query('SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?', [countryId, resistorId]);
+    if (resistors.length === 0) return res.status(404).json({ error: 'Resistor no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'resistance_entry',
+        countryCode,
+        itemId: id,
+        data: { id, title, summary, date, paragraphs, contentBlocks, media },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO resistance_entries (resistor_id, entry_id, title, summary, date, paragraphs, content_blocks, media) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [resistors[0].id, id, title, summary || '', date || '', JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(media || [])]
+    );
+    res.json({ success: true, item: { id, title, summary, date } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, resistorId, entryId } = req.params;
+    const { title, summary, date, paragraphs, contentBlocks, media } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [resistors] = await pool.query('SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?', [countryId, resistorId]);
+    if (resistors.length === 0) return res.status(404).json({ error: 'Resistor no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'resistance_entry',
+        countryCode,
+        itemId: entryId,
+        data: { title, summary, date, paragraphs, contentBlocks, media },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE resistance_entries SET title = ?, summary = ?, date = ?, paragraphs = ?, content_blocks = ?, media = ? WHERE resistor_id = ? AND entry_id = ?',
+      [title, summary || '', date || '', JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(media || []), resistors[0].id, entryId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, resistorId, entryId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [resistors] = await pool.query('SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?', [countryId, resistorId]);
+    if (resistors.length === 0) return res.status(404).json({ error: 'Resistor no encontrado' });
+
+    const [entries] = await pool.query('SELECT * FROM resistance_entries WHERE resistor_id = ? AND entry_id = ?', [resistors[0].id, entryId]);
+    if (entries.length === 0) return res.status(404).json({ error: 'Entrada no encontrada' });
+
+    const e = entries[0];
+    res.json({
+      id: e.entry_id,
+      title: e.title,
+      summary: e.summary,
+      date: e.date,
+      paragraphs: typeof e.paragraphs === 'string' ? JSON.parse(e.paragraphs) : e.paragraphs || [],
+      contentBlocks: typeof e.content_blocks === 'string' ? JSON.parse(e.content_blocks) : e.content_blocks || [],
+      media: typeof e.media === 'string' ? JSON.parse(e.media) : e.media || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, resistorId, entryId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [resistors] = await pool.query('SELECT id FROM resistors WHERE country_id = ? AND resistor_id = ?', [countryId, resistorId]);
+    if (resistors.length === 0) return res.status(404).json({ error: 'Resistor no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'resistance_entry',
+        countryCode,
+        itemId: entryId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM resistance_entries WHERE resistor_id = ? AND entry_id = ?', [resistors[0].id, entryId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ==================== ANALYSTS ====================
 router.get('/countries/:countryCode/analysts', authenticateToken, async (req, res) => {
   try {
     const countryId = await getCountryId(req.params.countryCode);
     if (!countryId) return res.json({ items: [] });
-    const [rows] = await pool.query('SELECT analyst_id as id, name, bio, image FROM analysts WHERE country_id = ? ORDER BY name', [countryId]);
-    res.json({ items: rows });
+    const [rows] = await pool.query('SELECT analyst_id as id, name, bio, image, social FROM analysts WHERE country_id = ? ORDER BY name', [countryId]);
+    res.json({ items: rows.map(r => ({ ...r, social: typeof r.social === 'string' ? JSON.parse(r.social) : r.social || {} })) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries/:countryCode/analysts', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const { id, name, bio, image, social } = req.body;
+    if (!id || !name) return res.status(400).json({ error: 'ID y nombre requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'analysts',
+        countryCode,
+        itemId: id,
+        data: { id, name, bio, image, social },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO analysts (country_id, analyst_id, name, bio, image, social) VALUES (?, ?, ?, ?, ?, ?)',
+      [countryId, id, name, bio || '', image || null, JSON.stringify(social || {})]
+    );
+    res.json({ success: true, item: { id, name, bio, image, social } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/analysts/:analystId', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, analystId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [analysts] = await pool.query('SELECT * FROM analysts WHERE country_id = ? AND analyst_id = ?', [countryId, analystId]);
+    if (analysts.length === 0) return res.status(404).json({ error: 'Analista no encontrado' });
+    const [analyses] = await pool.query('SELECT * FROM analyses WHERE analyst_id = ?', [analysts[0].id]);
+    res.json({
+      ...analysts[0],
+      social: typeof analysts[0].social === 'string' ? JSON.parse(analysts[0].social) : analysts[0].social || {},
+      analyses: analyses.map(a => ({
+        ...a,
+        paragraphs: typeof a.paragraphs === 'string' ? JSON.parse(a.paragraphs) : a.paragraphs || [],
+        contentBlocks: typeof a.content_blocks === 'string' ? JSON.parse(a.content_blocks) : a.content_blocks || [],
+        media: typeof a.media === 'string' ? JSON.parse(a.media) : a.media || []
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/analysts/:analystId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, analystId } = req.params;
+    const { name, bio, image, social } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'analysts',
+        countryCode,
+        itemId: analystId,
+        data: { name, bio, image, social },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE analysts SET name = ?, bio = ?, image = ?, social = ? WHERE country_id = ? AND analyst_id = ?',
+      [name, bio || '', image, JSON.stringify(social || {}), countryId, analystId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/analysts/:analystId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, analystId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'analysts',
+        countryCode,
+        itemId: analystId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM analysts WHERE country_id = ? AND analyst_id = ?', [countryId, analystId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries/:countryCode/analysts/:analystId/analysis', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode, analystId } = req.params;
+    const { id, title, summary, date, paragraphs, contentBlocks, media } = req.body;
+    if (!id || !title) return res.status(400).json({ error: 'ID y título requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [analysts] = await pool.query('SELECT id FROM analysts WHERE country_id = ? AND analyst_id = ?', [countryId, analystId]);
+    if (analysts.length === 0) return res.status(404).json({ error: 'Analista no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'analysis',
+        countryCode,
+        itemId: id,
+        data: { id, title, summary, date, paragraphs, contentBlocks, media },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO analyses (analyst_id, analysis_id, title, summary, date, paragraphs, content_blocks, media) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [analysts[0].id, id, title, summary || '', date || '', JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(media || [])]
+    );
+    res.json({ success: true, item: { id, title, summary, date } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/analysts/:analystId/analysis/:analysisId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, analystId, analysisId } = req.params;
+    const { title, summary, date, paragraphs, contentBlocks, media } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [analysts] = await pool.query('SELECT id FROM analysts WHERE country_id = ? AND analyst_id = ?', [countryId, analystId]);
+    if (analysts.length === 0) return res.status(404).json({ error: 'Analista no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'analysis',
+        countryCode,
+        itemId: analysisId,
+        data: { title, summary, date, paragraphs, contentBlocks, media },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE analyses SET title = ?, summary = ?, date = ?, paragraphs = ?, content_blocks = ?, media = ? WHERE analyst_id = ? AND analysis_id = ?',
+      [title, summary || '', date || '', JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(media || []), analysts[0].id, analysisId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/analysts/:analystId/analysis/:analysisId', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, analystId, analysisId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [analysts] = await pool.query('SELECT id FROM analysts WHERE country_id = ? AND analyst_id = ?', [countryId, analystId]);
+    if (analysts.length === 0) return res.status(404).json({ error: 'Analista no encontrado' });
+
+    const [analyses] = await pool.query('SELECT * FROM analyses WHERE analyst_id = ? AND analysis_id = ?', [analysts[0].id, analysisId]);
+    if (analyses.length === 0) return res.status(404).json({ error: 'Análisis no encontrado' });
+
+    const a = analyses[0];
+    res.json({
+      id: a.analysis_id,
+      title: a.title,
+      summary: a.summary,
+      date: a.date,
+      paragraphs: typeof a.paragraphs === 'string' ? JSON.parse(a.paragraphs) : a.paragraphs || [],
+      contentBlocks: typeof a.content_blocks === 'string' ? JSON.parse(a.content_blocks) : a.content_blocks || [],
+      media: typeof a.media === 'string' ? JSON.parse(a.media) : a.media || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/analysts/:analystId/analysis/:analysisId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, analystId, analysisId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    const [analysts] = await pool.query('SELECT id FROM analysts WHERE country_id = ? AND analyst_id = ?', [countryId, analystId]);
+    if (analysts.length === 0) return res.status(404).json({ error: 'Analista no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'analysis',
+        countryCode,
+        itemId: analysisId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM analyses WHERE analyst_id = ? AND analysis_id = ?', [analysts[0].id, analysisId]);
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -597,13 +1092,14 @@ router.get('/terminology/:termId', authenticateToken, async (req, res) => {
 
 router.put('/terminology/:termId', authenticateToken, checkPermission('edit'), async (req, res) => {
   try {
+    const { termId } = req.params;
     const { term, definition, category, relatedTerms, sources } = req.body;
 
     if (req.requiresApproval) {
       await savePendingChange({
         type: 'edit',
         section: 'terminology',
-        termId: req.params.termId,
+        termId,
         data: { term, definition, category, relatedTerms, sources },
         userId: req.user.id,
         userName: req.user.name
@@ -613,7 +1109,7 @@ router.put('/terminology/:termId', authenticateToken, checkPermission('edit'), a
 
     await pool.query(
       'UPDATE terminology SET term = ?, definition = ?, category = ?, related_terms = ?, sources = ? WHERE term_id = ?',
-      [term, definition, category || 'general', JSON.stringify(relatedTerms || []), JSON.stringify(sources || []), req.params.termId]
+      [term, definition, category || 'general', JSON.stringify(relatedTerms || []), JSON.stringify(sources || []), termId]
     );
     res.json({ success: true });
   } catch (error) {
@@ -623,90 +1119,132 @@ router.put('/terminology/:termId', authenticateToken, checkPermission('edit'), a
 
 router.delete('/terminology/:termId', authenticateToken, checkPermission('delete'), async (req, res) => {
   try {
+    const { termId } = req.params;
+
     if (req.requiresApproval) {
       await savePendingChange({
         type: 'delete',
         section: 'terminology',
-        termId: req.params.termId,
+        termId,
         userId: req.user.id,
         userName: req.user.name
       });
       return res.json({ success: true, pending: true });
     }
 
-    await pool.query('DELETE FROM terminology WHERE term_id = ?', [req.params.termId]);
+    await pool.query('DELETE FROM terminology WHERE term_id = ?', [termId]);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ==================== GALLERY ====================
-router.get('/gallery/images', async (req, res) => {
+// ==================== VELUM ====================
+router.get('/velum', authenticateToken, async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT url, title as name FROM fototeca WHERE type = "image" ORDER BY created_at DESC LIMIT 50');
-    res.json({ images: rows });
+    const lang = req.query.lang || 'es';
+    const [rows] = await pool.query('SELECT * FROM velum_articles WHERE lang = ? ORDER BY date DESC', [lang]);
+    res.json({ items: rows.map(r => ({ ...r, keywords: typeof r.keywords === 'string' ? JSON.parse(r.keywords) : r.keywords || [] })) });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ==================== PENDING CHANGES ====================
-router.get('/pending', authenticateToken, async (req, res) => {
+router.get('/velum/:articleId', authenticateToken, async (req, res) => {
   try {
-    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Solo admin' });
-    const [rows] = await pool.query('SELECT * FROM pending_changes WHERE status = "pending" ORDER BY created_at DESC');
-    res.json({ changes: rows });
+    const [rows] = await pool.query('SELECT * FROM velum_articles WHERE article_id = ?', [req.params.articleId]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Artículo no encontrado' });
+    const a = rows[0];
+    res.json({
+      id: a.article_id,
+      title: a.title,
+      subtitle: a.subtitle,
+      author: a.author,
+      authorImage: a.author_image,
+      coverImage: a.cover_image,
+      date: a.date,
+      abstract: a.abstract,
+      keywords: typeof a.keywords === 'string' ? JSON.parse(a.keywords) : a.keywords || [],
+      sections: typeof a.sections === 'string' ? JSON.parse(a.sections) : a.sections || [],
+      bibliography: typeof a.bibliography === 'string' ? JSON.parse(a.bibliography) : a.bibliography || []
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/pending/:changeId/approve', authenticateToken, async (req, res) => {
+router.post('/velum', authenticateToken, checkPermission('create'), async (req, res) => {
   try {
-    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Solo admin' });
-    await pool.query('UPDATE pending_changes SET status = "approved" WHERE change_id = ?', [req.params.changeId]);
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    const { id, title, subtitle, author, authorImage, coverImage, date, abstract, keywords, sections, bibliography, lang = 'es' } = req.body;
+    if (!id || !title) return res.status(400).json({ error: 'ID y título requeridos' });
 
-router.post('/pending/:changeId/reject', authenticateToken, async (req, res) => {
-  try {
-    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Solo admin' });
-    await pool.query('UPDATE pending_changes SET status = "rejected" WHERE change_id = ?', [req.params.changeId]);
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'velum',
+        articleId: id,
+        lang,
+        data: { id, title, subtitle, author, authorImage, coverImage, date, abstract, keywords, sections, bibliography },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
 
-// ==================== SECTION HEADERS ====================
-router.get('/countries/:countryCode/section-headers/:section', authenticateToken, async (req, res) => {
-  try {
-    const { countryCode, section } = req.params;
-    const countryId = await getCountryId(countryCode);
-    if (!countryId) return res.json({ title: '', description: '' });
-    const [rows] = await pool.query('SELECT title, description FROM section_headers WHERE country_id = ? AND section_id = ?', [countryId, section]);
-    if (rows.length === 0) return res.json({ title: '', description: '' });
-    res.json(rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.put('/countries/:countryCode/section-headers/:section', authenticateToken, checkCountryPermission, async (req, res) => {
-  try {
-    const { countryCode, section } = req.params;
-    const { title, description } = req.body;
-    const countryId = await getCountryId(countryCode);
-    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
     await pool.query(
-      'INSERT INTO section_headers (country_id, section_id, title, description) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), description = VALUES(description)',
-      [countryId, section, title, description]
+      'INSERT INTO velum_articles (article_id, title, subtitle, author, author_image, cover_image, date, abstract, keywords, sections, bibliography, lang) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [id, title, subtitle || '', author || '', authorImage || null, coverImage || null, date || '', abstract || '', JSON.stringify(keywords || []), JSON.stringify(sections || []), JSON.stringify(bibliography || []), lang]
     );
-    res.json({ success: true, data: { title, description } });
+    res.json({ success: true, item: { id, title } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/velum/:articleId', authenticateToken, checkPermission('edit'), async (req, res) => {
+  try {
+    const { articleId } = req.params;
+    const { title, subtitle, author, authorImage, coverImage, date, abstract, keywords, sections, bibliography } = req.body;
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'velum',
+        articleId,
+        data: { title, subtitle, author, authorImage, coverImage, date, abstract, keywords, sections, bibliography },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE velum_articles SET title = ?, subtitle = ?, author = ?, author_image = ?, cover_image = ?, date = ?, abstract = ?, keywords = ?, sections = ?, bibliography = ? WHERE article_id = ?',
+      [title, subtitle || '', author || '', authorImage || null, coverImage || null, date || '', abstract || '', JSON.stringify(keywords || []), JSON.stringify(sections || []), JSON.stringify(bibliography || []), articleId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/velum/:articleId', authenticateToken, checkPermission('delete'), async (req, res) => {
+  try {
+    const { articleId } = req.params;
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'velum',
+        articleId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM velum_articles WHERE article_id = ?', [articleId]);
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

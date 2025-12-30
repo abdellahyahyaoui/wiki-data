@@ -63,6 +63,13 @@ router.get('/countries/:code/meta', async (req, res) => {
           'SELECT section_id as id, label FROM sections WHERE country_id = ? ORDER BY sort_order',
           [country.id]
         );
+        
+        // Ensure VELUM is included if not in DB
+        const hasVelum = sections.some(s => s.id === 'velum');
+        if (!hasVelum) {
+          sections.push({ id: 'velum', label: 'VELUM' });
+        }
+
         return res.json({
           code: country.code,
           name: country.name,
@@ -75,7 +82,13 @@ router.get('/countries/:code/meta', async (req, res) => {
   }
   
   const fallback = loadJsonFallback(`/data/${lang}/${code}/meta.json`);
-  res.json(fallback || { code, name: code, sections: [] });
+  if (fallback) {
+    const hasVelum = fallback.sections.some(s => s.id === 'velum');
+    if (!hasVelum) {
+      fallback.sections.push({ id: 'velum', label: 'VELUM' });
+    }
+  }
+  res.json(fallback || { code, name: code, sections: [{ id: 'velum', label: 'VELUM' }] });
 });
 
 router.get('/countries/:code/description', async (req, res) => {
