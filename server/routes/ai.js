@@ -110,14 +110,25 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
         formatFields = '{ "titulo": "...", "contenido": "..." }';
     }
 
-    const prompt = `
-      Actúa como un TRADUCTOR Y ANALISTA para el CMS de WikiConflicts.
-      Tu misión es procesar este texto sobre ${countryCode} para la sección específica: ${section.toUpperCase()}.
+    const [existingTerms] = await pool.query(
+      "SELECT term FROM terminology WHERE lang = 'es'",
+    );
+    const existingTermList = existingTerms.map((t) => t.term.toLowerCase());
 
-      REGLAS DE ORO:
+    const prompt = `
+      Actúa como un TRADUCTOR Y ANALISTA HISTÓRICO ULTRA-FIEL para el CMS de WikiConflicts. 
+      Tu misión es procesar este texto sobre ${countryCode} para la sección específica: ${section.toUpperCase()}.
+      
+      REGLAS DE ORO INNEGOCIABLES:
       1. FIDELIDAD ABSOLUTA: No inventes nada. No suavices nada. Mantén la crudeza histórica.
       2. TRADUCCIONES DEL CORÁN: Usa la traducción de la "Universidad del Rey Fahd en Arabia Saudí".
-      3. LIMPIEZA: Elimina emoticonos y basura visual.
+      3. LIMPIEZA TÉCNICA: Elimina emoticonos, basura visual y caracteres extraños.
+      
+      INSTRUCCIONES DE DUPLICIDAD:
+      - NO incluyas en la terminología ninguno de los siguientes términos que YA existen en la base de datos: ${existingTermList.join(", ")}.
+      
+      INSTRUCCIONES POR SECCIÓN:
+      - ${sectionInstructions}
       
       FORMATO DE RESPUESTA (JSON OBLIGATORIO):
       Debes responder ÚNICAMENTE con un objeto JSON que contenga EXACTAMENTE estas llaves:
@@ -125,9 +136,7 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
       Estructura para esta sección: ${formatFields}
       
       Y SIEMPRE incluye esta llave adicional:
-      "terminologia": [ { "termino": "...", "definicion": "..." } ]
-
-      IMPORTANTE: No añadas llaves adicionales. Solo las especificadas.
+      "terminologia": [ { "termino": "...", "definicion": "..." } ] (Solo términos NUEVOS que no estén en la lista de arriba)
 
       TEXTO DE ENTRADA:
       ${fullText}
