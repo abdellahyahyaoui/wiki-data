@@ -103,23 +103,28 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     }
 
     const prompt = `
-      Actúa como un TRADUCTOR Y ANALISTA para el CMS de WikiConflicts.
+      Actúa como un TRADUCTOR Y ANALISTA HISTÓRICO ULTRA-FIEL para el CMS de WikiConflicts. 
       Tu misión es procesar este texto sobre ${countryCode} para la sección específica: ${section.toUpperCase()}.
+      
+      REGLAS DE ORO INNEGOCIABLES:
+      1. FIDELIDAD ABSOLUTA: No inventes nada. No suavices nada. No elimines información por ser "cruda" o "grave". Si el texto original relata un hecho violento o político, DEBES mantenerlo exactamente igual en la traducción.
+      2. TRADUCCIONES DEL CORÁN: Si el texto contiene versos del Corán, DEBES utilizar obligatoriamente la traducción de la "Universidad del Rey Fahd en Arabia Saudí".
+      3. LIMPIEZA TÉCNICA: Elimina emoticonos, basura visual, caracteres de control y signos de puntuación innecesarios.
+      4. IDIOMA: Traduce todo al español de forma profesional y seria.
+      
+      INSTRUCCIONES POR SECCIÓN:
+      - ${sectionInstructions}
+      
+      5. EXTRACCIÓN DE TERMINOLOGÍA: Al final, si detectas nombres de líderes, organizaciones o conceptos clave, lístalos bajo el encabezado === TERMINOLOGÍA === (Término: Definición corta traducida).
 
-      INSTRUCCIONES CRÍTICAS:
-      1. ${sectionInstructions}
-      2. TRADUCCIÓN FIEL: Traduce todo al español de forma profesional. NO inventes hechos.
-      3. LIMPIEZA: Elimina emoticonos, basura visual y caracteres extraños.
-      4. EXTRACCIÓN DE TERMINOLOGÍA: Al final, si detectas nombres de líderes, organizaciones o conceptos clave, lístalos bajo el encabezado === TERMINOLOGÍA ===.
-
-      FORMATO DE SALIDA (Usa exactamente estos encabezados para facilitar el copiado):
+      FORMATO DE SALIDA (Para copiar y pegar):
       ${section === 'timeline' ? '=== FECHA ===\n=== TÍTULO ===\n=== RESUMEN ===' : 
         section === 'testimonies' || section === 'resistance' ? '=== NOMBRE ===\n=== BIO ===\n=== CONTENIDO ===' :
         section === 'velum' ? '=== TÍTULO ===\n=== SUBTÍTULO ===\n=== RESUMEN ===\n=== CUERPO ===' :
         '=== TÍTULO ===\n=== CONTENIDO ==='}
       
-      === TERMINOLOGÍA (OPCIONAL) ===
-      (Término: Definición corta)
+      === TERMINOLOGÍA ===
+      (Si hay términos nuevos)
 
       TEXTO DE ENTRADA:
       ${fullText}

@@ -62,6 +62,10 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
   };
 
   const handleProcess = async () => {
+    if (!selectedSection) {
+      alert("Por favor, selecciona una sección primero");
+      return;
+    }
     setIsProcessing(true);
     setResult(null);
     try {
