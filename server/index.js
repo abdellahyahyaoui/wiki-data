@@ -71,6 +71,7 @@ if (!fs.existsSync(pendingFile)) fs.writeFileSync(pendingFile, JSON.stringify({ 
 
 // --- Routes ---
 app.use('/api/auth', authRoutes);
+app.use('/api/cms/ai', aiRoutes); // Cambiado para coincidir con el frontend
 app.use('/api/cms', cmsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/upload', uploadRoutes);
