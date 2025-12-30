@@ -31,6 +31,7 @@ async function initDatabase() {
   try {
     await connection.query("SET NAMES utf8mb4");
     await connection.query("SET CHARACTER SET utf8mb4");
+    await connection.query("SET collation_connection = 'utf8mb4_unicode_ci'");
     
     await connection.query(`
       CREATE TABLE IF NOT EXISTS countries (

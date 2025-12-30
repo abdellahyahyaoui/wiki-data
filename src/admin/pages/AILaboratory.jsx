@@ -120,7 +120,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
             {history.length === 0 ? <p>No hay textos acumulados.</p> : history.map(item => (
               <div key={item.id} style={{ marginBottom: '10px', padding: '10px', borderBottom: '1px solid #eee', fontSize: '0.9em' }}>
                 <small>{new Date(item.created_at).toLocaleDateString()}</small>
-                <p>{item.content.substring(0, 100)}...</p>
+                <p style={{ whiteSpace: 'pre-wrap', direction: 'rtl' }}>{item.content}</p>
               </div>
             ))}
           </div>
