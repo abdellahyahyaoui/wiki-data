@@ -17,7 +17,7 @@ async function savePendingChange(change) {
     await connection.query(
       `INSERT INTO pending_changes (change_id, type, section, country_code, lang, item_id, data, user_id, user_name, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-      [uuidv4(), change.type, change.section, change.country_code || null, change.lang || 'es', 
+      [uuidv4(), change.type, change.section, change.countryCode || null, change.lang || 'es', 
        change.itemId || change.articleId || change.termId || null, JSON.stringify(change.data), 
        change.userId, change.userName]
     );
@@ -30,120 +30,43 @@ async function savePendingChange(change) {
 // ==================== COUNTRIES ====================
 router.get('/countries', authenticateToken, async (req, res) => {
   try {
-    const lang = req.query.lang || 'es';
-    const [rows] = await pool.query(`
-      SELECT c.*, 
-      (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', s.section_id, 'label', s.label)) 
-       FROM sections s WHERE s.country_id = c.id) as sections
-      FROM countries c 
-      WHERE c.lang = ? 
-      ORDER BY c.name
-    `, [lang]);
-    res.json({ countries: rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get('/countries/:code', authenticateToken, async (req, res) => {
-  try {
-    const { code } = req.params;
-    const [rows] = await pool.query('SELECT * FROM countries WHERE code = ?', [code]);
-    if (rows.length === 0) return res.status(404).json({ error: 'País no encontrado' });
-    
-    const country = rows[0];
-    const [sections] = await pool.query('SELECT section_id as id, label FROM sections WHERE country_id = ? ORDER BY sort_order', [country.id]);
-    
-    res.json({ ...country, sections });
+    const [rows] = await pool.query('SELECT code, name FROM countries ORDER BY name');
+    res.json({ 
+      countries: rows.map(c => ({ 
+        ...c, 
+        sections: [
+          {id:'description',label:'Descripción'},
+          {id:'timeline',label:'Timeline'},
+          {id:'testimonies',label:'Testimonios'},
+          {id:'resistance',label:'Resistencia'},
+          {id:'media-gallery',label:'Fototeca'}
+        ] 
+      })) 
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
 router.post('/countries', authenticateToken, checkPermission('create'), async (req, res) => {
-  const connection = await pool.getConnection();
   try {
-    await connection.beginTransaction();
-    const { code, name, lang } = req.body;
+    const { code, name, lang = 'es' } = req.body;
+    if (!code || !name) return res.status(400).json({ error: 'Código y nombre requeridos' });
     
-    const [result] = await connection.query('INSERT INTO countries (code, name, lang) VALUES (?, ?, ?)', [code, name, lang || 'es']);
-    const countryId = result.insertId;
-
-    // Crear secciones por defecto
-    const defaultSections = [
-      { id: 'description', label: 'Descripción' },
-      { id: 'timeline', label: 'Cronología' },
-      { id: 'testimonies', label: 'Testimonios' },
-      { id: 'resistance', label: 'Resistencia' },
-      { id: 'analysts', label: 'Análisis' }
-    ];
-
-    for (const sec of defaultSections) {
-      await connection.query('INSERT INTO sections (country_id, section_id, label) VALUES (?, ?, ?)', [countryId, sec.id, sec.label]);
-    }
-
-    await connection.commit();
-    res.json({ success: true });
+    const [existing] = await pool.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [code]);
+    if (existing.length > 0) return res.status(400).json({ error: 'El país ya existe' });
+    
+    await pool.query('INSERT INTO countries (code, name, lang) VALUES (?, ?, ?)', [code, name, lang]);
+    res.json({ success: true, country: { code, name } });
   } catch (error) {
-    await connection.rollback();
     res.status(500).json({ error: error.message });
-  } finally {
-    connection.release();
   }
 });
 
 router.get('/predefined-countries', authenticateToken, async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT code, name_es as name, region FROM predefined_countries ORDER BY name_es');
+    const [rows] = await pool.query('SELECT code, name_es as name, region FROM predefined_countries ORDER BY region, name_es');
     res.json({ countries: rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ==================== TIMELINE ====================
-router.get('/countries/:countryCode/timeline', authenticateToken, async (req, res) => {
-  try {
-    const countryId = await getCountryId(req.params.countryCode);
-    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
-    const [rows] = await pool.query('SELECT * FROM timeline_events WHERE country_id = ? ORDER BY year, month', [countryId]);
-    res.json({ items: rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ==================== TESTIMONIES ====================
-router.get('/countries/:countryCode/testimonies', authenticateToken, async (req, res) => {
-  try {
-    const countryId = await getCountryId(req.params.countryCode);
-    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
-    const [rows] = await pool.query('SELECT * FROM witnesses WHERE country_id = ? ORDER BY created_at DESC', [countryId]);
-    res.json({ items: rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ==================== RESISTANCE ====================
-router.get('/countries/:countryCode/resistance', authenticateToken, async (req, res) => {
-  try {
-    const countryId = await getCountryId(req.params.countryCode);
-    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
-    const [rows] = await pool.query('SELECT * FROM resistors WHERE country_id = ? ORDER BY created_at DESC', [countryId]);
-    res.json({ items: rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ==================== ANALYSTS ====================
-router.get('/countries/:countryCode/analysts', authenticateToken, async (req, res) => {
-  try {
-    const countryId = await getCountryId(req.params.countryCode);
-    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
-    const [rows] = await pool.query('SELECT * FROM analysts WHERE country_id = ? ORDER BY created_at DESC', [countryId]);
-    res.json({ items: rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -153,9 +76,463 @@ router.get('/countries/:countryCode/analysts', authenticateToken, async (req, re
 router.get('/countries/:countryCode/description', authenticateToken, async (req, res) => {
   try {
     const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.json({ title: '', chapters: [] });
+    const [rows] = await pool.query('SELECT title, chapters FROM descriptions WHERE country_id = ?', [countryId]);
+    if (rows.length === 0) return res.json({ title: '', chapters: [] });
+    res.json({ 
+      title: rows[0].title, 
+      chapters: typeof rows[0].chapters === 'string' ? JSON.parse(rows[0].chapters) : rows[0].chapters || [] 
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries/:countryCode/description', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const { title, chapters } = req.body;
+    const countryId = await getCountryId(countryCode);
     if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
-    const [rows] = await pool.query('SELECT * FROM descriptions WHERE country_id = ?', [countryId]);
-    res.json(rows[0] || { title: '', chapters: [] });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'description',
+        countryCode,
+        data: { title, chapters },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO descriptions (country_id, title, chapters) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), chapters = VALUES(chapters)',
+      [countryId, title, JSON.stringify(chapters)]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/description', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const { title, chapters } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'description',
+        countryCode,
+        data: { title, chapters },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO descriptions (country_id, title, chapters) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE title = VALUES(title), chapters = VALUES(chapters)',
+      [countryId, title, JSON.stringify(chapters)]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/description', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'description',
+        countryCode,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM descriptions WHERE country_id = ?', [countryId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== TIMELINE ====================
+router.get('/countries/:countryCode/timeline', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.json({ items: [] });
+    const [rows] = await pool.query(
+      'SELECT event_id as id, date, title, summary, image, video, year, month FROM timeline_events WHERE country_id = ? ORDER BY year DESC, month DESC',
+      [countryId]
+    );
+    res.json({ items: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/timeline/:itemId', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, itemId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+    const [rows] = await pool.query(
+      'SELECT event_id as id, date, title, summary, image, video, year, month, paragraphs, content_blocks, sources FROM timeline_events WHERE country_id = ? AND event_id = ?',
+      [countryId, itemId]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: 'Evento no encontrado' });
+    const event = rows[0];
+    res.json({
+      ...event,
+      paragraphs: typeof event.paragraphs === 'string' ? JSON.parse(event.paragraphs) : event.paragraphs || [],
+      contentBlocks: typeof event.content_blocks === 'string' ? JSON.parse(event.content_blocks) : event.content_blocks || [],
+      sources: typeof event.sources === 'string' ? JSON.parse(event.sources) : event.sources || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries/:countryCode/timeline', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const { id, date, year, month, title, summary, image, video, paragraphs, contentBlocks, sources } = req.body;
+    if (!id || !title || !date) return res.status(400).json({ error: 'ID, título y fecha requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'timeline',
+        countryCode,
+        itemId: id,
+        data: { id, date, year, month, title, summary, image, video, paragraphs, contentBlocks, sources },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      `INSERT INTO timeline_events (country_id, event_id, date, year, month, title, summary, image, video, paragraphs, content_blocks, sources)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [countryId, id, date, year || null, month || null, title, summary || '', image || null, video || null,
+       JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []), JSON.stringify(sources || [])]
+    );
+    res.json({ success: true, item: { id, date, year, month, title, summary, image } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/timeline/:itemId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, itemId } = req.params;
+    const { date, year, month, title, summary, image, video, paragraphs, contentBlocks, sources } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'timeline',
+        countryCode,
+        itemId,
+        data: { date, year, month, title, summary, image, video, paragraphs, contentBlocks, sources },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      `UPDATE timeline_events SET date = ?, year = ?, month = ?, title = ?, summary = ?, image = ?, video = ?, paragraphs = ?, content_blocks = ?, sources = ?
+       WHERE country_id = ? AND event_id = ?`,
+      [date, year, month, title, summary || '', image, video, JSON.stringify(paragraphs || []), JSON.stringify(contentBlocks || []),
+       JSON.stringify(sources || []), countryId, itemId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/timeline/:itemId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, itemId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'timeline',
+        countryCode,
+        itemId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM timeline_events WHERE country_id = ? AND event_id = ?', [countryId, itemId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== TESTIMONIES ====================
+router.get('/countries/:countryCode/testimonies', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.json({ items: [] });
+    const [rows] = await pool.query('SELECT witness_id as id, name, bio, image, social FROM witnesses WHERE country_id = ? ORDER BY name', [countryId]);
+    res.json({ items: rows.map(r => ({ ...r, social: typeof r.social === 'string' ? JSON.parse(r.social) : r.social || {} })) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries/:countryCode/testimonies', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const { id, name, bio, image, social } = req.body;
+    if (!id || !name) return res.status(400).json({ error: 'ID y nombre requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'testimonies',
+        countryCode,
+        itemId: id,
+        data: { id, name, bio, image, social },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO witnesses (country_id, witness_id, name, bio, image, social) VALUES (?, ?, ?, ?, ?, ?)',
+      [countryId, id, name, bio || '', image || null, JSON.stringify(social || {})]
+    );
+    res.json({ success: true, item: { id, name, bio, image, social } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/testimonies/:witnessId/testimony/:testimonyId', authenticateToken, async (req, res) => {
+  try {
+    const { testimonyId } = req.params;
+    const [rows] = await pool.query('SELECT * FROM testimonies WHERE testimony_id = ?', [testimonyId]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Testimonio no encontrado' });
+    const t = rows[0];
+    res.json({
+      ...t,
+      contentBlocks: typeof t.content_blocks === 'string' ? JSON.parse(t.content_blocks) : t.content_blocks || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/testimonies/:witnessId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, witnessId } = req.params;
+    const { name, bio, image, social } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'testimonies',
+        countryCode,
+        itemId: witnessId,
+        data: { name, bio, image, social },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE witnesses SET name = ?, bio = ?, image = ?, social = ? WHERE country_id = ? AND witness_id = ?',
+      [name, bio || '', image, JSON.stringify(social || {}), countryId, witnessId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/testimonies/:witnessId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, witnessId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'testimonies',
+        countryCode,
+        itemId: witnessId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM witnesses WHERE country_id = ? AND witness_id = ?', [countryId, witnessId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== RESISTANCE ====================
+router.get('/countries/:countryCode/resistance', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.json({ items: [] });
+    const [rows] = await pool.query('SELECT resistor_id as id, name, bio, image FROM resistors WHERE country_id = ? ORDER BY name', [countryId]);
+    res.json({ items: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries/:countryCode/resistance', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const { id, name, bio, image } = req.body;
+    if (!id || !name) return res.status(400).json({ error: 'ID y nombre requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'resistance',
+        countryCode,
+        itemId: id,
+        data: { id, name, bio, image },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'INSERT INTO resistors (country_id, resistor_id, name, bio, image) VALUES (?, ?, ?, ?, ?)',
+      [countryId, id, name, bio || '', image || null]
+    );
+    res.json({ success: true, item: { id, name, bio, image } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/countries/:countryCode/resistance/:resistorId/entry/:entryId', authenticateToken, async (req, res) => {
+  try {
+    const { entryId } = req.params;
+    const [rows] = await pool.query('SELECT * FROM resistance_entries WHERE entry_id = ?', [entryId]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Entrada no encontrada' });
+    const e = rows[0];
+    res.json({
+      ...e,
+      contentBlocks: typeof e.content_blocks === 'string' ? JSON.parse(e.content_blocks) : e.content_blocks || []
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/resistance/:resistorId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, resistorId } = req.params;
+    const { name, bio, image } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'resistance',
+        countryCode,
+        itemId: resistorId,
+        data: { name, bio, image },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE resistors SET name = ?, bio = ?, image = ? WHERE country_id = ? AND resistor_id = ?',
+      [name, bio || '', image, countryId, resistorId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/resistance/:resistorId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, resistorId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'resistance',
+        countryCode,
+        itemId: resistorId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM resistors WHERE country_id = ? AND resistor_id = ?', [countryId, resistorId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== ANALYSTS ====================
+router.get('/countries/:countryCode/analysts', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.json({ items: [] });
+    const [rows] = await pool.query('SELECT analyst_id as id, name, bio, image FROM analysts WHERE country_id = ? ORDER BY name', [countryId]);
+    res.json({ items: rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -330,114 +707,6 @@ router.put('/countries/:countryCode/section-headers/:section', authenticateToken
     );
     res.json({ success: true, data: { title, description } });
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ==================== AI LABORATORY ====================
-router.get('/ai/history/:countryCode', authenticateToken, async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      'SELECT id, content, created_at FROM ai_raw_data WHERE country_code = ? AND status = "pending" ORDER BY created_at DESC',
-      [req.params.countryCode]
-    );
-    res.json({ history: rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.post('/ai/save', authenticateToken, async (req, res) => {
-  try {
-    const { countryCode, content } = req.body;
-    await pool.query(
-      'INSERT INTO ai_raw_data (country_code, content) VALUES (?, ?)',
-      [countryCode, content]
-    );
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.delete('/ai/history/:countryCode', authenticateToken, async (req, res) => {
-  try {
-    await pool.query(
-      'DELETE FROM ai_raw_data WHERE country_code = ?',
-      [req.params.countryCode]
-    );
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-const OpenAI = require('openai');
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-router.post('/ai/process/:countryCode', authenticateToken, async (req, res) => {
-  try {
-    const { countryCode } = req.params;
-    const lang = req.query.lang || 'es';
-    
-    // 1. Obtener textos acumulados
-    const [rawRows] = await pool.query(
-      'SELECT content FROM ai_raw_data WHERE country_code = ? AND status = "pending"',
-      [countryCode]
-    );
-    if (rawRows.length === 0) return res.status(400).json({ error: 'No hay datos nuevos para procesar' });
-    const fullText = rawRows.map(r => r.content).join('\n\n');
-
-    // 2. Obtener terminología existente para evitar duplicados
-    const [existingTerms] = await pool.query('SELECT term FROM terminology WHERE lang = ?', [lang]);
-    const termList = existingTerms.map(t => t.term.toLowerCase());
-
-    // 3. Prompt Detallado
-    const prompt = `
-      Actúa como un experto historiador y analista de conflictos. 
-      Analiza el siguiente contenido sobre el conflicto en \${countryCode}.
-      
-      OBJETIVOS:
-      1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: Traduce TODA la información al español de forma natural y profesional. No resumas excesivamente, mantén los detalles importantes.
-      2. TERMINOLOGÍA: Identifica términos clave (Personajes, Organizaciones, Conceptos). 
-         NO INCLUYAS estos términos si ya existen: \${termList.join(', ')}.
-      3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada en español.
-      4. TESTIMONIOS Y RESISTENCIA: Identifica relatos de testigos o acciones de movimientos de resistencia.
-         Crea perfiles completos (Nombre, Bio, Relato/Acción) traducidos al español.
-      5. SIN DUPLICIDAD: Si la información se repite en los textos de entrada, únala en una sola entrada coherente y bien redactada.
-      
-      Responde EXCLUSIVAMENTE en formato JSON con la siguiente estructura:
-      {
-        "terminology": [{"term": "...", "definition": "...", "category": "..."}],
-        "timeline": [{"date": "...", "title": "...", "summary": "..."}],
-        "testimonies": [{"name": "...", "bio": "...", "testimony": "..."}],
-        "resistance": [{"name": "...", "bio": "...", "action": "..."}],
-        "description": "..."
-      }
-
-      TEXTO DE ENTRADA (Puede estar en inglés u otros idiomas):
-      \${fullText}
-    `;
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "Eres un asistente que extrae datos históricos estructurados en JSON." },
-        { role: "user", content: prompt }
-      ],
-      response_format: { type: "json_object" }
-    });
-
-    const processedResult = JSON.parse(completion.choices[0].message.content);
-
-    // Marcar como procesado
-    await pool.query('UPDATE ai_raw_data SET status = "processed" WHERE country_code = ?', [countryCode]);
-
-    res.json(processedResult);
-  } catch (error) {
-    console.error("AI Error:", error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -1,0 +1,119 @@
+const express = require('express');
+const router = express.Router();
+const pool = require('../db').pool;
+const { authenticateToken } = require('../middleware/auth');
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+async function getCountryId(code) {
+  const [rows] = await pool.query('SELECT id FROM countries WHERE code = ? LIMIT 1', [code]);
+  return rows.length > 0 ? rows[0].id : null;
+}
+
+// ==================== AI LABORATORY ====================
+router.get('/history/:countryCode', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, content, created_at FROM ai_raw_data WHERE country_code = ? AND status = "pending" ORDER BY created_at DESC',
+      [req.params.countryCode]
+    );
+    res.json({ history: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/save', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, content } = req.body;
+    await pool.query(
+      'INSERT INTO ai_raw_data (country_code, content) VALUES (?, ?)',
+      [countryCode, content]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/history/:countryCode', authenticateToken, async (req, res) => {
+  try {
+    await pool.query(
+      'DELETE FROM ai_raw_data WHERE country_code = ?',
+      [req.params.countryCode]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/process/:countryCode', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const lang = req.query.lang || 'es';
+    
+    // 1. Obtener textos acumulados
+    const [rawRows] = await pool.query(
+      'SELECT content FROM ai_raw_data WHERE country_code = ? AND status = "pending"',
+      [countryCode]
+    );
+    if (rawRows.length === 0) return res.status(400).json({ error: 'No hay datos nuevos para procesar' });
+    const fullText = rawRows.map(r => r.content).join('\n\n');
+
+    // 2. Obtener terminología existente para evitar duplicados
+    const [existingTerms] = await pool.query('SELECT term FROM terminology WHERE lang = ?', [lang]);
+    const termList = existingTerms.map(t => t.term.toLowerCase());
+
+    // 3. Prompt Detallado
+    const prompt = `
+      Actúa como un experto historiador y analista de conflictos. 
+      Analiza el siguiente contenido sobre el conflicto en ${countryCode}.
+      
+      OBJETIVOS:
+      1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: Traduce TODA la información al español de forma natural y profesional. No resumas excesivamente, mantén los detalles importantes.
+      2. TERMINOLOGÍA: Identifica términos clave (Personajes, Organizaciones, Conceptos). 
+         NO INCLUYAS estos términos si ya existen: ${termList.join(', ')}.
+      3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada en español.
+      4. TESTIMONIOS Y RESISTENCIA: Identifica relatos de testigos o acciones de movimientos de resistencia.
+         Crea perfiles completos (Nombre, Bio, Relato/Acción) traducidos al español.
+      5. SIN DUPLICIDAD: Si la información se repite en los textos de entrada, únala en una sola entrada coherente y bien redactada.
+      
+      Responde EXCLUSIVAMENTE en formato JSON con la siguiente estructura:
+      {
+        "terminology": [{"term": "...", "definition": "...", "category": "..."}],
+        "timeline": [{"date": "...", "title": "...", "summary": "..."}],
+        "testimonies": [{"name": "...", "bio": "...", "testimony": "..."}],
+        "resistance": [{"name": "...", "bio": "...", "action": "..."}],
+        "description": "..."
+      }
+
+      TEXTO DE ENTRADA (Puede estar en inglés u otros idiomas):
+      ${fullText}
+    `;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "Eres un asistente que extrae datos históricos estructurados en JSON." },
+        { role: "user", content: prompt }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const processedResult = JSON.parse(completion.choices[0].message.content);
+
+    // Marcar como procesado
+    await pool.query('UPDATE ai_raw_data SET status = "processed" WHERE country_code = ?', [countryCode]);
+
+    res.json(processedResult);
+  } catch (error) {
+    console.error("AI Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = router;

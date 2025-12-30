@@ -9,6 +9,7 @@ const fs = require('fs');
 const { testConnection, initDatabase } = require('./db');
 const authRoutes = require('./routes/auth');
 const cmsRoutes = require('./routes/cms-db');
+const aiRoutes = require('./routes/ai');
 const uploadRoutes = require('./routes/upload');
 const publicApiRoutes = require('./routes/public-api');
 
@@ -71,6 +72,7 @@ if (!fs.existsSync(pendingFile)) fs.writeFileSync(pendingFile, JSON.stringify({ 
 // --- Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/cms', cmsRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/public', publicApiRoutes);
 
