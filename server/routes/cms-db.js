@@ -39,7 +39,8 @@ router.get('/countries', authenticateToken, async (req, res) => {
           {id:'timeline',label:'Timeline'},
           {id:'testimonies',label:'Testimonios'},
           {id:'resistance',label:'Resistencia'},
-          {id:'media-gallery',label:'Fototeca'}
+          {id:'media-gallery',label:'Fototeca'},
+          {id:'velum',label:'VELUM'}
         ] 
       })) 
     });
