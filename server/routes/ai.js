@@ -82,24 +82,28 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     const fullText = rawRows.map((r) => r.content).join("\n\n");
 
     let sectionInstructions = "";
+    let formatFields = "";
     switch(section) {
       case 'description':
         sectionInstructions = "Formatea para sección DESCRIPCIÓN: Genera un TÍTULO y el CONTENIDO principal dividido en párrafos limpios.";
+        formatFields = '{ "titulo": "...", "contenido": "..." }';
         break;
       case 'timeline':
         sectionInstructions = "Formatea para sección CRONOLOGÍA: Extrae FECHA (día/mes/año si existe), TÍTULO del evento y RESUMEN detallado.";
+        formatFields = '{ "fecha": "...", "titulo": "...", "resumen": "..." }';
         break;
       case 'testimonies':
-        sectionInstructions = "Formatea para sección TESTIMONIOS: Extrae NOMBRE del testigo, su BIO (si existe) y el RELATO/TESTIMONIO completo.";
-        break;
       case 'resistance':
-        sectionInstructions = "Formatea para sección RESISTENCIA: Extrae NOMBRE del grupo o persona, su BIO y la ACCIÓN o historia de resistencia.";
+        sectionInstructions = `Formatea para sección ${section.toUpperCase()}: Extrae NOMBRE del protagonista, su BIO (si existe) y el CONTENIDO principal.`;
+        formatFields = '{ "nombre": "...", "bio": "...", "contenido": "..." }';
         break;
       case 'velum':
         sectionInstructions = "Formatea para sección VELUM: Genera un TÍTULO, SUBTÍTULO, RESUMEN y el CUERPO completo del artículo.";
+        formatFields = '{ "titulo": "...", "subtitulo": "...", "resumen": "...", "cuerpo": "..." }';
         break;
       default:
         sectionInstructions = "Traduce y limpia el texto de forma general.";
+        formatFields = '{ "titulo": "...", "contenido": "..." }';
     }
 
     const prompt = `
@@ -112,15 +116,14 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
       3. LIMPIEZA: Elimina emoticonos y basura visual.
       
       FORMATO DE RESPUESTA (JSON OBLIGATORIO):
-      Debes responder ÚNICAMENTE con un objeto JSON que contenga las siguientes llaves según la sección:
+      Debes responder ÚNICAMENTE con un objeto JSON que contenga EXACTAMENTE estas llaves:
       
-      Si section === 'description': { "titulo": "...", "contenido": "..." }
-      Si section === 'timeline': { "fecha": "...", "titulo": "...", "resumen": "..." }
-      Si section === 'testimonies' o 'resistance': { "nombre": "...", "bio": "...", "contenido": "..." }
-      Si section === 'velum': { "titulo": "...", "subtitulo": "...", "resumen": "...", "cuerpo": "..." }
+      Estructura para esta sección: ${formatFields}
       
-      ADJUNTO (SIEMPRE INCLUIR):
-      "terminologia": [ { "termino": "...", "definicion": "..." } ] (Extrae nombres o conceptos clave)
+      Y SIEMPRE incluye esta llave adicional:
+      "terminologia": [ { "termino": "...", "definicion": "..." } ]
+
+      IMPORTANTE: No añadas llaves adicionales. Solo las especificadas.
 
       TEXTO DE ENTRADA:
       ${fullText}
