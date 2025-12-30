@@ -4,10 +4,11 @@ const pool = require("../db").pool;
 const { authenticateToken } = require("../middleware/auth");
 const OpenAI = require("openai");
 
-const openai = new OpenAI({
-  apiKey:
-    process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-});
+const apiKey = process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+let openai = null;
+if (apiKey) {
+  openai = new OpenAI({ apiKey });
+}
 
 async function getCountryId(code) {
   const [rows] = await pool.query(
@@ -80,6 +81,9 @@ router.delete(
 
 router.post("/process/:countryCode", authenticateToken, async (req, res) => {
   try {
+    if (!openai) {
+      return res.status(503).json({ error: "OpenAI API key not configured" });
+    }
     const { countryCode } = req.params;
     const lang = req.query.lang || "es";
 
