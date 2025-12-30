@@ -69,7 +69,7 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
       return res.status(503).json({ error: "OpenAI API key not configured" });
     }
     const { countryCode } = req.params;
-    const lang = req.query.lang || "es";
+    const { section } = req.body; // Recibimos la sección seleccionada
 
     const [rawRows] = await pool.query(
       'SELECT content FROM ai_raw_data WHERE country_code = ? AND status = "pending"',
@@ -81,43 +81,54 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
         .json({ error: "No hay datos nuevos para procesar" });
     const fullText = rawRows.map((r) => r.content).join("\n\n");
 
+    let sectionInstructions = "";
+    switch(section) {
+      case 'description':
+        sectionInstructions = "Formatea para sección DESCRIPCIÓN: Genera un TÍTULO y el CONTENIDO principal dividido en párrafos limpios.";
+        break;
+      case 'timeline':
+        sectionInstructions = "Formatea para sección CRONOLOGÍA: Extrae FECHA (día/mes/año si existe), TÍTULO del evento y RESUMEN detallado.";
+        break;
+      case 'testimonies':
+        sectionInstructions = "Formatea para sección TESTIMONIOS: Extrae NOMBRE del testigo, su BIO (si existe) y el RELATO/TESTIMONIO completo.";
+        break;
+      case 'resistance':
+        sectionInstructions = "Formatea para sección RESISTENCIA: Extrae NOMBRE del grupo o persona, su BIO y la ACCIÓN o historia de resistencia.";
+        break;
+      case 'velum':
+        sectionInstructions = "Formatea para sección VELUM: Genera un TÍTULO, SUBTÍTULO, RESUMEN y el CUERPO completo del artículo.";
+        break;
+      default:
+        sectionInstructions = "Traduce y limpia el texto de forma general.";
+    }
+
     const prompt = `
-      Actúa como un TRADUCTOR Y ANALISTA HISTÓRICO ULTRA-FIEL. 
-      Tu misión es procesar este texto sobre el conflicto en ${countryCode}.
+      Actúa como un TRADUCTOR Y ANALISTA para el CMS de WikiConflicts.
+      Tu misión es procesar este texto sobre ${countryCode} para la sección específica: ${section.toUpperCase()}.
+
+      INSTRUCCIONES CRÍTICAS:
+      1. ${sectionInstructions}
+      2. TRADUCCIÓN FIEL: Traduce todo al español de forma profesional. NO inventes hechos.
+      3. LIMPIEZA: Elimina emoticonos, basura visual y caracteres extraños.
+      4. EXTRACCIÓN DE TERMINOLOGÍA: Al final, si detectas nombres de líderes, organizaciones o conceptos clave, lístalos bajo el encabezado === TERMINOLOGÍA ===.
+
+      FORMATO DE SALIDA (Usa exactamente estos encabezados para facilitar el copiado):
+      ${section === 'timeline' ? '=== FECHA ===\n=== TÍTULO ===\n=== RESUMEN ===' : 
+        section === 'testimonies' || section === 'resistance' ? '=== NOMBRE ===\n=== BIO ===\n=== CONTENIDO ===' :
+        section === 'velum' ? '=== TÍTULO ===\n=== SUBTÍTULO ===\n=== RESUMEN ===\n=== CUERPO ===' :
+        '=== TÍTULO ===\n=== CONTENIDO ==='}
       
-      REGLAS DE ORO:
-      1. NO INVENTES NADA. Si el texto no dice algo, no lo pongas.
-      2. TRADUCCIÓN FIEL: Traduce todo al español de forma profesional y seria.
-      3. LIMPIEZA TOTAL: Elimina emoticonos, signos de puntuación extraños, caracteres de control o ruido visual.
-      4. EXTRACCIÓN DE DATOS: Si dentro del texto hay:
-         - Eventos con fecha -> Ponlos en la sección CRONOLOGÍA.
-         - Testimonios o nombres -> Ponlos en la sección TESTIMONIOS.
-         - Acciones de resistencia -> Ponlos en la sección RESISTENCIA.
-      5. FORMATO DE SALIDA: No uses JSON. Devuelve un texto plano estructurado así:
+      === TERMINOLOGÍA (OPCIONAL) ===
+      (Término: Definición corta)
 
-      === TÍTULO SUGERIDO ===
-      (Un título corto y descriptivo)
-
-      === DESCRIPCIÓN PRINCIPAL ===
-      (El texto principal traducido y limpio)
-
-      === CRONOLOGÍA ===
-      (Lista de eventos encontrados: Fecha - Título - Resumen)
-
-      === TESTIMONIOS / RESISTENCIA ===
-      (Nombres y lo que dicen o hacen)
-
-      TEXTO DE ENTRADA (ÁRABE/OTROS):
+      TEXTO DE ENTRADA:
       ${fullText}
     `;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        {
-          role: "system",
-          content: "Eres un traductor experto que devuelve texto plano estructurado, no JSON.",
-        },
+        { role: "system", content: "Eres un experto en extracción de datos para CMS. Devuelves texto plano estructurado." },
         { role: "user", content: prompt },
       ],
     });

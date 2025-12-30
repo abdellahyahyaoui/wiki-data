@@ -8,6 +8,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
   const [history, setHistory] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState(null);
+  const [selectedSection, setSelectedSection] = useState('description');
 
   useEffect(() => {
     fetchHistory();
@@ -67,8 +68,10 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
       const res = await fetch(`/api/cms/ai/process/${countryCode}`, { 
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        },
+        body: JSON.stringify({ section: selectedSection })
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -128,25 +131,46 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
               </div>
             ))}
           </div>
-          <button 
-            onClick={handleProcess}
-            disabled={isProcessing || history.length === 0}
-            style={{ marginTop: '20px', padding: '15px 30px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', width: '100%', fontSize: '16px', fontWeight: 'bold' }}
-          >
-            {isProcessing ? 'Procesando con IA...' : 'EJECUTAR IA (Traducir y Limpiar)'}
-          </button>
+
+          <div style={{ marginTop: '20px', padding: '20px', background: '#e9ecef', borderRadius: '8px' }}>
+            <h4 style={{ margin: '0 0 10px 0' }}>Configuración de Procesamiento</h4>
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Sección Destino:</label>
+              <select 
+                value={selectedSection} 
+                onChange={(e) => setSelectedSection(e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
+              >
+                <option value="description">Descripción General</option>
+                <option value="timeline">Cronología (Eventos)</option>
+                <option value="testimonies">Testimonios</option>
+                <option value="resistance">Resistencia</option>
+                <option value="velum">Artículo Velum</option>
+              </select>
+            </div>
+            <button 
+              onClick={handleProcess}
+              disabled={isProcessing || history.length === 0}
+              style={{ padding: '15px 30px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', width: '100%', fontSize: '16px', fontWeight: 'bold' }}
+            >
+              {isProcessing ? 'Procesando con IA...' : `PROCESAR PARA ${selectedSection.toUpperCase()}`}
+            </button>
+          </div>
         </div>
 
         <div className="result-section">
           <h3>Resultados de la IA (Texto Limpio para Copiar)</h3>
           {result ? (
             <div style={{ border: '2px solid #28a745', padding: '20px', borderRadius: '8px', background: 'white', position: 'relative' }}>
-              <button 
-                onClick={() => copyToClipboard(result)}
-                style={{ position: 'absolute', top: '10px', right: '10px', padding: '5px 15px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-              >
-                Copiar Todo
-              </button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <span style={{ color: '#28a745', fontWeight: 'bold' }}>Sección: {selectedSection.toUpperCase()}</span>
+                <button 
+                  onClick={() => copyToClipboard(result)}
+                  style={{ padding: '5px 15px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Copiar Todo
+                </button>
+              </div>
               <pre style={{ 
                 background: '#f8f9fa', 
                 padding: '15px', 
@@ -154,7 +178,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
                 whiteSpace: 'pre-wrap', 
                 fontFamily: 'inherit',
                 lineHeight: '1.6',
-                minHeight: '400px',
+                minHeight: '500px',
                 border: '1px solid #eee'
               }}>
                 {result}
@@ -162,8 +186,9 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
             </div>
           ) : (
             <div style={{ border: '1px dashed #ccc', padding: '40px', textAlign: 'center', color: '#999' }}>
-              <p>Los resultados aparecerán aquí tras procesar.</p>
-              <p><small>La IA traducirá el árabe, limpiará símbolos y extraerá datos automáticamente.</small></p>
+              <p>1. Selecciona la sección arriba a la izquierda.</p>
+              <p>2. Pulsa el botón verde para ejecutar.</p>
+              <p><small>La IA adaptará el formato a los campos de esa sección.</small></p>
             </div>
           )}
         </div>
