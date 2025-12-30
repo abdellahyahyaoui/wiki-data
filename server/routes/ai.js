@@ -20,7 +20,14 @@ router.get('/history/:countryCode', authenticateToken, async (req, res) => {
       'SELECT id, content, created_at FROM ai_raw_data WHERE country_code = ? AND status = "pending" ORDER BY created_at DESC',
       [req.params.countryCode]
     );
-    res.json({ history: rows });
+    // Explicitly map content to ensure it's returned as text
+    res.json({ 
+      history: rows.map(r => ({
+        id: r.id,
+        content: r.content,
+        created_at: r.created_at
+      }))
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -29,21 +36,12 @@ router.get('/history/:countryCode', authenticateToken, async (req, res) => {
 router.post('/save', authenticateToken, async (req, res) => {
   try {
     const { countryCode, content } = req.body;
+    if (!content) return res.status(400).json({ error: 'Contenido vacío' });
+    
     console.log('Saving AI raw data for:', countryCode);
     
-    // Ensure table exists (fail-safe)
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS ai_raw_data (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        country_code VARCHAR(50) NOT NULL,
-        content TEXT NOT NULL,
-        status ENUM('pending', 'processed') DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
     await pool.query(
-      'INSERT INTO ai_raw_data (country_code, content) VALUES (?, ?)',
+      'INSERT INTO ai_raw_data (country_code, content, status) VALUES (?, ?, "pending")',
       [countryCode, content]
     );
     res.json({ success: true });
@@ -53,10 +51,23 @@ router.post('/save', authenticateToken, async (req, res) => {
   }
 });
 
-router.delete('/history/:countryCode', authenticateToken, async (req, res) => {
+router.delete('/history/:countryCode/:id', authenticateToken, async (req, res) => {
+  try {
+    const { countryCode, id } = req.params;
+    await pool.query(
+      'DELETE FROM ai_raw_data WHERE country_code = ? AND id = ?',
+      [countryCode, id]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/history/clear/:countryCode', authenticateToken, async (req, res) => {
   try {
     await pool.query(
-      'DELETE FROM ai_raw_data WHERE country_code = ?',
+      'DELETE FROM ai_raw_data WHERE country_code = ? AND status = "pending"',
       [req.params.countryCode]
     );
     res.json({ success: true });
