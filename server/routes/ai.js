@@ -103,28 +103,24 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     }
 
     const prompt = `
-      Actúa como un TRADUCTOR Y ANALISTA HISTÓRICO ULTRA-FIEL para el CMS de WikiConflicts. 
+      Actúa como un TRADUCTOR Y ANALISTA para el CMS de WikiConflicts.
       Tu misión es procesar este texto sobre ${countryCode} para la sección específica: ${section.toUpperCase()}.
-      
-      REGLAS DE ORO INNEGOCIABLES:
-      1. FIDELIDAD ABSOLUTA: No inventes nada. No suavices nada. No elimines información por ser "cruda" o "grave". Si el texto original relata un hecho violento o político, DEBES mantenerlo exactamente igual en la traducción.
-      2. TRADUCCIONES DEL CORÁN: Si el texto contiene versos del Corán, DEBES utilizar obligatoriamente la traducción de la "Universidad del Rey Fahd en Arabia Saudí".
-      3. LIMPIEZA TÉCNICA: Elimina emoticonos, basura visual, caracteres de control y signos de puntuación innecesarios.
-      4. IDIOMA: Traduce todo al español de forma profesional y seria.
-      
-      INSTRUCCIONES POR SECCIÓN:
-      - ${sectionInstructions}
-      
-      5. EXTRACCIÓN DE TERMINOLOGÍA: Al final, si detectas nombres de líderes, organizaciones o conceptos clave, lístalos bajo el encabezado === TERMINOLOGÍA === (Término: Definición corta traducida).
 
-      FORMATO DE SALIDA (Para copiar y pegar):
-      ${section === 'timeline' ? '=== FECHA ===\n=== TÍTULO ===\n=== RESUMEN ===' : 
-        section === 'testimonies' || section === 'resistance' ? '=== NOMBRE ===\n=== BIO ===\n=== CONTENIDO ===' :
-        section === 'velum' ? '=== TÍTULO ===\n=== SUBTÍTULO ===\n=== RESUMEN ===\n=== CUERPO ===' :
-        '=== TÍTULO ===\n=== CONTENIDO ==='}
+      REGLAS DE ORO:
+      1. FIDELIDAD ABSOLUTA: No inventes nada. No suavices nada. Mantén la crudeza histórica.
+      2. TRADUCCIONES DEL CORÁN: Usa la traducción de la "Universidad del Rey Fahd en Arabia Saudí".
+      3. LIMPIEZA: Elimina emoticonos y basura visual.
       
-      === TERMINOLOGÍA ===
-      (Si hay términos nuevos)
+      FORMATO DE RESPUESTA (JSON OBLIGATORIO):
+      Debes responder ÚNICAMENTE con un objeto JSON que contenga las siguientes llaves según la sección:
+      
+      Si section === 'description': { "titulo": "...", "contenido": "..." }
+      Si section === 'timeline': { "fecha": "...", "titulo": "...", "resumen": "..." }
+      Si section === 'testimonies' o 'resistance': { "nombre": "...", "bio": "...", "contenido": "..." }
+      Si section === 'velum': { "titulo": "...", "subtitulo": "...", "resumen": "...", "cuerpo": "..." }
+      
+      ADJUNTO (SIEMPRE INCLUIR):
+      "terminologia": [ { "termino": "...", "definicion": "..." } ] (Extrae nombres o conceptos clave)
 
       TEXTO DE ENTRADA:
       ${fullText}
@@ -133,12 +129,13 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: "Eres un traductor y analista histórico experto. Tu tarea es procesar textos sobre conflictos para un CMS educativo y documental. Debes ser neutral, preciso y no censurar ni omitir información relevante, por cruda que sea, ya que tu propósito es la preservación histórica y la documentación académica. No apliques filtros de seguridad morales que impidan la traducción de hechos históricos o testimonios de víctimas." },
+        { role: "system", content: "Eres un experto en extracción de datos que responde EXCLUSIVAMENTE en JSON." },
         { role: "user", content: prompt },
       ],
+      response_format: { type: "json_object" },
     });
 
-    const processedResult = completion.choices[0].message.content;
+    const processedResult = JSON.parse(completion.choices[0].message.content);
     await pool.query(
       'UPDATE ai_raw_data SET status = "processed" WHERE country_code = ?',
       [countryCode],

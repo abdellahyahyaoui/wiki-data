@@ -163,30 +163,50 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
         </div>
 
         <div className="result-section">
-          <h3>Resultados de la IA (Texto Limpio para Copiar)</h3>
+          <h3>Resultados de la IA (Campos del CMS)</h3>
           {result ? (
-            <div style={{ border: '2px solid #28a745', padding: '20px', borderRadius: '8px', background: 'white', position: 'relative' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <span style={{ color: '#28a745', fontWeight: 'bold' }}>Sección: {selectedSection.toUpperCase()}</span>
-                <button 
-                  onClick={() => copyToClipboard(result)}
-                  style={{ padding: '5px 15px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  Copiar Todo
-                </button>
-              </div>
-              <pre style={{ 
-                background: '#f8f9fa', 
-                padding: '15px', 
-                fontSize: '14px', 
-                whiteSpace: 'pre-wrap', 
-                fontFamily: 'inherit',
-                lineHeight: '1.6',
-                minHeight: '500px',
-                border: '1px solid #eee'
-              }}>
-                {result}
-              </pre>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {Object.entries(result).map(([key, value]) => {
+                if (key === 'terminologia') return null;
+                return (
+                  <div key={key} style={{ background: 'white', border: '1px solid #ddd', padding: '15px', borderRadius: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <strong style={{ textTransform: 'uppercase', color: '#555' }}>{key}</strong>
+                      <button 
+                        onClick={() => copyToClipboard(value)}
+                        style={{ padding: '3px 10px', fontSize: '12px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        Copiar {key}
+                      </button>
+                    </div>
+                    <textarea 
+                      readOnly 
+                      value={value} 
+                      style={{ width: '100%', minHeight: '80px', border: '1px solid #eee', padding: '8px', background: '#fcfcfc', fontFamily: 'inherit' }}
+                    />
+                  </div>
+                );
+              })}
+
+              {result.terminologia && result.terminologia.length > 0 && (
+                <div style={{ background: '#fff3cd', border: '1px solid #ffeeba', padding: '15px', borderRadius: '8px' }}>
+                  <h4 style={{ margin: '0 0 10px 0' }}>=== TERMINOLOGÍA DETECTADA ===</h4>
+                  {result.terminologia.map((t, idx) => (
+                    <div key={idx} style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #ddd' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <strong>{t.termino}</strong>
+                        <button 
+                          onClick={() => copyToClipboard(`${t.termino}: ${t.definicion}`)}
+                          style={{ padding: '2px 8px', fontSize: '11px', background: '#856404', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                        >
+                          Copiar
+                        </button>
+                      </div>
+                      <p style={{ margin: '5px 0', fontSize: '13px' }}>{t.definicion}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <div style={{ border: '1px dashed #ccc', padding: '40px', textAlign: 'center', color: '#999' }}>
