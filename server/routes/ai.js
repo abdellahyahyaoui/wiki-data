@@ -29,12 +29,26 @@ router.get('/history/:countryCode', authenticateToken, async (req, res) => {
 router.post('/save', authenticateToken, async (req, res) => {
   try {
     const { countryCode, content } = req.body;
+    console.log('Saving AI raw data for:', countryCode);
+    
+    // Ensure table exists (fail-safe)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ai_raw_data (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        country_code VARCHAR(50) NOT NULL,
+        content TEXT NOT NULL,
+        status ENUM('pending', 'processed') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     await pool.query(
       'INSERT INTO ai_raw_data (country_code, content) VALUES (?, ?)',
       [countryCode, content]
     );
     res.json({ success: true });
   } catch (error) {
+    console.error('Save AI Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -73,14 +87,17 @@ router.post('/process/:countryCode', authenticateToken, async (req, res) => {
       Actúa como un experto historiador y analista de conflictos. 
       Analiza el siguiente contenido sobre el conflicto en ${countryCode}.
       
+      REGLAS CRÍTICAS DE CONTENIDO:
+      1. PRESERVACIÓN HISTÓRICA: Tu deber es transmitir la información tal cual, sin importar lo dura o cruda que sea. NO puedes quitar, eliminar ni suavizar textos políticos o históricos. La precisión es obligatoria.
+      2. TRADUCCIONES DEL CORÁN: Si el texto contiene versos del Corán, DEBES utilizar obligatoriamente la traducción de la "Universidad del Rey Fahd en Arabia Saudí".
+      
       OBJETIVOS:
       1. TRADUCCIÓN Y ORGANIZACIÓN TOTAL: Traduce TODA la información al español de forma natural y profesional. No resumas excesivamente, mantén los detalles importantes.
       2. TERMINOLOGÍA: Identifica términos clave (Personajes, Organizaciones, Conceptos). 
          NO INCLUYAS estos términos si ya existen: ${termList.join(', ')}.
       3. CRONOLOGÍA (Timeline): Extrae todos los eventos con fecha, título y descripción detallada en español.
       4. TESTIMONIOS Y RESISTENCIA: Identifica relatos de testigos o acciones de movimientos de resistencia.
-         Crea perfiles completos (Nombre, Bio, Relato/Acción) traducidos al español.
-      5. SIN DUPLICIDAD: Si la información se repite en los textos de entrada, únala en una sola entrada coherente y bien redactada.
+      5. SIN DUPLICIDAD: Une la información repetida en una sola entrada coherente.
       
       Responde EXCLUSIVAMENTE en formato JSON con la siguiente estructura:
       {
@@ -91,7 +108,7 @@ router.post('/process/:countryCode', authenticateToken, async (req, res) => {
         "description": "..."
       }
 
-      TEXTO DE ENTRADA (Puede estar en inglés u otros idiomas):
+      TEXTO DE ENTRADA:
       ${fullText}
     `;
 
