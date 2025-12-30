@@ -75,7 +75,7 @@ export default function TimelineEditor({ countryCode }) {
 
   async function openEditModal(item) {
     try {
-      const res =  fetch(`${API_BASE}/api/cms/countries/${countryCode}/timeline/${item.id}?lang=es`, {
+      const res =  await fetch(`${API_BASE}/api/cms/countries/${countryCode}/timeline/${item.id}?lang=es`, {
         headers: getAuthHeaders()
       });
       

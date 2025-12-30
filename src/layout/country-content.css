@@ -1855,7 +1855,7 @@ font-family: poppins;
 
 /* Rich Content Display for Articles */
 .rich-content-display {
-  line-height: 1;
+  line-height: 2;
   color: #333;
 }
 
@@ -2030,7 +2030,7 @@ font-family: poppins;
   margin-top: 0px;
       /* font-family: "EB Garamond", serif; */
  
-  font-size: 1.6rem; 
+ 
   font-style: italic;
   color: #333;
 /* text-align: center; */

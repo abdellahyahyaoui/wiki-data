@@ -90,7 +90,7 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
         formatFields = '{ "titulo": "...", "contenido": "..." }';
         break;
       case 'timeline':
-        sectionInstructions = "Formatea para sección CRONOLOGÍA: Extrae FECHA (día/mes/año si existe), TÍTULO del evento y RESUMEN detallado.";
+        sectionInstructions = "Formatea para sección CRONOLOGÍA: Extrae FECHA (día/mes/año si existe), TÍTULO del evento y RESUMEN detallado, Traduce TODO el contenido al español.";
         formatFields = '{ "fecha": "...", "titulo": "...", "resumen": "...","contenido": "..."}';
         break;
       case 'testimonies':
