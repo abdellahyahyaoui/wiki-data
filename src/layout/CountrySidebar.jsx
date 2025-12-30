@@ -146,7 +146,7 @@ export default function CountrySidebar({ countryName, sections, currentSection, 
 
         {/* OTRAS SECCIONES */}
         {sections
-          .filter((s) => s.id !== "description")
+           .filter((s) => s.id !== "description" && s.id !== "velum")
           .map((sec) => (
             <div className="sidebar-block" key={sec.id}>
               <div className="sidebar-section-title">{sec.label}</div>
