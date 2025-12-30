@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-
+import API_BASE from '../../utils/apiBase';
 const AILaboratory = ({ countryCode: propCountryCode }) => {
   const { countryCode: paramsCountryCode } = useParams();
   const countryCode = propCountryCode || paramsCountryCode;
@@ -16,12 +16,13 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch(`/api/cms/ai/history/${countryCode}`, {
+      const res = await fetch(`${API_BASE}/api/cms/ai/history/${countryCode}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
       const data = await res.json();
+      
       setHistory(data.history || []);
     } catch (err) {
       console.error("Error fetching history:", err);
@@ -31,7 +32,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
   const handleSave = async () => {
     if (!text.trim()) return;
     try {
-      await fetch(`/api/cms/ai/save`, {
+      await fetch(`${API_BASE}/api/cms/ai/save`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
   const handleClear = async () => {
     if (!window.confirm("¿Estás seguro de que quieres vaciar toda la materia prima acumulada para este país?")) return;
     try {
-      await fetch(`/api/cms/ai/history/${countryCode}`, {
+      await fetch(`${API_BASE}/api/cms/ai/history/${countryCode}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -69,7 +70,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
     setIsProcessing(true);
     setResult(null);
     try {
-      const res = await fetch(`/api/cms/ai/process/${countryCode}`, { 
+      const res = await fetch(`${API_BASE}/api/cms/ai/process/${countryCode}`, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

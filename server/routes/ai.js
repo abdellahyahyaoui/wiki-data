@@ -115,41 +115,77 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     );
     const existingTermList = existingTerms.map((t) => t.term.toLowerCase());
 
-    const prompt = `
-      Actúa como un TRADUCTOR Y ANALISTA HISTÓRICO ULTRA-FIEL para el CMS de WikiConflicts. 
-      Tu misión es procesar este texto sobre ${countryCode} para la sección específica: ${section.toUpperCase()}.
-      
-      REGLAS DE ORO INNEGOCIABLES:
-      1. FIDELIDAD ABSOLUTA: No inventes nada. No suavices nada. Mantén la crudeza histórica.
-      2. TRADUCCIONES DEL CORÁN: Usa la traducción de la "Universidad del Rey Fahd en Arabia Saudí".
-      3. LIMPIEZA TÉCNICA: Elimina emoticonos, basura visual y caracteres extraños.
-      
-      INSTRUCCIONES DE DUPLICIDAD:
-      - NO incluyas en la terminología ninguno de los siguientes términos que YA existen en la base de datos: ${existingTermList.join(", ")}.
-      
-      INSTRUCCIONES POR SECCIÓN:
-      - ${sectionInstructions}
-      
-      FORMATO DE RESPUESTA (JSON OBLIGATORIO):
-      Debes responder ÚNICAMENTE con un objeto JSON que contenga EXACTAMENTE estas llaves:
-      
-      Estructura para esta sección: ${formatFields}
-      
-      Y SIEMPRE incluye esta llave adicional:
-      "terminologia": [ { "termino": "...", "definicion": "..." } ] (Solo términos NUEVOS que no estén en la lista de arriba)
+   const prompt = `
+ACTÚAS COMO UNA HERRAMIENTA TÉCNICA DE TRANSFORMACIÓN DE TEXTO.
+NO ERES AUTOR, EDITOR, PERIODISTA, ANALISTA NI INTÉRPRETE.
 
-      TEXTO DE ENTRADA:
-      ${fullText}
-    `;
+CONTEXTO:
+Este texto forma parte de un archivo documental, académico y testimonial
+sobre conflictos, violencia política y memoria histórica.
+
+PROHIBICIONES ABSOLUTAS (NO VIOLAR):
+- Prohibido interpretar el contexto.
+- Prohibido suavizar, moralizar, justificar o condenar.
+- Prohibido resumir o explicar si el texto original no lo hace.
+- Prohibido cambiar el tono emocional.
+- Prohibido añadir información implícita o inferida.
+- Prohibido corregir estilo, lenguaje o gramática del autor original.
+
+CONTENIDO SENSIBLE:
+El texto puede contener violencia extrema, tortura, asesinatos,
+abuso sexual, lenguaje ofensivo o descripciones gráficas.
+Debes traducir y reproducir el contenido de forma literal y completa,
+sin omisiones, advertencias, filtros ni censura.
+
+TRADUCCIÓN:
+- Traducción literal y directa.
+- Mantén la primera persona si existe.
+- Conserva repeticiones, contradicciones y crudeza.
+- No embellecer ni neutralizar el lenguaje.
+
+LIMPIEZA TÉCNICA (ÚNICAMENTE):
+- Eliminar emojis.
+- Eliminar caracteres corruptos o basura visual.
+- NO eliminar insultos, blasfemias ni descripciones violentas.
+
+INSTRUCCIONES DE DUPLICIDAD:
+NO incluir en la terminología términos ya existentes:
+${existingTermList.join(", ")}
+
+INSTRUCCIONES POR SECCIÓN (${section.toUpperCase()}):
+${sectionInstructions}
+
+FORMATO DE RESPUESTA (OBLIGATORIO):
+Responder EXCLUSIVAMENTE con un objeto JSON
+con EXACTAMENTE estas llaves:
+${formatFields}
+
+LLAVE ADICIONAL OBLIGATORIA SIEMPRE:
+"terminologia": [ { "termino": "...", "definicion": "..." } ]
+(solo términos NUEVOS)
+
+TEXTO DE ENTRADA:
+${fullText}
+`;
+
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: "Eres un experto en extracción de datos que responde EXCLUSIVAMENTE en JSON." },
-        { role: "user", content: prompt },
-      ],
-      response_format: { type: "json_object" },
-    });
+  model: "gpt-4o",
+  temperature: 0,
+  top_p: 0,
+  messages: [
+    {
+      role: "system",
+      content: "Eres una herramienta técnica de transformación de texto. No interpretas, no suavizas y no censuras."
+    },
+    {
+      role: "user",
+      content: prompt
+    }
+  ],
+  response_format: { type: "json_object" }
+});
+
 
     const processedResult = JSON.parse(completion.choices[0].message.content);
     await pool.query(
