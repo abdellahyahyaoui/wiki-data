@@ -20,14 +20,7 @@ router.get('/history/:countryCode', authenticateToken, async (req, res) => {
       'SELECT id, content, created_at FROM ai_raw_data WHERE country_code = ? AND status = "pending" ORDER BY created_at DESC',
       [req.params.countryCode]
     );
-    // Explicitly map content to ensure it's returned as text
-    res.json({ 
-      history: rows.map(r => ({
-        id: r.id,
-        content: r.content,
-        created_at: r.created_at
-      }))
-    });
+    res.json({ history: rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -38,15 +31,12 @@ router.post('/save', authenticateToken, async (req, res) => {
     const { countryCode, content } = req.body;
     if (!content) return res.status(400).json({ error: 'Contenido vacío' });
     
-    console.log('Saving AI raw data for:', countryCode);
-    
     await pool.query(
       'INSERT INTO ai_raw_data (country_code, content, status) VALUES (?, ?, "pending")',
       [countryCode, content]
     );
     res.json({ success: true });
   } catch (error) {
-    console.error('Save AI Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -81,7 +71,6 @@ router.post('/process/:countryCode', authenticateToken, async (req, res) => {
     const { countryCode } = req.params;
     const lang = req.query.lang || 'es';
     
-    // 1. Obtener textos acumulados
     const [rawRows] = await pool.query(
       'SELECT content FROM ai_raw_data WHERE country_code = ? AND status = "pending"',
       [countryCode]
@@ -89,11 +78,9 @@ router.post('/process/:countryCode', authenticateToken, async (req, res) => {
     if (rawRows.length === 0) return res.status(400).json({ error: 'No hay datos nuevos para procesar' });
     const fullText = rawRows.map(r => r.content).join('\n\n');
 
-    // 2. Obtener terminología existente para evitar duplicados
     const [existingTerms] = await pool.query('SELECT term FROM terminology WHERE lang = ?', [lang]);
     const termList = existingTerms.map(t => t.term.toLowerCase());
 
-    // 3. Prompt Detallado
     const prompt = `
       Actúa como un experto historiador y analista de conflictos. 
       Analiza el siguiente contenido sobre el conflicto en ${countryCode}.
@@ -133,10 +120,7 @@ router.post('/process/:countryCode', authenticateToken, async (req, res) => {
     });
 
     const processedResult = JSON.parse(completion.choices[0].message.content);
-
-    // Marcar como procesado
     await pool.query('UPDATE ai_raw_data SET status = "processed" WHERE country_code = ?', [countryCode]);
-
     res.json(processedResult);
   } catch (error) {
     console.error("AI Error:", error);
