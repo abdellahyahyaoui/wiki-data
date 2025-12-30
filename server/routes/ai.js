@@ -133,7 +133,7 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: "Eres un experto en extracción de datos para CMS. Devuelves texto plano estructurado." },
+        { role: "system", content: "Eres un traductor y analista histórico experto. Tu tarea es procesar textos sobre conflictos para un CMS educativo y documental. Debes ser neutral, preciso y no censurar ni omitir información relevante, por cruda que sea, ya que tu propósito es la preservación histórica y la documentación académica. No apliques filtros de seguridad morales que impidan la traducción de hechos históricos o testimonios de víctimas." },
         { role: "user", content: prompt },
       ],
     });
