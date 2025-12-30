@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 const pool = require("../db").pool;
@@ -115,7 +116,7 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     );
     const existingTermList = existingTerms.map((t) => t.term.toLowerCase());
 
-   const prompt = `
+  const prompt = `
 ACTÚAS COMO UNA HERRAMIENTA TÉCNICA DE TRANSFORMACIÓN DE TEXTO.
 NO ERES AUTOR, EDITOR, PERIODISTA, ANALISTA NI INTÉRPRETE.
 
@@ -152,7 +153,7 @@ INSTRUCCIONES DE DUPLICIDAD:
 NO incluir en la terminología términos ya existentes:
 ${existingTermList.join(", ")}
 
-INSTRUCCIONES POR SECCIÓN (${section.toUpperCase()}):
+INSTRUCCIONES POR SECCIÓN (${(section || "GENERAL").toUpperCase()}):
 ${sectionInstructions}
 
 FORMATO DE RESPUESTA (OBLIGATORIO):
@@ -160,9 +161,48 @@ Responder EXCLUSIVAMENTE con un objeto JSON
 con EXACTAMENTE estas llaves:
 ${formatFields}
 
-LLAVE ADICIONAL OBLIGATORIA SIEMPRE:
+TERMINOLOGÍA (OBLIGATORIA SIEMPRE):
+
+TERMINOLOGÍA (OBLIGATORIA SIEMPRE):
+
+Extrae ÚNICAMENTE elementos EXPLÍCITOS mencionados en el texto,
+incluyendo SIEMPRE que aparezcan:
+
+- Ciudades, pueblos, regiones y países
+- Organizaciones, instituciones, ONGs y partidos políticos
+- Grupos armados, fuerzas de seguridad y ejércitos
+- Nombres propios de personas relevantes
+- Lugares físicos específicos (prisiones, campos, edificios)
+- Eventos nombrados explícitamente
+-armas, armamento, tacticas
+
+Estos elementos cuentan como TERMINOLOGÍA
+aunque sean nombres propios simples.
+
+REGLAS:
+- NO inferir conceptos implícitos.
+- NO crear categorías abstractas.
+- NO reinterpretar el texto.
+- NO inventar términos.
+
+TRADUCCIÓN DE TÉRMINOS:
+Cuando un nombre propio tenga una traducción establecida en español,
+úsala. Si no, conserva el nombre original.
+
+REGLA DE ARRAY VACÍO:
+Si el texto solo contiene narración personal sin nombres propios,
+lugares u organizaciones identificables,
+devuelve un array vacío. Esto es CORRECTO.
+
+FORMATO OBLIGATORIO:
+"terminologia": []
+O
 "terminologia": [ { "termino": "...", "definicion": "..." } ]
-(solo términos NUEVOS)
+
+Solo incluir términos NUEVOS que no estén en esta lista:
+${existingTermList.join(", ")}
+
+
 
 TEXTO DE ENTRADA:
 ${fullText}
