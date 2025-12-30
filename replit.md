@@ -66,6 +66,12 @@ The application uses these environment variables:
 - Password: `Admin1234!`
 
 ## Recent Changes
+- 2025-12-30: Configured for Replit environment
+  - Made OpenAI API key optional (server starts without it, AI features disabled)
+  - Built React frontend to /build folder
+  - Server running on port 5000 with JSON file fallback
+  - Set up autoscale deployment configuration
+  
 - 2025-12-29: Fresh import configured for Replit environment
   - Updated API base to use relative URLs for proper Replit proxy support
   - Built React frontend to /build folder
