@@ -170,7 +170,8 @@ ${fullText}
 
 
     const completion = await openai.chat.completions.create({
-  model: "gpt-4o",
+model: "gpt-4.1-mini",
+
   temperature: 0,
   top_p: 0,
   messages: [
