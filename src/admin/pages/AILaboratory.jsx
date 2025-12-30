@@ -150,6 +150,7 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
                 <option value="testimonies">Testimonios</option>
                 <option value="resistance">Resistencia</option>
                 <option value="velum">Artículo Velum</option>
+                <option value="terminology">Terminología (Directo)</option>
               </select>
             </div>
             <button 
@@ -166,7 +167,25 @@ const AILaboratory = ({ countryCode: propCountryCode }) => {
           <h3>Resultados de la IA (Campos del CMS)</h3>
           {result ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {Object.entries(result).map(([key, value]) => {
+              {selectedSection === 'terminology' && result.terminos ? (
+                <div style={{ background: '#fff3cd', border: '1px solid #ffeeba', padding: '15px', borderRadius: '8px' }}>
+                  <h4 style={{ margin: '0 0 10px 0' }}>=== TERMINOLOGÍA (PARA SECCIÓN) ===</h4>
+                  {result.terminos.map((t, idx) => (
+                    <div key={idx} style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #ddd' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <strong>{t.termino}</strong>
+                        <button 
+                          onClick={() => copyToClipboard(`${t.termino}: ${t.definicion}`)}
+                          style={{ padding: '2px 8px', fontSize: '11px', background: '#856404', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+                        >
+                          Copiar
+                        </button>
+                      </div>
+                      <p style={{ margin: '5px 0', fontSize: '13px' }}>{t.definicion}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : Object.entries(result).map(([key, value]) => {
                 if (key === 'terminologia') return null;
                 return (
                   <div key={key} style={{ background: 'white', border: '1px solid #ddd', padding: '15px', borderRadius: '8px' }}>

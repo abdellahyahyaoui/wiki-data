@@ -101,6 +101,10 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
         sectionInstructions = "Formatea para sección VELUM: Genera un TÍTULO, SUBTÍTULO, RESUMEN y el CUERPO completo del artículo.";
         formatFields = '{ "titulo": "...", "subtitulo": "...", "resumen": "...", "cuerpo": "..." }';
         break;
+      case 'terminology':
+        sectionInstructions = "Formatea para sección TERMINOLOGÍA: Extrae todos los conceptos, personajes y organizaciones clave con sus definiciones.";
+        formatFields = '{ "terminos": [ { "termino": "...", "definicion": "..." } ] }';
+        break;
       default:
         sectionInstructions = "Traduce y limpia el texto de forma general.";
         formatFields = '{ "titulo": "...", "contenido": "..." }';
