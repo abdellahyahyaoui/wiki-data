@@ -116,7 +116,7 @@ router.post("/process/:countryCode", authenticateToken, async (req, res) => {
     );
     const existingTermList = existingTerms.map((t) => t.term.toLowerCase());
 
-  const prompt = `
+const prompt = `
 ACTÚAS COMO UNA HERRAMIENTA TÉCNICA DE TRANSFORMACIÓN DE TEXTO.
 NO ERES AUTOR, EDITOR, PERIODISTA, ANALISTA NI INTÉRPRETE.
 
@@ -143,6 +143,9 @@ TRADUCCIÓN:
 - Mantén la primera persona si existe.
 - Conserva repeticiones, contradicciones y crudeza.
 - No embellecer ni neutralizar el lenguaje.
+- NO traduzcas nombres propios salvo que tengan una traducción oficial al español.
+- Siempre que se refiera a Dios, utiliza el término "Allah" exclusivamente.
+- Traduce cualquier texto o verso del Corán según la versión oficial de la Universidad Rey Fahd de Arabia Saudita.
 
 LIMPIEZA TÉCNICA (ÚNICAMENTE):
 - Eliminar emojis.
@@ -163,8 +166,6 @@ ${formatFields}
 
 TERMINOLOGÍA (OBLIGATORIA SIEMPRE):
 
-TERMINOLOGÍA (OBLIGATORIA SIEMPRE):
-
 Extrae ÚNICAMENTE elementos EXPLÍCITOS mencionados en el texto,
 incluyendo SIEMPRE que aparezcan:
 
@@ -174,7 +175,7 @@ incluyendo SIEMPRE que aparezcan:
 - Nombres propios de personas relevantes
 - Lugares físicos específicos (prisiones, campos, edificios)
 - Eventos nombrados explícitamente
--armas, armamento, tacticas
+- Armas, armamento, tácticas
 
 Estos elementos cuentan como TERMINOLOGÍA
 aunque sean nombres propios simples.
@@ -201,8 +202,6 @@ O
 
 Solo incluir términos NUEVOS que no estén en esta lista:
 ${existingTermList.join(", ")}
-
-
 
 TEXTO DE ENTRADA:
 ${fullText}
