@@ -331,7 +331,7 @@ async function initDatabase() {
         content TEXT NOT NULL,
         status ENUM('pending', 'processed') DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+      ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
     `);
 
     console.log('Database tables initialized successfully');
