@@ -102,12 +102,35 @@ if (fs.existsSync(buildPath)) {
 
 const host = '0.0.0.0';
 
+async function ensureCountriesExist() {
+  try {
+    const { pool } = require('./db');
+    const countries = [
+      { code: 'LY', name: 'Libia' },
+      { code: 'AE', name: 'Emiratos Árabes Unidos' }
+    ];
+    
+    for (const country of countries) {
+      const [existing] = await pool.query('SELECT id FROM countries WHERE code = ?', [country.code]);
+      if (existing.length === 0) {
+        await pool.query('INSERT INTO countries (code, name) VALUES (?, ?)', [country.code, country.name]);
+        console.log(`✓ Created country: ${country.code} - ${country.name}`);
+      }
+    }
+  } catch (error) {
+    console.log('Countries check (not critical):', error.message);
+  }
+}
+
 async function startServer() {
   try {
     const dbConnected = await testConnection();
     if (dbConnected) {
       await initDatabase();
       console.log('Database initialized');
+      
+      // Ensure all required countries exist
+      await ensureCountriesExist();
     } else {
       console.log('Warning: Running without MySQL - using JSON fallback');
     }

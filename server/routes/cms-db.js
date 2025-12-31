@@ -58,6 +58,19 @@ router.post('/countries', authenticateToken, checkPermission('create'), async (r
     if (existing.length > 0) return res.status(400).json({ error: 'El país ya existe' });
     
     await pool.query('INSERT INTO countries (code, name, lang) VALUES (?, ?, ?)', [code, name, lang]);
+    
+    // Get the new country ID
+    const [newCountry] = await pool.query('SELECT id FROM countries WHERE code = ?', [code]);
+    const countryId = newCountry[0].id;
+    
+    // Initialize ALL sections with empty data
+    try {
+      await pool.query('INSERT INTO descriptions (country_id, title, chapters) VALUES (?, ?, ?)', 
+        [countryId, '', JSON.stringify([])]);
+    } catch (e) {
+      // Ignore if already exists
+    }
+    
     res.json({ success: true, country: { code, name } });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1244,6 +1257,108 @@ router.delete('/velum/:articleId', authenticateToken, checkPermission('delete'),
     }
 
     await pool.query('DELETE FROM velum_articles WHERE article_id = ?', [articleId]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== FOTOTECA ====================
+router.get('/countries/:countryCode/fototeca', authenticateToken, async (req, res) => {
+  try {
+    const countryId = await getCountryId(req.params.countryCode);
+    if (!countryId) return res.json({ items: [] });
+    const [rows] = await pool.query(
+      'SELECT item_id as id, title, description, date, type, url FROM fototeca WHERE country_id = ? ORDER BY date DESC',
+      [countryId]
+    );
+    res.json({ items: rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/countries/:countryCode/fototeca', authenticateToken, checkCountryPermission, checkPermission('create'), async (req, res) => {
+  try {
+    const { countryCode } = req.params;
+    const { title, description, date, type, url } = req.body;
+    if (!title || !url) return res.status(400).json({ error: 'Título y URL requeridos' });
+
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'create',
+        section: 'fototeca',
+        countryCode,
+        data: { title, description, date, type, url },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    const itemId = uuidv4();
+    await pool.query(
+      'INSERT INTO fototeca (item_id, country_id, title, description, date, type, url) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [itemId, countryId, title, description || '', date || new Date().toISOString().split('T')[0], type || 'image', url]
+    );
+    res.json({ success: true, id: itemId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/countries/:countryCode/fototeca/:itemId', authenticateToken, checkCountryPermission, checkPermission('edit'), async (req, res) => {
+  try {
+    const { countryCode, itemId } = req.params;
+    const { title, description, date, type, url } = req.body;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'edit',
+        section: 'fototeca',
+        countryCode,
+        itemId,
+        data: { title, description, date, type, url },
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query(
+      'UPDATE fototeca SET title = ?, description = ?, date = ?, type = ?, url = ? WHERE country_id = ? AND item_id = ?',
+      [title, description || '', date, type || 'image', url, countryId, itemId]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/countries/:countryCode/fototeca/:itemId', authenticateToken, checkCountryPermission, checkPermission('delete'), async (req, res) => {
+  try {
+    const { countryCode, itemId } = req.params;
+    const countryId = await getCountryId(countryCode);
+    if (!countryId) return res.status(404).json({ error: 'País no encontrado' });
+
+    if (req.requiresApproval) {
+      await savePendingChange({
+        type: 'delete',
+        section: 'fototeca',
+        countryCode,
+        itemId,
+        userId: req.user.id,
+        userName: req.user.name
+      });
+      return res.json({ success: true, pending: true });
+    }
+
+    await pool.query('DELETE FROM fototeca WHERE country_id = ? AND item_id = ?', [countryId, itemId]);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });

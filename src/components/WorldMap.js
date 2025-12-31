@@ -41,7 +41,7 @@ const countryData = {
   egypt: { name: "Egipto", coordinates: [31.2357, 30.0444], hasConflict: true },
   sudan: { name: "Sudán", coordinates: [32.5599, 15.5007], hasConflict: true },
   saudi: { name: "Arabia Saudita", coordinates: [46.6753, 24.7136], hasConflict: false },
-  uae: { name: "Emiratos Árabes Unidos", coordinates: [54.3705, 24.4539], hasConflict: false },
+  uae: { name: "Emiratos Árabes Unidos", coordinates: [54.3705, 24.4539], hasConflict: true },
   qatar: { name: "Qatar", coordinates: [51.531, 25.2854], hasConflict: false },
   bahrain: { name: "Baréin", coordinates: [50.5577, 26.0667], hasConflict: false },
   jordan: { name: "Jordania", coordinates: [35.9456, 31.9454], hasConflict: false },

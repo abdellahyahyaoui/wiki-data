@@ -50,11 +50,23 @@ router.get('/countries/:code/meta', async (req, res) => {
   const { code } = req.params;
   const lang = req.query.lang || 'es';
   
+  // Default sections for all countries
+  const defaultSections = [
+    { id: 'description', label: 'Descripción del conflicto' },
+    { id: 'timeline', label: 'Timeline' },
+    { id: 'testimonies', label: 'Testimonios' },
+    { id: 'resistance', label: 'Resistencia' },
+    { id: 'analysts', label: 'Análisis' },
+    { id: 'media-gallery', label: 'Fototeca' },
+    { id: 'velum', label: 'VELUM' },
+    { id: 'terminology', label: 'Terminología' }
+  ];
+  
   if (await isDbConnected()) {
     try {
       const [countries] = await pool.query(
-        'SELECT id, code, name FROM countries WHERE code = ? AND lang = ?',
-        [code, lang]
+        'SELECT id, code, name FROM countries WHERE code = ?',
+        [code]
       );
       
       if (countries.length > 0) {
@@ -64,16 +76,19 @@ router.get('/countries/:code/meta', async (req, res) => {
           [country.id]
         );
         
-        // Ensure VELUM is included if not in DB
-        const hasVelum = sections.some(s => s.id === 'velum');
+        // If no sections in DB, use defaults
+        const finalSections = sections.length > 0 ? sections : defaultSections;
+        
+        // Ensure VELUM is included
+        const hasVelum = finalSections.some(s => s.id === 'velum');
         if (!hasVelum) {
-          sections.push({ id: 'velum', label: 'VELUM' });
+          finalSections.push({ id: 'velum', label: 'VELUM' });
         }
 
         return res.json({
           code: country.code,
           name: country.name,
-          sections: sections
+          sections: finalSections
         });
       }
     } catch (error) {
@@ -87,8 +102,11 @@ router.get('/countries/:code/meta', async (req, res) => {
     if (!hasVelum) {
       fallback.sections.push({ id: 'velum', label: 'VELUM' });
     }
+    return res.json(fallback);
   }
-  res.json(fallback || { code, name: code, sections: [{ id: 'velum', label: 'VELUM' }] });
+  
+  // Default response with all sections
+  res.json({ code, name: code, sections: defaultSections });
 });
 
 router.get('/countries/:code/description', async (req, res) => {
